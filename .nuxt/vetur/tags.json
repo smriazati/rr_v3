@@ -1,0 +1,131 @@
+{
+  "SanityContent": {
+    "description": "Auto imported from node_modules/@nuxtjs/sanity/dist/components/sanity-content.js"
+  },
+  "SanityFile": {
+    "description": "Auto imported from node_modules/@nuxtjs/sanity/dist/components/sanity-file.js"
+  },
+  "SanityImage": {
+    "description": "Auto imported from node_modules/@nuxtjs/sanity/dist/components/sanity-image.js"
+  },
+  "Pagination": {
+    "description": "Auto imported from components/Pagination.vue"
+  },
+  "ConclusionEnd": {
+    "description": "Auto imported from components/Conclusion/End.vue"
+  },
+  "LocalizationImage": {
+    "description": "Auto imported from components/Localization/Image.vue"
+  },
+  "LocalizationImageNoCaption": {
+    "description": "Auto imported from components/Localization/ImageNoCaption.vue"
+  },
+  "LocalizationImageZoomer": {
+    "description": "Auto imported from components/Localization/ImageZoomer.vue"
+  },
+  "LocalizationLanguagePicker": {
+    "description": "Auto imported from components/Localization/LanguagePicker.vue"
+  },
+  "LocalizationQuote": {
+    "description": "Auto imported from components/Localization/Quote.vue"
+  },
+  "LocalizationRte": {
+    "description": "Auto imported from components/Localization/Rte.vue"
+  },
+  "LocalizationString": {
+    "description": "Auto imported from components/Localization/String.vue"
+  },
+  "ExhibitLandingPageFooter": {
+    "description": "Auto imported from components/Exhibit/LandingPageFooter.vue"
+  },
+  "ExhibitNav": {
+    "description": "Auto imported from components/Exhibit/Nav.vue"
+  },
+  "ExhibitNav0": {
+    "description": "Auto imported from components/Exhibit/Nav0.vue"
+  },
+  "StoriesAftermath": {
+    "description": "Auto imported from components/Stories/Aftermath.vue"
+  },
+  "StoriesIntro": {
+    "description": "Auto imported from components/Stories/Intro.vue"
+  },
+  "StoriesSubheadline": {
+    "description": "Auto imported from components/Stories/Subheadline.vue"
+  },
+  "StoriesSubjects": {
+    "description": "Auto imported from components/Stories/Subjects.vue"
+  },
+  "ScrollHint": {
+    "description": "Auto imported from components/Scroll/Hint.vue"
+  },
+  "ScrollProgressBar": {
+    "description": "Auto imported from components/Scroll/ProgressBar.vue"
+  },
+  "StoryLandingPageImages": {
+    "description": "Auto imported from components/Story/LandingPageImages.vue"
+  },
+  "StoryTitle": {
+    "description": "Auto imported from components/Story/Title.vue"
+  },
+  "StoryTitle0": {
+    "description": "Auto imported from components/Story/Title0.vue"
+  },
+  "SystemIcon": {
+    "description": "Auto imported from components/System/Icon.vue"
+  },
+  "SystemImageZoomer": {
+    "description": "Auto imported from components/System/ImageZoomer.vue"
+  },
+  "SystemLogo": {
+    "description": "Auto imported from components/System/Logo.vue"
+  },
+  "SystemTextScroller": {
+    "description": "Auto imported from components/System/TextScroller.vue"
+  },
+  "VimeoComponent": {
+    "description": "Auto imported from components/Vimeo/Component.vue"
+  },
+  "VimeoComponentBg": {
+    "description": "Auto imported from components/Vimeo/ComponentBg.vue"
+  },
+  "ContentImageFull": {
+    "description": "Auto imported from components/Content/ImageFull.vue"
+  },
+  "ContentImageText": {
+    "description": "Auto imported from components/Content/ImageText.vue"
+  },
+  "ContentQuote": {
+    "description": "Auto imported from components/Content/Quote.vue"
+  },
+  "ContentText": {
+    "description": "Auto imported from components/Content/Text.vue"
+  },
+  "ContentVideo": {
+    "description": "Auto imported from components/Content/Video.vue"
+  },
+  "MapControls": {
+    "description": "Auto imported from components/Map/Controls.vue"
+  },
+  "MapControlsMarkerListItem": {
+    "description": "Auto imported from components/Map/ControlsMarkerListItem.vue"
+  },
+  "MapIntro": {
+    "description": "Auto imported from components/Map/Intro.vue"
+  },
+  "MapModal": {
+    "description": "Auto imported from components/Map/Modal.vue"
+  },
+  "MapStorymap": {
+    "description": "Auto imported from components/Map/Storymap.vue"
+  },
+  "MapModalsS": {
+    "description": "Auto imported from components/Map/Modals/S.vue"
+  },
+  "MapModalsS4": {
+    "description": "Auto imported from components/Map/Modals/S4.vue"
+  },
+  "MapModalsS5": {
+    "description": "Auto imported from components/Map/Modals/S5.vue"
+  }
+}
