@@ -1,11 +1,11 @@
 <template>
     <div>
         <div v-if="content">
-            <div v-if="activeLanguage == 'en'">
-                <SanityContent :blocks="content?.en?.rte" />
+            <div v-if="activeString">
+                <SanityContent :blocks="activeString?.rte" />
             </div>
-            <div v-if="activeLanguage == 'uk'">
-                <SanityContent :blocks="content?.uk?.rte" />
+            <div v-else>
+                <SanityContent :blocks="content?.en?.rte" />
             </div>
         </div>
     </div>
@@ -25,6 +25,11 @@ export default {
         ...mapState("localization", {
             activeLanguage: (state) => state.activeLanguage,
         }),
+        activeString() {
+            if (!this.activeLanguage) { return "" }
+            if (!this.content) { return "" }
+            return this.content[this.activeLanguage]
+        }
     },
 }
 </script>

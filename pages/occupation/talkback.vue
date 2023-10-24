@@ -32,7 +32,7 @@
 
         <div v-if="isPaginationVisible" class="pagination-wrapper">
             <div v-if="nav">
-                <Pagination v-if="nav?.next" link="/3" :message="nav.next" />
+                <Pagination v-if="nav?.next" link="/resistance" :message="nav.next" />
             </div>
         </div>
     </div>
@@ -58,14 +58,8 @@ export default {
     },
     head() {
         return {
-            title: this.name
-                .replace(/-/g, " ")
-                .split(" ")
-                .map((word) => {
-                    return word[0].toUpperCase() + word.substring(1);
-                })
-                .join(" "),
-        };
+            title: this.$setPageTitle(this.pageMetadata)
+        }
     },
     methods: {
         toggleDefs() {

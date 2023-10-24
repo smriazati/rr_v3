@@ -14,22 +14,20 @@
         </h2>
       </div>
       <button ref="button" class="light full-width">
-        <nuxt-link to="/1/">
+        <nuxt-link to="/intro/">
           <div v-if="ctaText">
             <LocalizationString :string="ctaText"></LocalizationString>
           </div>
         </nuxt-link>
       </button>
     </header>
-
-    <LandingPageFooter></LandingPageFooter>
+    <ExhibitLandingPageFooter></ExhibitLandingPageFooter>
   </div>
 </template>
 
 <script>
 
 import { groq } from '@nuxtjs/sanity'
-import LandingPageFooter from '../components/Exhibit/LandingPageFooter.vue';
 const schema = "intro0"
 const query = groq`*[_type == "${schema}"][0]`
 
@@ -40,15 +38,14 @@ export default {
   },
   data() {
     return {
-      name: "home",
+      name: "home"
     };
   },
   head() {
     return {
-      title: this.name.charAt(0).toUpperCase() + this.name.slice(1),
-    };
+      title: this.$setPageTitle(this.pageMetadata)
+    }
   },
-  components: { LandingPageFooter }
 };
 </script>
 

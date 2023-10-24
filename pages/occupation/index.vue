@@ -2,7 +2,7 @@
     <div :class="name">
         <h1 class="visually-hidden">{{ name }}</h1>
         <div v-if="nav && viewedAllStories">
-            <Pagination v-if="nav?.next" link="/2/talkback" :message="nav.next" />
+            <Pagination v-if="nav?.nav?.next" link="/occupation/talkback" :message="nav.nav.next" />
         </div>
         <MapStorymap ref="storymap" :animActive="true" :markers="markersData" :visitedOnce="visitedOnce" />
         <div v-if="isIntroVisible" class="modal-container transparent">
@@ -22,8 +22,15 @@
 import { mapState } from "vuex";
 
 import { groq } from '@nuxtjs/sanity'
-const schema = "settings2"
-const query = groq`*[_type == "${schema}"]{nav}[0]`
+const query = groq`
+{
+"nav": *[_id == "settings2"]{
+  nav
+}[0],
+  "metadata": *[_id == "intro2"][0]{
+    pageMetadata
+  }
+}`
 
 export default {
     asyncData({ $sanity }) {
@@ -78,11 +85,6 @@ export default {
             ],
         };
     },
-    head() {
-        return {
-            title: this.name.charAt(0).toUpperCase() + this.name.slice(1),
-        };
-    },
     watch: {
         activeStoryId() {
             if (this.activeStoryId !== null) {
@@ -109,7 +111,13 @@ export default {
             }
         },
     },
+    head() {
+        return {
+            title: this.$setPageTitle(this.metadata.pageMetadata)
+        }
+    },
     mounted() {
+
         if (this.visitedOnce) {
             this.areMapControlsActive = true;
         }

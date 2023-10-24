@@ -70,6 +70,11 @@ export default {
       wrapperHeight: null,
     };
   },
+  head() {
+    return {
+      title: this.$setPageTitle(this.pageMetadata)
+    }
+  },
   mounted() {
     this.setWrapperHeight();
     this.setContentAnimation();

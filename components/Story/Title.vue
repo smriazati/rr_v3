@@ -7,7 +7,7 @@
           <LocalizationString :string="activeSection.title"></LocalizationString>
         </h2>
         <h1 class="collapsed-mb" v-if="activeSubject">
-          <LocalizationString :string="activeSubject.name">
+          <LocalizationString :string="activeSubject?.name">
           </LocalizationString>
         </h1>
       </div>
@@ -70,8 +70,8 @@ export default {
       }
       if (!this.subjectId) { return subject }
       if (!this.content.subjects) { return subject }
-      subject.name = this.content.subjects[this.subjectId].name
-      subject.image = this.content.subjects[this.subjectId].img
+      subject.name = this.content.subjects[this.subjectId]?.name
+      subject.image = this.content.subjects[this.subjectId]?.img
       return subject
     },
   },

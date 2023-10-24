@@ -27,7 +27,10 @@ export default {
     ],
   },
   css: ['~/assets/sass/main.scss'],
-  plugins: ['~/plugins/maps.client', '~/plugins/router-actions.client', '~/plugins/vimeo.client', '~/plugins/sanity-image-builder'],
+  plugins: ['~/plugins/maps.client', '~/plugins/router-actions.client', '~/plugins/vimeo.client', '~/plugins/sanity-image-builder', '~/plugins/page-metadata'],
+  router: {
+    middleware: ['language']
+  },
   components: true,
   gsap: {
     extraPlugins: {

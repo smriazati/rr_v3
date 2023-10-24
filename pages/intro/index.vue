@@ -41,8 +41,8 @@ export default {
   },
   head() {
     return {
-      title: this.name.charAt(0).toUpperCase() + this.name.slice(1),
-    };
+      title: this.$setPageTitle(this.pageMetadata)
+    }
   },
   mounted() {
     this.setWrapperHeight();

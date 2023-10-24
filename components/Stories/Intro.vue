@@ -1,7 +1,7 @@
 <template>
     <main ref="content" class="content">
         <StoryTitle :subjectId="subjectId" :sectionId="sectionId" />
-        <div class="row" v-for="item in content.sections" :key="item._key"
+        <div class="row" v-for="item in content?.sections" :key="item._key"
             :class="item._type == 'contentImgFull' ? 'dark' : ''">
             <div class="content-image-text" v-if="item._type == 'contentImgText'">
                 <ContentImageText :content="item"></ContentImageText>

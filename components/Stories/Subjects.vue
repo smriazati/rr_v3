@@ -1,5 +1,5 @@
 <template>
-    <div class="stories-subjects-wrapper">
+    <div class="stories-subjects-wrapper" id="stories">
         <div class="content-wrapper">
             <div class="text-wrapper">
                 <h2 v-if="title" class="h1 title collapsed-mb">

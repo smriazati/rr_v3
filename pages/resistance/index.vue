@@ -18,7 +18,7 @@
         <div class="video-wrapper vimeo-component">
           <VimeoComponent vidId="650434994"></VimeoComponent>
         </div>
-
+        <!-- 
         <div class="button-wrapper">
           <button ref="button" class="light full-width" v-if="nav">
             <nuxt-link :to="`/resistance/talkback`">
@@ -27,6 +27,13 @@
               </span>
             </nuxt-link>
           </button>
+        </div> -->
+
+
+        <div v-if="isPaginationVisible" class="pagination-wrapper">
+          <div v-if="nav">
+            <Pagination v-if="nav?.next" link="/resistance/talkback" :message="nav.next" />
+          </div>
         </div>
       </div>
     </div>
@@ -47,11 +54,6 @@ export default {
     const content = $sanity.fetch(query)
     return content
   },
-  head() {
-    return {
-      title: this.name.charAt(0).toUpperCase() + this.name.slice(1),
-    };
-  },
   data() {
     return {
       name: "resistance",
@@ -70,7 +72,11 @@ export default {
       },
     };
   },
-
+  head() {
+    return {
+      title: this.$setPageTitle(this.pageMetadata)
+    }
+  },
   methods: {
     onFilmEnded() {
       this.isFilmEnded = true;
@@ -119,6 +125,10 @@ export default {
 .resistance-page-wrapper {
   .pagination {
     bottom: 82px;
+  }
+
+  &.stories-page-wrapper .row-wrapper {
+    padding-bottom: 175px;
   }
 }
 

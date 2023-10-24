@@ -30,14 +30,8 @@ export default {
   },
   head() {
     return {
-      title: this.name
-        .replace(/-/g, " ")
-        .split(" ")
-        .map((word) => {
-          return word[0].toUpperCase() + word.substring(1);
-        })
-        .join(" "),
-    };
+      title: this.$setPageTitle(this.pageMetadata)
+    }
   },
 };
 </script>

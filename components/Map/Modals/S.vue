@@ -8,7 +8,7 @@
             </div>
             <div class="row" v-for="item in content.sections" :key="item._key"
                 :class="item._type == 'contentImgFull' ? 'dark' : ''">
-                <div v-if="item._type == 'contentImgText'">
+                <div v-if="item._type == 'contentImgText'" class="image-text">
                     <ContentImageText :content="item"></ContentImageText>
                 </div>
                 <div v-if="item._type == 'contentImgFull'">
@@ -50,5 +50,15 @@ export default {
 .storymap-modal-content .title h1 {
     display: flex;
     justify-content: center;
+}
+
+.storymap-modal-content blockquote figcaption span {
+    justify-content: center;
+}
+
+.storymap-modal-content .image-text {
+    .col-text {
+        flex: 100%;
+    }
 }
 </style>

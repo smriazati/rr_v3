@@ -1,10 +1,29 @@
 <template>
-    <div>
-        <div class='language-picker' v-if="showLanguagePicker">
-            <p>Select your language</p>
-            <button :class="activeLanguage === 'en' ? 'active' : ''" @click="setActiveLanguage('en')">English</button>
-            <button :class="activeLanguage === 'uk' ? 'active' : ''" @click="setActiveLanguage('uk')">украї́нська
-                мо́ва</button>
+    <div class="language-picker-wrapper">
+        <div v-if="showLanguagePicker">
+            <div class="menu-wrapper" :class="isExpanded ? 'show' : 'hide'">
+                <div>
+                    <p>Select your language</p>
+                    <ul>
+                        <li>
+                            <button :class="activeLanguage === 'en' ? 'active' : ''"
+                                @click="setActiveLanguage('en')">English</button>
+
+                        </li>
+                        <li>
+                            <button :class="activeLanguage === 'uk' ? 'active' : ''"
+                                @click="setActiveLanguage('uk')">украї́нська</button>
+                        </li>
+                    </ul>
+                    <button @click="toggleCollapse" class="close flat">
+                        <img src="/icons/close.svg" alt="close icon" />
+                    </button>
+                </div>
+            </div>
+            <div :class="!isExpanded ? 'show' : 'hide'">
+                <button @click="toggleCollapse" class="flat open">
+                    <img src="/icons/language.svg" alt="close icon" /></button>
+            </div>
         </div>
     </div>
 </template>
@@ -24,6 +43,7 @@ const query = groq`*[_type == "${schema}"]{
 export default {
     data: () => ({
         showLanguagePicker: '',
+        isExpanded: false
     }),
     async fetch() {
         const data = await this.$sanity.fetch(query)
@@ -45,31 +65,89 @@ export default {
     methods: {
         setActiveLanguage(lang) {
             this.$store.commit("localization/setActiveLanguage", lang);
+            this.$router.push({ query: { lang: lang } });
         },
+        toggleCollapse() {
+            this.isExpanded = !this.isExpanded;
+        }
     },
 };
 </script>
 
 <style lang="scss">
-.language-picker {
+.language-picker-wrapper {
     position: fixed;
     top: 0;
     left: 0;
     z-index: 999;
-    background: black;
-    padding: 1rem;
 
     button {
-        margin: 1rem 0;
-        background: transparent;
+        color: #fff;
+        position: relative;
+    }
 
-        &.active {
-            color: $sage;
+    .hide {
+        display: none;
+    }
+
+    .menu-wrapper {
+        background: black;
+        padding: 1rem;
+        height: 100%;
+        width: 300px;
+        text-align: left;
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        button.close {
+            position: absolute;
+            top: 20px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            filter: invert(1);
+        }
+    }
+
+    p {
+        font-size: 12px;
+        font-style: italic;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+            background: #000;
+            transition: .3s ease all;
+
+            // &:hover {
+            //     background: $sage;
+            // }
         }
 
-        &:hover {
-            background: transparent;
+        li button {
+            display: flex;
+            justify-content: flex-start;
+            margin: 0;
+            padding: 10px;
+            margin: 10px 0;
+
+            &.active {
+                background: $sage;
+            }
         }
+
+    }
+
+    .open {
+        width: 20px;
+        height: 20px;
+        top: 15px;
+        left: 15px;
+        filter: invert(1);
     }
 }
 </style>

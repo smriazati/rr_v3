@@ -4,7 +4,7 @@
             <div class="title">
                 <StoryTitle :subjectId="`subject${this.$route.params.id}`" :sectionId="sectionId" />
             </div>
-            <div class="slider-controls">
+            <!-- <div class="slider-controls">
                 <button @click="goToPrev()" class="flat">
                     <span class="visually-hidden">Prev</span>
                     <SystemIcon type="arrow" color="light" :width="25" class="icon icon-arrow-left" />
@@ -21,13 +21,13 @@
                     <span class="visually-hidden">Next</span>
                     <SystemIcon type="arrow" color="light" :width="25" />
                 </button>
-            </div>
+            </div> -->
 
             <div class="story" ref="theStory">
                 <StoriesAftermath :schema="`story4_${this.$route.params.id}`"></StoriesAftermath>
             </div>
             <div class="pagination-row flex-row" v-show="isPaginationVisible">
-                <Pagination link="/aftermath/stories" :message="nav?.prev" :back="true" />
+                <PaginationHash link="/aftermath/stories" hash="stories" :message="nav?.prev" :back="true" />
                 <Pagination link="/conclusion" :message="nav?.next" />
             </div>
         </div>
@@ -53,7 +53,7 @@ export default {
         return {
             name: "aftermath-stories-individual",
             sectionId: "aftermath",
-            isPaginationVisible: false,
+            isPaginationVisible: true,
             pageNames: {
                 1: "Aftermath: Luba Chomut",
                 2: "Aftermath: Yosef Zilberberg",
@@ -67,11 +67,11 @@ export default {
     },
     head() {
         return {
-            title: this.pageNames[this.$route.params.id],
-        };
+            title: this.$setPageTitle(this.pageMetadata)
+        }
     },
     mounted() {
-        this.initSlider();
+        // this.initSlider();
     },
     watch: {
         activeSlide() {
@@ -105,23 +105,23 @@ export default {
             }
         },
         initSlider() {
-            const parent = this.$refs.story;
+            // const parent = this.$refs.story;
 
-            const main = parent.querySelector("main.content");
-            if (!main) { return }
-            main.classList.add("slider-wrapper");
+            // const main = parent.querySelector("main.content");
+            // if (!main) { return }
+            // main.classList.add("slider-wrapper");
 
-            const slides = Array.from(main.children);
-            this.slideNum = slides.length;
+            // const slides = Array.from(main.children);
+            // this.slideNum = slides.length;
 
-            slides.forEach((slide, i) => {
-                slide.classList.add("slide");
-                slide.classList.add(`slide-${i}`);
+            // slides.forEach((slide, i) => {
+            //     slide.classList.add("slide");
+            //     slide.classList.add(`slide-${i}`);
 
-                if (i === 0) {
-                    slide.classList.add(this.activeSlideClass);
-                }
-            });
+            //     if (i === 0) {
+            //         slide.classList.add(this.activeSlideClass);
+            //     }
+            // });
         },
         goToNext() {
             // console.log("going to next");

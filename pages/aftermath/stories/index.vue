@@ -23,14 +23,8 @@ export default {
     },
     head() {
         return {
-            title: this.name
-                .replace(/-/g, " ")
-                .split(" ")
-                .map((word) => {
-                    return word[0].toUpperCase() + word.substring(1);
-                })
-                .join(" "),
-        };
+            title: this.$setPageTitle(this.pageMetadata)
+        }
     },
 };
 </script>
@@ -47,7 +41,7 @@ export default {
     .text-wrapper {
         padding: 30px;
         max-width: 60ch;
-        margin-bottom: 60px;
+        /* margin-bottom: 60px; */
 
         >*:last-child {
             margin-bottom: 0px;

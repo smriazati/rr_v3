@@ -1,12 +1,12 @@
 <template>
     <div ref="wrapper" class="story-wrapper">
         <div ref="storyWrapper">
-            <StoriesIntro :subjectId="`subject${this.$route.params.id}`" sectionId="intro"
-                :schema="`story1_${this.$route.params.id}`" />
+            <StoriesIntro :subjectId="`subject${Number(this.$route.params.id) + 1}`" sectionId="intro"
+                :schema="`story1_${Number(this.$route.params.id) + 1}`" />
         </div>
         <div class="pagination-row flex-row" v-show="isPaginationVisible">
-            <Pagination link="/intro/stories" :message="nav?.prev" :back="true" />
-            <Pagination link="/2" :message="nav?.next" />
+            <PaginationHash link="/intro/stories" hash="stories" :message="nav?.prev" :back="true" />
+            <Pagination link="/occupation" :message="nav?.next" />
         </div>
     </div>
 </template>
@@ -17,8 +17,6 @@ const schema = "settings1"
 const query = groq`*[_type == "${schema}"][0]{
     nav
   }`
-
-
 
 export default {
     asyncData({ $sanity }) {
@@ -38,8 +36,8 @@ export default {
     },
     head() {
         return {
-            title: this.pageNames[this.$route.params.id],
-        };
+            title: this.$setPageTitle(this.pageMetadata)
+        }
     },
     methods: {
         showPagination() {

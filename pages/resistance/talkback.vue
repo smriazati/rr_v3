@@ -38,7 +38,7 @@
     </div>
     <div>
       <div v-if="nav">
-        <Pagination v-if="nav?.next" link="/4" :message="nav.next" />
+        <Pagination v-if="nav?.next" link="/aftermath" :message="nav.next" />
       </div>
     </div>
   </div>
@@ -55,22 +55,16 @@ export default {
     const content = $sanity.fetch(query)
     return content
   },
-  head() {
-    return {
-      title: this.name
-        .replace(/-/g, " ")
-        .split(" ")
-        .map((word) => {
-          return word[0].toUpperCase() + word.substring(1);
-        })
-        .join(" "),
-    };
-  },
   data() {
     return {
       name: "resistance-talkback",
       galleryCount: 12,
     };
+  },
+  head() {
+    return {
+      title: this.$setPageTitle(this.pageMetadata)
+    }
   },
 };
 </script>
