@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <LocalizationImage :img="content.img"></LocalizationImage>
+        <LocalizationImage :img="content.img" :height="800"></LocalizationImage>
     </div>
 </template>
 <script>

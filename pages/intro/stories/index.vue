@@ -39,6 +39,7 @@ export default {
 <style lang="scss">
 .stories-page-wrapper {
   background: linear-gradient(180deg, #162D11 0%, #375132 100%);
+  flex: 100%;
 
   .intro-text-wrapper {
     max-width: 586px;

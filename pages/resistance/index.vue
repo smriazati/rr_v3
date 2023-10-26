@@ -18,17 +18,6 @@
         <div class="video-wrapper vimeo-component">
           <VimeoComponent vidId="650434994"></VimeoComponent>
         </div>
-        <!-- 
-        <div class="button-wrapper">
-          <button ref="button" class="light full-width" v-if="nav">
-            <nuxt-link :to="`/resistance/talkback`">
-              <span>
-                <LocalizationString :string="nav?.next"></LocalizationString>
-              </span>
-            </nuxt-link>
-          </button>
-        </div> -->
-
 
         <div v-if="isPaginationVisible" class="pagination-wrapper">
           <div v-if="nav">
@@ -134,6 +123,7 @@ export default {
 
 .stories-page-wrapper {
   background: linear-gradient(180deg, #162D11 0%, #375132 100%);
+  flex: 100%;
 
   .intro-text-wrapper {
     max-width: 586px;

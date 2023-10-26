@@ -51,7 +51,6 @@ export default {
   ],
   modules: [
     '@nuxtjs/style-resources',
-    '@nuxt/content',
     '@nuxtjs/sanity/module'
   ],
   sanity: {

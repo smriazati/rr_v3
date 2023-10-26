@@ -3,7 +3,7 @@
         <div class="tree-icon">
             <img src="/icons/tree.svg" alt="" />
         </div>
-        <nuxt-link :to="{ path: link, hash: `#${hash}` }" class="wrapper">
+        <nuxt-link :to="{ path: link, hash: `#${hash}`, query: $route.query }" class="wrapper">
             <h3 v-if="!back" class="subheadline">
                 <span v-if="activeLanguage == 'en'">
                     {{ labels.next?.en }}

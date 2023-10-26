@@ -2,12 +2,7 @@
   <div class="scroll-hint">
     <div v-if="!hasScrolled && showScrollHint" ref="arrow" class="icon-wrapper">
       <p class="visually-hidden">Scroll down</p>
-      <SystemIcon
-        type="arrow"
-        :width="30"
-        color="light"
-        class="icon-arrow-down"
-      />
+      <SystemIcon type="arrow" :width="30" color="light" class="icon-arrow-down" />
     </div>
   </div>
 </template>
@@ -48,18 +43,21 @@ export default {
   text-align: center;
   display: flex;
   justify-content: center;
+
   .icon-wrapper {
     text-align: center;
     display: flex;
     justify-content: center;
   }
+
   position: absolute;
   bottom: 25%;
   left: 0;
   width: 100%;
   z-index: 100;
+
   .icon-wrapper {
-    animation: bounceIn 1s ease-in alternate infinite;
+    animation: bounceIn 2s ease-in alternate infinite;
   }
 }
 </style>

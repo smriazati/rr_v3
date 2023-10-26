@@ -1,8 +1,7 @@
 export default (context, inject) => {
     function setPageTitle(data) {
-        // console.log('metadata', data)
         const activeLanguage = this.$store.state.localization.activeLanguage
-        const titleInActiveLang = this.pageMetadata?.pageTitle[activeLanguage];
+        const titleInActiveLang = data?.pageTitle[activeLanguage];
 
         let baseName = '';
         if (this.name) {

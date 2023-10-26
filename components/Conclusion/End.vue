@@ -1,18 +1,18 @@
 <template>
   <div class="conclusion-ending-slide">
-    <div class="bg-image">
+    <!-- <div class="bg-image">
       <img src="/icons/tree.svg" alt="Tree icon" />
-    </div>
+    </div> -->
     <div class="text-wrapper centered">
-      <p v-if="content.title">
+      <p v-if="content.title" class="h1">
         <LocalizationString :string="content.title"></LocalizationString>
       </p>
       <p class="small" v-if="content.subhead">
         <LocalizationString :string="content.subhead"></LocalizationString>
       </p>
       <nav>
-        <button class="circle-btn bright" v-if="content.btnText">
-          <nuxt-link to="/">
+        <button ref="button" class="light full-width" v-if="content.btnText">
+          <nuxt-link :to="{ path: '/', query: $route.query }">
             <LocalizationString :string="content.btnText"></LocalizationString>
           </nuxt-link>
         </button>
@@ -33,46 +33,40 @@ export default {
 </script>
 <style lang="scss">
 .conclusion.page .conclusion-ending-slide {
-  background: $white;
-  padding-top: 400px;
+  margin-top: 25vh;
+  background: #192912;
   height: 100vh;
-  max-height: 100vh;
-  padding-bottom: 25%;
-
-  padding-bottom: 25vh;
-  // @media (min-width: $collapse-bp) {
-  //   margin-bottom: 54px;
-  // }
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 
-  .bg-image {
+  &:before {
+    content: "";
+    background-image: url(/icons/tree.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: grayscale(0.9) blur(3px) brightness(2);
     opacity: 0.3;
-
-    img {
-      filter: grayscale(1) brightness(3);
-    }
+    position: absolute;
+    height: 150%;
+    width: 100%;
+    top: -5%;
   }
 
   .text-wrapper {
     position: relative;
-  }
 
-  p {
-    color: $gray;
-
-    &.small {
-      @include pStyle($gray);
+    .h1 {
+      font-size: 72px;
+      line-height: 80px;
+      font-weight: 700;
+      letter-spacing: 2%;
     }
 
-    display: flex;
-    justify-content: center;
-  }
-
-  @media (max-width: 960px) {
-    padding-top: 50vh;
-    padding-bottom: 60px;
-
-    button.align-left {
+    p:not(.h1) {
+      max-width: 55ch;
       margin: 0 auto;
     }
   }

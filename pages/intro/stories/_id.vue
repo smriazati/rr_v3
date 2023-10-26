@@ -1,42 +1,46 @@
 <template>
     <div ref="wrapper" class="story-wrapper">
         <div ref="storyWrapper">
-            <StoriesIntro :subjectId="`subject${Number(this.$route.params.id) + 1}`" sectionId="intro"
-                :schema="`story1_${Number(this.$route.params.id) + 1}`" />
+            <StoriesIntro :subjectId="`subject${this.$route.params.id}`" sectionId="intro"
+                :schema="`story1_${this.$route.params.id}`" />
         </div>
         <div class="pagination-row flex-row" v-show="isPaginationVisible">
-            <PaginationHash link="/intro/stories" hash="stories" :message="nav?.prev" :back="true" />
-            <Pagination link="/occupation" :message="nav?.next" />
+            <PaginationHash link="/intro/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
+            <Pagination link="/occupation" :message="nav?.nav?.next" />
         </div>
     </div>
 </template>
   
 <script>
 import { groq } from '@nuxtjs/sanity'
-const schema = "settings1"
-const query = groq`*[_type == "${schema}"][0]{
-    nav
-  }`
+
 
 export default {
-    asyncData({ $sanity }) {
-        const nav = $sanity.fetch(query)
-        return nav
+    asyncData({ $sanity, params }) {
+
+        const schema = "settings1"
+        const query = groq`
+{
+    "nav": *[_id == "${schema}"]{
+        nav
+    }[0],
+    "metadata": *[_id == "story1_${params.id}"][0]{
+        pageMetadata
+    }
+}
+`
+        const data = $sanity.fetch(query)
+        return data
     },
     data() {
         return {
-            name: "intro-stories-individual",
-            isPaginationVisible: true,
-            pageNames: {
-                1: "Meet Luba Chomut",
-                2: "Meet Yosef Zilberberg",
-                3: "Meet Mania Schwartzman",
-            },
+            name: "intro-stories",
+            isPaginationVisible: true
         };
     },
     head() {
         return {
-            title: this.$setPageTitle(this.pageMetadata)
+            title: this.$setPageTitle(this.metadata.pageMetadata)
         }
     },
     methods: {

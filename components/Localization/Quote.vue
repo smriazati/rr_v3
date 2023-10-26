@@ -3,6 +3,9 @@
         <span v-if="activeString">
             &ldquo;{{ activeString }}&rdquo;
         </span>
+        <span v-else>
+            {{ this.string?.en }}
+        </span>
     </span>
 </template>
 

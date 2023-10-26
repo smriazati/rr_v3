@@ -164,7 +164,7 @@ export default {
 
 
 <style lang="scss">
-.aftermath-stories-individual.stories-individual {
+.aftermath-stories.stories-individual {
   .page-grid {
     display: flex;
     flex-direction: column;

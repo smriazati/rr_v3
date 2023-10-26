@@ -115,6 +115,7 @@ export default {
     setContentAnimation() {
       const gsap = this.$gsap;
       const grid = this.$refs.grid;
+      const pin = this.$refs.pin;
       const header = grid.querySelector("header");
       const monuments = grid.querySelector("section.monuments");
       const unmarked = grid.querySelector("section.unmarked");
@@ -147,13 +148,13 @@ export default {
 
       gsap.set(monumentsC2, {
         autoAlpha: 0,
-        x: xDistance * -1,
+        // x: xDistance * -1,
         filter: filterStart,
       });
 
       gsap.to(monumentsC2, {
         autoAlpha: 1,
-        x: 0,
+        // x: 0,
         filter: filterEnd,
         scrollTrigger: {
           trigger: header,
@@ -166,13 +167,13 @@ export default {
 
       gsap.set(monumentsC3, {
         autoAlpha: 0,
-        x: xDistance,
+        // x: xDistance,
         filter: filterStart,
       });
 
       gsap.to(monumentsC3, {
         autoAlpha: 1,
-        x: 0,
+        // x: 0,
         filter: filterEnd,
         scrollTrigger: {
           trigger: header,
@@ -221,6 +222,19 @@ export default {
           // markers: true,
         },
       });
+
+      // fade out 
+
+      gsap.to(pin, {
+        autoAlpha: 0,
+        scrollTrigger: {
+          trigger: unmarkedC2,
+          start: `bottom+=${window.innerHeight / 3}px bottom`,
+          end: `bottom+=${window.innerHeight} top`,
+          scrub: 0.8,
+          // markers: true,
+        },
+      })
     },
   },
 };
@@ -278,6 +292,8 @@ export default {
       padding: 30px;
       width: 50%;
       text-align: right;
+
+
     }
   }
 }
@@ -289,10 +305,25 @@ export default {
     @include pBigStyle();
   }
 
+  figure p {
+    font-size: 14px;
+    letter-spacing: .02px;
+    line-height: 18px;
+
+    &.credit {
+      font-size: 10px;
+    }
+  }
+
   blockquote {
     @media (max-width: $nav-bp) {
-      font-size: 30px;
+      font-size: 32px;
       line-height: 38px;
+
+      p {
+        font-size: 32px;
+        line-height: 38px;
+      }
     }
   }
 

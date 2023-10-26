@@ -1,15 +1,17 @@
 <template>
   <div class="text-scroller" ref="textScroller">
-    <div class="panel text-wrapper light centered flex-col" v-for="(item, index) in panels" :key="index">
-      <p>
-        <LocalizationString :string="item"></LocalizationString>
-      </p>
-      <button class="flat up" v-if="index !== 0" @click="goToSection(index - 1)">
-        <SystemIcon type="arrow" :width="40" color="light" class="icon icon-arrow-up" />
-      </button>
-      <button class="flat down" v-if="index < panelNum - 1" @click="goToSection(index + 1)">
-        <SystemIcon type="arrow" :width="40" color="light" class="icon icon-arrow-down" />
-      </button>
+    <div class="panel" v-for="(item, index) in panels" :key="index">
+      <div class="text-wrapper light centered flex-col">
+        <p>
+          <LocalizationString :string="item"></LocalizationString>
+        </p>
+        <button class="flat up" v-if="index !== 0" @click="goToSection(index - 1)">
+          <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-up" />
+        </button>
+        <button class="flat down" v-if="index < panelNum - 1" @click="goToSection(index + 1)">
+          <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-down" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -26,10 +28,11 @@ export default {
     return {
       scrollTween: null,
       activeSection: 0,
+      currentSection: 0
     };
   },
   mounted() {
-    this.setTextScrollerAnim();
+    this.setNewAnim();
   },
   watch: {
     activeSection() {
@@ -59,6 +62,43 @@ export default {
       // console.log("activating section", i);
       this.activeSection = i;
       // console.log("triggered set active section", i);
+    },
+    setNewAnim() {
+      const gsap = this.$gsap;
+      const scrollTrigger = this.$ScrollTrigger;
+      let sections = gsap.utils.toArray(".panel");
+
+      this.currentSection = sections[0];
+      console.log(sections)
+      gsap.defaults({ overwrite: 'auto', duration: 0.3 });
+
+      // stretch out the body height according to however many sections there are. 
+      gsap.set("body", { height: (sections.length * innerHeight) + "px" });
+      console.log((sections.length * innerHeight) + "px")
+      // create a ScrollTrigger for each section
+      sections.forEach((section, i) => {
+        scrollTrigger.create({
+          // use dynamic scroll positions based on the window height (offset by half to make it feel natural)
+          start: () => (i - 0.5) * innerHeight,
+          end: () => (i + 0.5) * innerHeight,
+          // when a new section activates (from either direction), set the section accordinglyl.
+          onToggle: self => self.isActive && this.setNewSection(section),
+          toggleClass: { targets: section, className: "is-active" },
+
+        });
+      });
+
+
+    },
+
+    setNewSection(newSection) {
+      const gsap = this.$gsap;
+
+      if (newSection !== this.currentSection) {
+        gsap.to(this.currentSection, { autoAlpha: 0 })
+        gsap.to(newSection, { autoAlpha: 1 });
+        this.currentSection = newSection;
+      }
     },
     setTextScrollerAnim() {
       const gsap = this.$gsap;
@@ -95,7 +135,6 @@ body {
 
 .text-scroller {
   width: 100%;
-  background: rgba(10, 10, 10, 0.4);
   padding: 0 25px;
 
   .text-wrapper {
@@ -110,25 +149,42 @@ body {
 
   .panel {
     height: 100vh;
-    position: sticky;
-    top: 0;
+    // position: sticky;
+    // top: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    // background: rgba(10, 10, 10, 0.6);
 
-    display: grid;
-    grid-template-columns: 1;
-    grid-template-rows: 1fr min-content 1fr;
+    position: fixed;
+    width: 100%;
+    min-width: 100vw;
+    height: 100%;
+    top: 0;
+    left: 0;
 
-    .up {
-      grid-row: 1 / 2;
-      align-self: end;
-      justify-self: center;
+    .text-wrapper {
+      display: grid;
+      grid-template-columns: 1;
+      grid-template-rows: 1fr min-content 1fr;
+
+      .up {
+        grid-row: 1 / 2;
+        align-self: end;
+        justify-self: center;
+      }
+
+      >div {
+        grid-row: 2 / 3;
+      }
     }
 
-    >div {
-      grid-row: 2 / 3;
+    p {
+      max-width: 60ch;
+      margin: 0 auto;
     }
+
+
 
     .down {
       margin-top: 30px;
@@ -156,6 +212,7 @@ body {
     opacity: 0;
 
     &.is-active {
+      z-index: 999;
       opacity: 1;
       filter: blur(0px);
     }

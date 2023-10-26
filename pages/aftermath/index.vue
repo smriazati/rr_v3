@@ -5,6 +5,9 @@
             <ScrollProgressBar :height="wrapperHeight" />
         </div>
         <div class="wrapper">
+            <div class="image-zoom-wrapper">
+                <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
+            </div>
             <div class="text-scroller-wrapper" v-if="panels">
                 <SystemTextScroller :panels="panels" @scrolled-to-end="showPagination()" />
             </div>

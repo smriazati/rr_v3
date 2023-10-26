@@ -4,31 +4,12 @@
             <div class="title">
                 <StoryTitle :subjectId="`subject${this.$route.params.id}`" :sectionId="sectionId" />
             </div>
-            <!-- <div class="slider-controls">
-                <button @click="goToPrev()" class="flat">
-                    <span class="visually-hidden">Prev</span>
-                    <SystemIcon type="arrow" color="light" :width="25" class="icon icon-arrow-left" />
-                </button>
-                <div class="slide-counter">
-                    <ul>
-                        <li v-for="index in slideNum" :key="index" class="link-hover"
-                            :class="activeSlide === index - 1 ? 'active-slide' : ''" @click="goToSlide(index)">
-                            <span class="visually-hidden">{{ index }}</span>
-                        </li>
-                    </ul>
-                </div>
-                <button @click="goToNext()" class="flat">
-                    <span class="visually-hidden">Next</span>
-                    <SystemIcon type="arrow" color="light" :width="25" />
-                </button>
-            </div> -->
-
             <div class="story" ref="theStory">
                 <StoriesAftermath :schema="`story4_${this.$route.params.id}`"></StoriesAftermath>
             </div>
             <div class="pagination-row flex-row" v-show="isPaginationVisible">
-                <PaginationHash link="/aftermath/stories" hash="stories" :message="nav?.prev" :back="true" />
-                <Pagination link="/conclusion" :message="nav?.next" />
+                <PaginationHash link="/aftermath/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
+                <Pagination link="/conclusion" :message="nav?.nav?.next" />
             </div>
         </div>
 
@@ -37,15 +18,25 @@
   
 <script>
 import { groq } from '@nuxtjs/sanity'
-const schema = "settings4"
-const query = groq`*[_type == "${schema}"][0]{
-    nav
-  }`
+
 
 
 
 export default {
-    asyncData({ $sanity }) {
+    asyncData({ $sanity, params }) {
+
+        const schema = "settings4"
+        const query = groq`
+        {
+            "nav": *[_id == "${schema}"]{
+                nav
+            }[0],
+            "metadata": *[_id == "story4_${params.id}"][0]{
+                pageMetadata
+            }
+        }
+        `
+
         const nav = $sanity.fetch(query)
         return nav
     },
@@ -54,101 +45,13 @@ export default {
             name: "aftermath-stories-individual",
             sectionId: "aftermath",
             isPaginationVisible: true,
-            pageNames: {
-                1: "Aftermath: Luba Chomut",
-                2: "Aftermath: Yosef Zilberberg",
-                3: "Aftermath: Mania Schwartzman",
-            },
-            activeSlide: 0,
-            activeSlideClass: "active-slide",
-            previousActiveSlide: null,
-            slideNum: null,
         };
     },
     head() {
         return {
-            title: this.$setPageTitle(this.pageMetadata)
+            title: this.$setPageTitle(this.metadata?.pageMetadata)
         }
-    },
-    mounted() {
-        // this.initSlider();
-    },
-    watch: {
-        activeSlide() {
-            this.pauseActiveVids();
-            const activeSlideClass = this.activeSlideClass;
-            const activeSlideEl = document.querySelector(
-                `.slide-${this.activeSlide}`
-            );
-            activeSlideEl?.classList.add(activeSlideClass);
-
-            const previousActiveSlideEl = document.querySelector(
-                `.slide-${this.previousActiveSlide}`
-            );
-            previousActiveSlideEl?.classList.remove(activeSlideClass);
-            // console.log(previousActiveSlideEl, activeSlideEl);
-
-            if (this.activeSlide === this.slideNum - 1) {
-                this.isPaginationVisible = true;
-            }
-        },
-    },
-    methods: {
-        pauseActiveVids() {
-            let activeVid = document.querySelector(".vimeo-component.playing");
-            if (activeVid) {
-                let pauseBtn = activeVid.querySelector(".pauseBtn");
-                console.log(pauseBtn);
-                if (pauseBtn) {
-                    pauseBtn.click();
-                }
-            }
-        },
-        initSlider() {
-            // const parent = this.$refs.story;
-
-            // const main = parent.querySelector("main.content");
-            // if (!main) { return }
-            // main.classList.add("slider-wrapper");
-
-            // const slides = Array.from(main.children);
-            // this.slideNum = slides.length;
-
-            // slides.forEach((slide, i) => {
-            //     slide.classList.add("slide");
-            //     slide.classList.add(`slide-${i}`);
-
-            //     if (i === 0) {
-            //         slide.classList.add(this.activeSlideClass);
-            //     }
-            // });
-        },
-        goToNext() {
-            // console.log("going to next");
-
-            this.previousActiveSlide = this.activeSlide;
-            if (this.activeSlide === this.slideNum - 1) {
-                this.activeSlide = 0;
-            } else {
-                this.activeSlide = this.activeSlide + 1;
-            }
-        },
-        goToPrev() {
-            // console.log("going to prev");
-            this.previousActiveSlide = this.activeSlide;
-            if (this.activeSlide === 0) {
-                this.activeSlide = this.slideNum - 1;
-            } else {
-                this.activeSlide = this.activeSlide - 1;
-            }
-        },
-        goToSlide(index) {
-            this.previousActiveSlide = this.activeSlide;
-            // console.log(index - 1);
-            this.activeSlide = index - 1;
-            // console.log(this.activeSlide);
-        },
-    },
+    }
 };
 </script>
   
@@ -207,75 +110,7 @@ export default {
             }
         }
 
-        .slider-controls {
-            // position: fixed;
-            // bottom: 54px;
-            width: 100%;
-            height: 54px;
-            position: fixed;
-            bottom: 58px;
-            z-index: 999;
-            background: #000;
-            display: flex;
-            justify-content: center;
 
-            @media (max-width: $collapse-bp) {
-                z-index: 10;
-            }
-
-            .slide-counter {
-                padding: 15px 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            ul {
-                display: flex;
-                padding: 10px;
-                list-style: none;
-
-                >*:not(:last-child) {
-                    margin-right: 15px;
-                }
-
-                li {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    &:before {
-                        content: " ";
-                        width: 10px;
-                        height: 10px;
-                        display: block;
-                        border-radius: 3px;
-                        background: #fff;
-                        transition: 0.3s ease all;
-                    }
-
-                    &.active-slide {
-                        &:before {
-                            background: $sage;
-                        }
-
-                        &:hover {
-                            cursor: default;
-                        }
-                    }
-                }
-            }
-
-            .icon.light {
-                &:hover {
-                    // filter: grayscale(1) invert(0) brightness(90);
-                }
-            }
-
-            ul li:hover::before {
-                background: $sage;
-            }
-        }
 
         .story {
             flex: 100%;
@@ -330,7 +165,6 @@ export default {
     }
 
     .pagination-row {
-        margin-bottom: 100px;
 
         @media (max-width: $collapse-bp) {
             margin-top: 30px;

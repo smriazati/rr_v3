@@ -1,7 +1,7 @@
 <template>
     <main ref="content" class="content">
         <StoryTitle :subjectId="subjectId" :sectionId="sectionId" />
-        <div class="row" v-for="item in content?.sections" :key="item._key"
+        <div class="row section gsap-fade-in" v-for="item in content?.sections" :key="item._key"
             :class="item._type == 'contentImgFull' ? 'dark' : ''">
             <div class="content-image-text" v-if="item._type == 'contentImgText'">
                 <ContentImageText :content="item"></ContentImageText>
@@ -43,10 +43,54 @@ export default {
             required: true,
         },
     },
+    watch: {
+        content() {
+            if (this.content !== '') {
+                this.$nextTick(() => {
+                    this.setAnim();
+                })
+            }
+        }
+    },
     methods: {
-        onScrollEnd() {
-            this.$emit("on-scroll-end");
-        },
+        setAnim() {
+            const gsap = this.$gsap;
+            const content = this.$refs.content;
+            const sections = content.querySelectorAll(".section");
+            console.log(content, sections)
+            if (!sections) { return }
+            sections.forEach((panel, i) => {
+
+                if (i === 0) {
+                    gsap.set(panel, {
+                        autoAlpha: 0,
+                        y: 150,
+                    });
+
+                    gsap.to(panel, {
+                        autoAlpha: 1,
+                        y: 0,
+                        duration: 1
+                    })
+                } else {
+                    gsap.set(panel, {
+                        autoAlpha: 0,
+                        y: 150,
+                    });
+
+                    gsap.to(panel, {
+                        autoAlpha: 1,
+                        y: 0,
+                        scrollTrigger: {
+                            trigger: panel,
+                            start: `top+=150px bottom`,
+                            end: `+=300px`,
+                            scrub: 1.1,
+                        },
+                    });
+                }
+            });
+        }
     },
 };
 </script>

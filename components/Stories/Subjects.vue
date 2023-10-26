@@ -13,7 +13,7 @@
             </div>
             <div class="card-row">
                 <nuxt-link class="card" v-for="(item, key, index) in subjects" :key="index"
-                    :to="`/${routeSection}/stories/${index + 1}`">
+                    :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
                     <figure class="image-wrapper">
                         <div class="img">
                             <LocalizationImageNoCaption :img="item.img"></LocalizationImageNoCaption>
@@ -24,7 +24,7 @@
                     </figure>
                     <div class="button-wrapper">
                         <button ref="button" class="dark full-width" v-if="subjectCTA">
-                            <nuxt-link :to="`/${route}/stories/${index}`">
+                            <nuxt-link :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
                                 <span>
                                     <LocalizationString :string="subjectCTA"></LocalizationString>
                                 </span>

@@ -45,14 +45,16 @@ export default {
 <style lang="scss">
 .scroll-progress-bar-wrapper {
   position: fixed;
-  width: 25px;
+  width: 10px;
   top: 0;
   left: 0px;
   z-index: 22;
+
   @media (max-width: $mobile-bp) {
     width: 10px;
   }
 }
+
 .scroll-progress-bar {
   background: $sage; // sage for hard light;
   mix-blend-mode: hard-light;

@@ -35,7 +35,12 @@ export default {
         alt() {
             if (!this.img) { return "" }
             if (!this.img.alt) { return "" }
-            return this.img?.alt[this.activeLanguage]
+            const alt = this.img?.alt[this.activeLanguage]
+            if (alt) {
+                return alt
+            } else {
+                this.img?.alt["en"]
+            }
         },
     }
 };

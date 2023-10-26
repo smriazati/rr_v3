@@ -14,7 +14,7 @@
         </h2>
       </div>
       <button ref="button" class="light full-width">
-        <nuxt-link to="/intro/">
+        <nuxt-link :to="{ path: `/intro`, query: $route.query }">
           <div v-if="ctaText">
             <LocalizationString :string="ctaText"></LocalizationString>
           </div>

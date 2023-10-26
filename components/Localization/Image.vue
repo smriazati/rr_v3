@@ -1,11 +1,14 @@
 <template>
     <figure>
-        <div v-if="src !== '' && !size" class="image-wrapper">
-            <img :src="$urlFor(src)" :alt="alt" />
+        <div v-if="src !== ''">
+            <div v-if="size || height" class="image-wrapper">
+                <img :src="$urlFor(src).width(size).height(height)" :alt="alt" />
+            </div>
+            <div v-else class="image-wrapper">
+                <img :src="$urlFor(src)" :alt="alt" />
+            </div>
         </div>
-        <div v-if="src !== '' && size" class="image-wrapper">
-            <img :src="$urlFor(src).width(size)" :alt="alt" />
-        </div>
+
         <figcaption>
             <p class="caption">{{ caption }}</p>
             <p class="credit">{{ credit }}</p>
@@ -25,6 +28,10 @@ export default {
         size: {
             type: Number,
             required: false
+        },
+        height: {
+            type: Number,
+            required: false
         }
     },
     computed: {
@@ -39,17 +46,32 @@ export default {
         alt() {
             if (!this.img) { return "" }
             if (!this.img.alt) { return "" }
-            return this.img?.alt[this.activeLanguage]
+            const alt = this.img?.alt[this.activeLanguage]
+            if (alt) {
+                return alt
+            } else {
+                this.img?.alt["en"]
+            }
         },
         caption() {
             if (!this.img) { return "" }
             if (!this.img.caption) { return "" }
-            return this.img?.caption[this.activeLanguage]
+            const caption = this.img?.caption[this.activeLanguage]
+            if (caption) {
+                return caption
+            } else {
+                this.img?.caption["en"]
+            }
         },
         credit() {
             if (!this.img) { return "" }
             if (!this.img.credit) { return "" }
-            return this.img?.credit[this.activeLanguage]
+            const credit = this.img?.credit[this.activeLanguage]
+            if (credit) {
+                return credit
+            } else {
+                this.img?.credit["en"]
+            }
         }
     }
 };

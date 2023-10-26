@@ -4,55 +4,49 @@
       <h1>Table of Contents</h1>
       <ul>
         <li>
-          <nuxt-link to="/1">Introduction</nuxt-link>
+          <nuxt-link to="/intro">Introduction</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/1/stories">Introduction Stories</nuxt-link>
+          <nuxt-link to="/intro/stories">Introduction Stories</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/1/stories/1"
-            >Introduction: Meet Luba Chumot</nuxt-link
-          >
+          <nuxt-link to="/intro/stories/1">Introduction: Meet Luba Chumot</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/1/stories/2"
-            >Introduction: Meet Yosef Zilberberg</nuxt-link
-          >
+          <nuxt-link to="/intro/stories/2">Introduction: Meet Yosef Zilberberg</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/1/stories/3"
-            >Introduction: Meet Miriam Schwartzman</nuxt-link
-          >
+          <nuxt-link to="/intro/stories/3">Introduction: Meet Miriam Schwartzman</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/2">Occupation</nuxt-link>
+          <nuxt-link to="/occupation">Occupation</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/2/talkback">Occupation Talkback</nuxt-link>
+          <nuxt-link to="/occupation/talkback">Occupation Talkback</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/3">Resistance</nuxt-link>
+          <nuxt-link to="/resistance">Resistance</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/3/talkback">Resistance Talkback</nuxt-link>
+          <nuxt-link to="/resistance/talkback">Resistance Talkback</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/4">Aftermath</nuxt-link>
+          <nuxt-link to="/aftermath">Aftermath</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/4/stories">Aftermath Stories</nuxt-link>
+          <nuxt-link to="/aftermath/stories">Aftermath Stories</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/4/stories/1">Aftermath: Laura Oberlender</nuxt-link>
+          <nuxt-link to="/aftermath/stories/1">Aftermath: Laura Oberlender</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/4/stories/2">Aftermath: Yosef Zilberberg</nuxt-link>
+          <nuxt-link to="/aftermath/stories/2">Aftermath: Yosef Zilberberg</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/4/stories/3">Aftermath: Miriam Schwartzman</nuxt-link>
+          <nuxt-link to="/aftermath/stories/3">Aftermath: Miriam Schwartzman</nuxt-link>
         </li>
         <li>
-          <nuxt-link to="/5">Conclusion</nuxt-link>
+          <nuxt-link to="/conclusion">Conclusion</nuxt-link>
         </li>
       </ul>
     </nav>
@@ -86,9 +80,11 @@ export default {
   li {
     margin-bottom: 15px;
   }
+
   a:hover {
     text-decoration: underline;
   }
+
   h1 {
     margin-bottom: 30px;
   }

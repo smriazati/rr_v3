@@ -12,7 +12,7 @@
       ref="navWrapper">
       <ul ref="navLinks" v-if="sections">
         <li v-for="(item, index) in sections" :key="index">
-          <nuxt-link :to="`/${sectionsArr[index]}`">
+          <nuxt-link :to="{ path: `/${sectionsArr[index]}`, query: $route.query }">
             <LocalizationString :string="item"></LocalizationString>
           </nuxt-link>
         </li>
