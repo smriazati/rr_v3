@@ -1,6 +1,6 @@
 <template>
   <div ref="wrapper" class="instruction-modal" tabindex="0" @keydown.esc="closeModal">
-    <main class="story-map-intro">
+    <main class="story-map-intro" v-if="content">
       <header>
         <div>
           <h1>
@@ -47,13 +47,16 @@ const query = groq`*[_type == "${schema}"][0]`
 
 export default {
   data: () => ({
-    content: '',
+    content: null,
     isCollapsed: false,
   }),
   async fetch() {
-    this.content = await this.$sanity.fetch(query)
-    console.log(this.content)
+    const data = await this.$sanity.fetch(query)
+    console.log('data is', data)
+    if (!data) { return }
+    this.content = data
   },
+  fetchOnServer: false,
   mounted() {
     const wrapper = this.$refs.wrapper;
 
