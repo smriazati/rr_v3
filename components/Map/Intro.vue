@@ -52,6 +52,7 @@ export default {
   }),
   async fetch() {
     this.content = await this.$sanity.fetch(query)
+    console.log(this.content)
   },
   mounted() {
     const wrapper = this.$refs.wrapper;
