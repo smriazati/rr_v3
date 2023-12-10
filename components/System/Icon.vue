@@ -1,11 +1,6 @@
 <template>
   <span class="icon" :class="`${type} ${color}`">
-    <img
-      :src="`/icons/${type}.svg`"
-      :alt="`${type} icon`"
-      :width="width"
-      :height="width"
-    />
+    <img :src="`/icons/${type}.svg`" :alt="`${type} icon`" :width="width" :height="width" />
   </span>
 </template>
 <script>
@@ -28,6 +23,10 @@ export default {
 .icon {
   &.light {
     filter: invert(1);
+  }
+
+  &.dark {
+    filter: invert(0);
   }
 }
 </style>

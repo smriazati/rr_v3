@@ -1,33 +1,26 @@
 <template>
     <div class="language-picker-wrapper">
-        <div v-if="showLanguagePicker">
-            <div class="menu-wrapper" :class="isExpanded ? 'show' : 'hide'">
-                <div>
-                    <ul>
+        <div>
+            <div class="dropdown-wrapper">
+                <div class="dropdown-active">
+                    <div class="wrapper">
+                        <span class="label" @click="toggleDropdown">{{ languages[activeLanguage].name }}</span>
+                        <button @click="toggleDropdown" class="flat">
+                            <SystemIcon type="arrow" color="light" :width="15" />
+                        </button>
+                    </div>
+                </div>
+                <div class="dropdown-options" :class="isExpanded ? 'show' : 'hide'">
+                    <ul class="wrapper">
                         <li>
-                            <button :class="activeLanguage === 'en' ? 'active' : ''"
-                                @click="setActiveLanguage('en')">English</button>
+                            <button class="flat" @click="setActiveLanguage('en')">English</button>
 
                         </li>
                         <li>
-                            <button :class="activeLanguage === 'uk' ? 'active' : ''"
-                                @click="setActiveLanguage('uk')">украї́нська</button>
+                            <button class="flat" @click="setActiveLanguage('uk')">украї́нська</button>
                         </li>
                     </ul>
-                    <button @click="toggleCollapse" class="close flat visually-hidden">
-                        <img src="/icons/close.svg" alt="close icon" />
-                    </button>
                 </div>
-            </div>
-            <div :class="!isExpanded ? 'show' : 'hide'">
-                <button @click="toggleCollapse" class="flat open">
-                    <span v-if="isExpanded">
-                        <img src="/icons/close.svg" alt="close icon" />
-                    </span>
-                    <span v-else>
-                        <img src="/icons/language.svg" alt="language picker icon" />
-                    </span>
-                </button>
             </div>
         </div>
     </div>
@@ -62,6 +55,19 @@ export default {
             required: false,
         },
     },
+    data() {
+        return {
+            isExpanded: false,
+            languages: {
+                "en": {
+                    "name": "English"
+                },
+                "uk": {
+                    "name": "украї́нська"
+                }
+            }
+        }
+    },
     computed: {
         ...mapState("localization", {
             activeLanguage: (state) => state.activeLanguage,
@@ -69,10 +75,11 @@ export default {
     },
     methods: {
         setActiveLanguage(lang) {
+            this.toggleDropdown();
             this.$store.commit("localization/setActiveLanguage", lang);
             this.$router.push({ query: { lang: lang } });
         },
-        toggleCollapse() {
+        toggleDropdown() {
             this.isExpanded = !this.isExpanded;
         }
     },
@@ -80,93 +87,77 @@ export default {
 </script>
 
 <style lang="scss">
-.language-picker-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
+.dropdown-wrapper {
+    display: flex;
+    flex-direction: column;
 
-    button {
-        color: #fff;
-        position: relative;
-    }
+    margin-bottom: 30px;
 
-    // .hide {
-    //     // display: none;
-    //     transform: translateX(100vw);
-    // }
+    .dropdown-active {
+        display: inline-flex;
 
-    .menu-wrapper {
-        transform: translateX(-100vw);
-        transition: .3s ease all;
-
-        &.show {
-            transform: translateX(0vw);
-        }
-    }
-
-    .menu-wrapper {
-        background: black;
-        padding: 1rem;
-        height: 100%;
-        width: 300px;
-        text-align: left;
-        position: fixed;
-        top: 0;
-        left: 0;
-
-        >div {
-            margin-top: 40px;
-
-        }
-    }
-
-    p {
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        // border-bottom: 1px solid white;
-        display: inline-block;
-        margin-bottom: 20px;
-    }
-
-    ul {
-        list-style: none;
-        padding: 0;
-
-        li {
-            background: #000;
-            transition: .3s ease all;
-
-            // &:hover {
-            //     background: $sage;
-            // }
-        }
-
-        li button {
+        .wrapper {
             display: flex;
-            justify-content: flex-start;
-            margin: 0;
-            padding: 10px;
-            margin: 10px 0;
+            align-items: stretch;
+            color: #000;
 
-            &.active {
-                background: $sage;
+            .label {
+                background: white;
+                border: 1px solid black;
+                font-size: 24px;
+                text-transform: uppercase;
+                font-weight: 800;
+                padding: 15px 15px;
+            }
+
+            button {
+                background: #000;
+                border: 1px solid black;
+
+                border-radius: 0;
+                padding: 15px 15px;
+
+                img {
+                    transform: rotate(90deg)
+                }
+
+                .icon {
+                    padding-left: 0;
+                }
             }
         }
-
     }
 
-    .open {
-        width: 20px;
-        height: 20px;
-        top: 15px;
-        left: 15px;
-        filter: invert(1);
+    .dropdown-options {
         display: flex;
+        margin-top: -1px;
 
-        img {
-            display: flex;
+        &.hide {
+            display: none;
+        }
+
+        .wrapper {
+            background: #eaeaea;
+            border: 1px solid black;
+            padding: 15px;
+
+            @media (min-width: $collapse-bp) {
+                flex: 0 0 100%;
+            }
+
+            @media (max-width: $collapse-bp) {
+                flex: 0 0 200px;
+            }
+
+            >*:not(:last-child) {
+                margin-bottom: 15px;
+            }
+
+        }
+
+
+        button {
+            font-size: 18px;
         }
     }
 }

@@ -42,7 +42,10 @@ export default {
     prefetch: true,
     preconnect: true,
     families: {
-      'Atkinson+Hyperlegible': true,
+      'Atkinson+Hyperlegible': {
+        wght: [400, 700],
+        ital: [400]
+      },
     },
     display: 'swap'
   },

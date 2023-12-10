@@ -1,17 +1,14 @@
 <template>
   <div class="exhibit-nav">
-    <button :class="isExpanded ? 'expanded' : 'collapsed'" class="menu-toggle flat" @click="toggleMenu">
-      <span class="text visually-hidden">View Menu</span>
-      <span class="menu-button"><svg viewBox="0 0 100 80" width="36" height="36">
-          <rect class="line-1" width="64" height="10"></rect>
-          <rect class="line-2" y="30" width="80" height="10"></rect>
-          <rect class="line-3" y="60" width="64" height="10"></rect>
-        </svg></span>
+    <button :class="isExpanded ? 'expanded' : 'collapsed'" class="flat" @click="toggleMenu">
+      <ExhibitNavToggleButton></ExhibitNavToggleButton>
     </button>
     <nav :class="isExpanded ? 'expanded' : 'collapsed'" v-show="isExhibitNavVisible" class="exhibit-nav-wrapper"
       ref="navWrapper">
-      <ul ref="navLinks" v-if="sections">
-        <li v-for="(item, index) in sections" :key="index">
+      <LocalizationLanguagePicker></LocalizationLanguagePicker>
+      <ul ref="navLinks" v-if="sections" class="nav-links">
+        <li v-for="(item, index) in sections" :key="index"
+          :class="activeSectionKey == sectionsArr[index] ? 'active' : ''">
           <nuxt-link :to="{ path: `/${sectionsArr[index]}`, query: $route.query }">
             <LocalizationString :string="item"></LocalizationString>
           </nuxt-link>
@@ -44,6 +41,17 @@ export default {
     ...mapState("exhibitNav", {
       isExhibitNavVisible: (state) => state.isExhibitNavVisible,
     }),
+    activeSectionKey() {
+      const path = this.$route.path;
+      const sections = this.sectionsArr.slice();
+      let activeSectionKey = "";
+      sections.forEach(item => {
+        if (path.includes(item)) {
+          activeSectionKey = item;
+        }
+      })
+      return activeSectionKey;
+    },
     sections() {
       if (!this.content) { return null }
       if (!this.content.sections) { return null }
@@ -132,199 +140,69 @@ export default {
 </script>
 
 <style lang="scss">
-.route-null {
-  .exhibit-nav {
-    display: none;
-  }
-}
-
-.menu-toggle .line-1 {
-  top: 0px;
-  -webkit-transform-origin: left center;
-  -moz-transform-origin: left center;
-  -o-transform-origin: left center;
-  transform-origin: left center;
-}
-
-.menu-toggle .line-2 {
-  top: 18px;
-  -webkit-transform-origin: left center;
-  -moz-transform-origin: left center;
-  -o-transform-origin: left center;
-  transform-origin: left center;
-}
-
-.menu-toggle .line-3 {
-  top: 36px;
-  -webkit-transform-origin: left center;
-  -moz-transform-origin: left center;
-  -o-transform-origin: left center;
-  transform-origin: left center;
-}
-
-.menu-toggle.expanded .line-1 {
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  transform: rotate(45deg);
-  top: -3px;
-  left: 8px;
-}
-
-.menu-toggle.expanded .line-2 {
-  width: 0%;
-  opacity: 0;
-}
-
-.menu-toggle.expanded .line-3 {
-  -webkit-transform: rotate(-45deg) translateY(6px) translateX(2px);
-  -moz-transform: rotate(-45deg) translateY(6px) translateX(2px);
-  -o-transform: rotate(-45deg) translateY(6px) translateX(2px);
-  transform: rotate(-45deg) translateY(6px) translateX(2px);
-  top: 39px;
-  left: 8px;
-}
-
-.exhibit-nav {
+.exhibit-nav>button {
   position: fixed;
-  z-index: 400;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #404a3b;
+  z-index: 999;
+  top: 20px;
+  left: 20px;
+  filter: invert(1);
+}
 
-  //   color: #fff;
-  ul {
-    display: flex;
-    list-style: none;
-    justify-content: space-between;
-    width: 100%;
-
-    li {
-      flex: 1;
-      text-align: center;
-      font-size: 14px;
-      letter-spacing: 0.6px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      a {
-        color: rgb(213, 213, 213);
-        transform: scale(1);
-        transition: 0.3s ease all;
-        display: block;
-        height: 100%;
-        width: 100%;
-        padding: 15px;
-        display: flex;
-        justify-content: center;
-        text-decoration: none;
-      }
-
-      &:hover {
-        a {
-          background: $gray;
-          color: $white;
-        }
-      }
-
-      a:hover,
-      a:hover span {
-        text-decoration: none;
-      }
-
-      a.nuxt-link-active {
-        background: $forest;
-        color: $white;
-
-        &:hover {
-          cursor: default;
-        }
-
-        // transform: scale(1.1);
-      }
-    }
-  }
-
-  .menu-toggle {
-    display: none;
-  }
+.exhibit-nav-wrapper {
+  position: fixed;
+  z-index: 111;
+  background: #31572A;
+  height: 100%;
 
   @media (max-width: $collapse-bp) {
-    .menu-toggle {
-      display: block;
+    width: 100%;
+  }
 
-      &:focus {
-        outline: 0;
-      }
+  padding: 70px 20px;
 
-      // top: 0;
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      width: 45px;
-      height: 45px;
-      z-index: 301;
+  @media (min-width: $collapse-bp) {
+    padding-top: 90px;
+  }
 
-      rect {
-        transition: 0.3s ease all;
-        fill: #fff;
-      }
+  display: flex;
+  flex-direction: column;
 
-      &:hover {
-        cursor: pointer;
+  .nav-links {
+    li {
+      padding: 15px;
+      background: #31572A;
+      transition: .3s ease all;
 
-        rect {
-          fill: $sage;
-        }
-      }
-    }
-
-    width: auto;
-    display: flex;
-    background: transparent;
-    flex-direction: column;
-    justify-content: center;
-    height: 0;
-
-    ul {
-      height: 100vh;
-      background: rgba($forest, 1);
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      padding-left: 15px;
-      padding-right: 30px;
-      background: rgba($forest, 1);
-
-      li {
-        background: rgba($forest, 1);
-        flex: 0;
-        text-transform: uppercase;
-        font-size: 22px;
-        text-align: left;
-        line-height: 24px;
-        letter-spacing: 2px;
-        width: auto;
+      &:hover,
+      &.active {
+        background: #000;
 
         a {
-          background: rgba($forest, 1);
-        }
-
-        a.nuxt-link-active {
-          color: $gray;
-
-          &:hover {
-            cursor: default;
-          }
+          color: #fff;
         }
       }
     }
 
-    .exhibit-nav-wrapper.collapsed {
-      transform: translateX(-100vw);
+    li a {
+      color: #fff;
+      text-transform: uppercase;
     }
+
+    li.main a {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    li.secondary a {
+      font-size: 18px;
+    }
+  }
+}
+
+.exhibit-nav nav {
+
+  &.collapsed {
+    transform: translateX(-100vw);
   }
 }
 </style>

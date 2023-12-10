@@ -1,7 +1,6 @@
 <template>
   <div class="default-layout" :class="`route-${page}`">
     <ExhibitNav />
-    <LocalizationLanguagePicker></LocalizationLanguagePicker>
     <nuxt :key="$route.fullPath" />
   </div>
 </template>
