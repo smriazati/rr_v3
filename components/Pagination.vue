@@ -104,9 +104,12 @@ export default {
   position: fixed;
   z-index: 130;
 
+
   @media (min-width: $collapse-bp) {
     border-radius: 5px;
   }
+
+
 
   animation: slideIn 0.8s ease-in forwards;
   bottom: 100px;

@@ -368,6 +368,10 @@ blockquote {
   font-size: 24px;
   line-height: 28px;
   letter-spacing: 2px;
+
+  @media (max-width: $collapse-bp) {
+    font-size: 14px;
+  }
 }
 
 

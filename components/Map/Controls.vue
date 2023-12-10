@@ -356,6 +356,13 @@ $marker-color-5: #a16231;
 
 @media (max-width: $collapse-bp) {
   .map-controls.expanded {
+    .map-options {
+      ul li>span:last-child {
+        justify-content: flex-start;
+        padding-left: 0;
+      }
+    }
+
     background: rgba($gray, 0.9);
     position: fixed;
     z-index: 201;
@@ -364,7 +371,7 @@ $marker-color-5: #a16231;
     width: 100%;
     height: 100%;
     overflow-y: scroll;
-    padding: 80px 0;
+    padding: 120px 0 80px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;

@@ -31,12 +31,18 @@ export default {
   
   
 <style lang="scss">
+.route-aftermath-stories .stories-subjects-wrapper {
+    padding-top: 100px;
+}
+
 .aftermath-stories {
     @media (max-width: $collapse-bp) {
         padding-top: 60px;
     }
 
     position: relative;
+
+
 
     .text-wrapper {
         padding: 30px;

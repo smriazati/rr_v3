@@ -92,10 +92,32 @@ export default {
     margin-bottom: 30px;
   }
 
-  h1 {
+  h1,
+  h2.h1 {
     display: flex;
     justify-content: center;
+
   }
+
+  @media (max-width: 650px) {
+
+    .subheadline {
+      font-size: 14px;
+    }
+
+    h2.h1 {
+      font-size: 48px;
+    }
+
+  }
+
+  @media (min-width: 650px) {
+
+    h2.h1 {
+      font-size: 72px;
+    }
+  }
+
 
 }
 </style>

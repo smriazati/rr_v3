@@ -1,5 +1,5 @@
 <template>
-    <div class="row content-text">
+    <div class="row">
         <div class="col" v-if="content">
             <h2 v-if="content.title">
                 <LocalizationString :string="content.title"></LocalizationString>
@@ -24,6 +24,14 @@ export default {
     display: flex;
     justify-content: center;
     margin-top: 15px;
+}
+
+.content-text {
+    @media (max-width: $collapse-bp) {
+        max-width: 90%;
+        padding: 0 30px;
+        margin: 0 auto;
+    }
 }
 
 .col p:not(:last-child) {

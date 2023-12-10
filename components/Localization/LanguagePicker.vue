@@ -3,7 +3,6 @@
         <div v-if="showLanguagePicker">
             <div class="menu-wrapper" :class="isExpanded ? 'show' : 'hide'">
                 <div>
-                    <p>Select your language</p>
                     <ul>
                         <li>
                             <button :class="activeLanguage === 'en' ? 'active' : ''"
@@ -15,14 +14,20 @@
                                 @click="setActiveLanguage('uk')">украї́нська</button>
                         </li>
                     </ul>
-                    <button @click="toggleCollapse" class="close flat">
+                    <button @click="toggleCollapse" class="close flat visually-hidden">
                         <img src="/icons/close.svg" alt="close icon" />
                     </button>
                 </div>
             </div>
             <div :class="!isExpanded ? 'show' : 'hide'">
                 <button @click="toggleCollapse" class="flat open">
-                    <img src="/icons/language.svg" alt="close icon" /></button>
+                    <span v-if="isExpanded">
+                        <img src="/icons/close.svg" alt="close icon" />
+                    </span>
+                    <span v-else>
+                        <img src="/icons/language.svg" alt="language picker icon" />
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -86,8 +91,18 @@ export default {
         position: relative;
     }
 
-    .hide {
-        display: none;
+    // .hide {
+    //     // display: none;
+    //     transform: translateX(100vw);
+    // }
+
+    .menu-wrapper {
+        transform: translateX(-100vw);
+        transition: .3s ease all;
+
+        &.show {
+            transform: translateX(0vw);
+        }
     }
 
     .menu-wrapper {
@@ -100,19 +115,19 @@ export default {
         top: 0;
         left: 0;
 
-        button.close {
-            position: absolute;
-            top: 20px;
-            right: 10px;
-            width: 15px;
-            height: 15px;
-            filter: invert(1);
+        >div {
+            margin-top: 40px;
+
         }
     }
 
     p {
-        font-size: 12px;
-        font-style: italic;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        // border-bottom: 1px solid white;
+        display: inline-block;
+        margin-bottom: 20px;
     }
 
     ul {
@@ -148,6 +163,11 @@ export default {
         top: 15px;
         left: 15px;
         filter: invert(1);
+        display: flex;
+
+        img {
+            display: flex;
+        }
     }
 }
 </style>

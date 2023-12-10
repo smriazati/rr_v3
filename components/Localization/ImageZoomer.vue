@@ -142,6 +142,11 @@ export default {
             flex-direction: column-reverse;
             display: flex;
 
+
+            @media (max-width: $collapse-bp) {
+                max-width: 30ch;
+            }
+
             p {
                 font-size: 14px;
                 letter-spacing: .02px;

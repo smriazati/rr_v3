@@ -270,9 +270,18 @@ export default {
   max-height: 100%;
   overflow: hidden;
 
+  display: flex;
+
+  figure,
+  figure>div,
+  .image-wrapper {
+    flex: 100%;
+  }
+
   figure {
     width: 100%;
     height: 100%;
+
 
     img {
       min-width: 100%;

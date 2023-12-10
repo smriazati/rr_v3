@@ -23,7 +23,7 @@
                         </figcaption>
                     </figure>
                     <div class="button-wrapper">
-                        <button ref="button" class="dark full-width" v-if="subjectCTA">
+                        <button ref="button" class="bright full-width" v-if="subjectCTA">
                             <nuxt-link :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
                                 <span>
                                     <LocalizationString :string="subjectCTA"></LocalizationString>
@@ -113,13 +113,25 @@ export default {
     }
 
     .card-row {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-gap: 30px;
+        // display: flex;
+        // flex-wrap: wrap;
+        // justify-content: center;
 
-        >*:not(:last-child) {
-            margin-right: 30px;
-        }
+        // @media (min-width: $collapse-bp) {
+        //     >*:not(:last-child) {
+        //         margin-right: 30px;
+        //     }
+        // }
+
+        // @media (max-width: $collapse-bp) {
+        //     >*:not(:last-child) {
+        //         margin-bottom: 30px;
+        //     }
+        // }
+
     }
 
     .card {

@@ -42,6 +42,7 @@ export default {
   align-items: center;
   overflow: hidden;
 
+
   &:before {
     content: "";
     background-image: url(/icons/tree.svg);
@@ -53,6 +54,10 @@ export default {
     height: 150%;
     width: 100%;
     top: -5%;
+
+    @media (max-width: $collapse-bp) {
+      top: -25%;
+    }
   }
 
   .text-wrapper {
@@ -63,11 +68,21 @@ export default {
       line-height: 80px;
       font-weight: 700;
       letter-spacing: 2%;
+
+      @media (max-width: $collapse-bp) {
+        font-size: 30px;
+        line-height: 30px;
+      }
     }
 
     p:not(.h1) {
       max-width: 55ch;
       margin: 0 auto;
+
+      @media (max-width: $collapse-bp) {
+        font-size: 18px;
+        line-height: 22px;
+      }
     }
   }
 }

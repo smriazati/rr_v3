@@ -33,6 +33,9 @@ export default {
   },
   mounted() {
     this.setNewAnim();
+    this.$nextTick(() => {
+      this.scrolledToEnd();
+    })
   },
   watch: {
     activeSection() {
@@ -63,18 +66,38 @@ export default {
       this.activeSection = i;
       // console.log("triggered set active section", i);
     },
+    scrolledToEnd() {
+      const scrollTrigger = this.$ScrollTrigger;
+      const gsap = this.$gsap;
+      const ref = this.$refs.textScroller;
+      let sections = gsap.utils.toArray(".panel");
+      if (!ref || !scrollTrigger || !sections) {
+        return
+      }
+      const endHeight = ((sections.length * innerHeight) - (innerHeight / 1.5)) + "px";
+
+      scrollTrigger.create({
+        start: "0px",
+        end: `+=${endHeight} bottom`,
+        onLeave: ({ progress, direction, isActive }) => {
+          // console.log(progress, direction, isActive)
+          this.$emit("scrolled-to-end");
+        },
+        // markers: true
+      });
+    },
     setNewAnim() {
       const gsap = this.$gsap;
       const scrollTrigger = this.$ScrollTrigger;
       let sections = gsap.utils.toArray(".panel");
 
       this.currentSection = sections[0];
-      console.log(sections)
+      // console.log(sections)
       gsap.defaults({ overwrite: 'auto', duration: 0.3 });
 
       // stretch out the body height according to however many sections there are. 
       gsap.set("body", { height: (sections.length * innerHeight) + "px" });
-      console.log((sections.length * innerHeight) + "px")
+      // console.log((sections.length * innerHeight) + "px")
       // create a ScrollTrigger for each section
       sections.forEach((section, i) => {
         scrollTrigger.create({
@@ -149,6 +172,7 @@ body {
 
   .panel {
     height: 100vh;
+    padding: 0 15px;
     // position: sticky;
     // top: 0;
     display: flex;

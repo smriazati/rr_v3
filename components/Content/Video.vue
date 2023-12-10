@@ -52,8 +52,26 @@ export default {
 }
 
 .content-video {
+
     .col.text-wrapper {
-        flex: 0 0 45ch;
+        @media (min-width: $collapse-bp) {
+
+            flex: 0 0 45ch;
+        }
+
+        @media (max-width: $collapse-bp) {
+            margin-top: 30px;
+        }
+    }
+
+    .caption {
+        @media (max-width: $collapse-bp) {
+            text-align: center;
+
+            span {
+                justify-content: center;
+            }
+        }
     }
 }
 </style>

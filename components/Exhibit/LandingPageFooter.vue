@@ -47,10 +47,12 @@ export default {
     align-items: center;
     padding: 15px;
 
-    >*:first-child {
-        flex: 0 0 50ch;
-
+    @media (min-width: 50ch) {
+        >*:first-child {
+            flex: 0 0 50ch;
+        }
     }
+
 
     >* {
         &:not(:last-child) {
@@ -64,9 +66,9 @@ export default {
         left: 0;
     }
 
-    @media (max-width: $collapse-bp) {
-        margin-top: 30px;
-    }
+    // @media (max-width: $collapse-bp) {
+    //     margin-top: 30px;
+    // }
 
     width: 100%;
     background: $gray;
@@ -93,6 +95,10 @@ export default {
 
         img {
             max-height: 50px;
+        }
+
+        @media (max-width: $collapse-bp) {
+            margin-top: 15px;
         }
     }
 }

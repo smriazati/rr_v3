@@ -119,6 +119,11 @@ export default {
   &.stories-page-wrapper .row-wrapper {
     padding-bottom: 175px;
   }
+
+  h1 {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .stories-page-wrapper {
@@ -129,6 +134,10 @@ export default {
     max-width: 586px;
     margin: 0 auto;
     padding: 100px 10px;
+
+    @media (max-width: $collapse-bp) {
+      padding: 100px 20px 0 20px;
+    }
 
     h2 {
       display: flex;
@@ -150,8 +159,14 @@ export default {
     align-items: center;
 
     .text-wrapper {
-      flex: 0 0 45ch;
-      padding: 0 30px;
+      @media (min-width: $collapse-bp) {
+        flex: 0 0 45ch;
+        padding: 0 30px;
+      }
+
+      @media (max-width: $collapse-bp) {
+        max-width: 100%;
+      }
     }
 
     .video-wrapper {
@@ -165,5 +180,36 @@ export default {
   }
 
 
+}
+
+@media (max-width: $collapse-bp) {
+  .resistance-page-wrapper.stories-page-wrapper .row-wrapper {
+    padding-bottom: 0;
+  }
+
+  .resistance-page-wrapper.stories-page-wrapper .row {
+    margin-bottom: 0;
+  }
+
+  .stories-page-wrapper .row-wrapper {
+    width: 100%;
+    padding: 10% 0 0 0;
+
+
+    .text-wrapper,
+    .video-wrapper {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .pagination-wrapper {
+      flex: 0 0 100%;
+      margin-top: 30px;
+    }
+
+    .pagination-wrapper nav {
+      position: relative;
+    }
+  }
 }
 </style>

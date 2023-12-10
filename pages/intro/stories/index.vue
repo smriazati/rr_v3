@@ -45,6 +45,10 @@ export default {
     max-width: 586px;
     margin: 0 auto;
     padding: 100px 10px;
+
+    @media (max-width: $collapse-bp) {
+      padding: 100px 20px 0 20px;
+    }
   }
 
   h1,

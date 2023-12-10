@@ -126,7 +126,7 @@ export default {
     }
 
     @media (max-width: $collapse-bp) {
-      padding: 30px;
+      padding: 15px;
     }
 
     width: 100%;
@@ -164,6 +164,12 @@ export default {
     h1,
     h2 {
       text-align: left;
+      display: flex;
+      justify-self: center;
+
+      @media (max-width: $collapse-bp) {
+        text-align: center;
+      }
     }
 
     h1 {
@@ -197,6 +203,7 @@ export default {
 
     @media (max-width: $collapse-bp) {
       text-align: center;
+      padding: 50px 10px;
     }
   }
 
@@ -205,7 +212,7 @@ export default {
 
     // padding-top: 60px;
     @media (max-width: $collapse-bp) {
-      padding-top: 30px;
+      padding: 15px 20px;
     }
 
     .text-wrapper p:last-child {
@@ -220,7 +227,7 @@ export default {
     }
 
     @media (max-width: $collapse-bp) {
-      padding-top: 0;
+      padding-top: 15px;
     }
 
     grid-area: f;

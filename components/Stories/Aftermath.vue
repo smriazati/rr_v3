@@ -10,7 +10,7 @@
                     <div v-if="item._type == 'contentImgFull'">
                         <ContentImageFull :content="item"></ContentImageFull>
                     </div>
-                    <div v-if="item._type == 'contentText'">
+                    <div v-if="item._type == 'contentText'" class="context-text-wrapper">
                         <ContentText :content="item"></ContentText>
                     </div>
                     <div v-if="item._type == 'contentVideo'" class="content-video">
@@ -110,5 +110,13 @@ export default {
 .aftermath-stories .content-quote {
     max-width: 55ch;
     text-align: center;
+}
+
+.aftermath-stories {
+    @media (max-width: $collapse-bp) {
+        .context-text-wrapper {
+            padding: 0 30px;
+        }
+    }
 }
 </style>

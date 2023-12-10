@@ -172,7 +172,10 @@ export default {
     }
 
     nav.pagination {
-        margin-top: -100px;
+
+        @media (min-width: $collapse-bp) {
+            margin-top: -100px;
+        }
 
         .wrapper {
             // background: darken($sage, 10);

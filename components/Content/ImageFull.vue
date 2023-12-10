@@ -14,3 +14,22 @@ export default {
 }
 </script>
 
+
+<style lang="scss">
+.content-image {
+
+    .image-wrapper,
+    figure {
+        display: flex;
+        justify-content: center;
+
+        figcaption {
+            @media (max-width: $collapse-bp) {
+                align-items: center;
+                margin-top: 5px;
+            }
+        }
+    }
+}
+</style>
+
