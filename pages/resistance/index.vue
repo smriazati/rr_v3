@@ -155,7 +155,7 @@ export default {
     flex-wrap: wrap;
     max-width: 1080px;
     margin: 0 auto;
-    margin-bottom: 54px;
+    margin-bottom: 0;
     align-items: center;
 
     .text-wrapper {

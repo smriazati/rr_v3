@@ -298,7 +298,7 @@ export default {
     align-items: center;
 
     @media (min-width: $collapse-bp) {
-      height: calc(100vh - 54px);
+      height: calc(100vh);
     }
 
     @media (max-width: $collapse-bp) {

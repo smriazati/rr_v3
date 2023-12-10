@@ -7,8 +7,8 @@
       ref="navWrapper">
       <LocalizationLanguagePicker></LocalizationLanguagePicker>
       <ul ref="navLinks" v-if="sections" class="nav-links">
-        <li v-for="(item, index) in sections" :key="index"
-          :class="activeSectionKey == sectionsArr[index] ? 'active' : ''">
+        <li v-for="(item, index) in sections" :key="index" :class="activeSectionKey == sectionsArr[index] ? 'active' : ''"
+          @click="toggleMenu">
           <nuxt-link :to="{ path: `/${sectionsArr[index]}`, query: $route.query }">
             <LocalizationString :string="item"></LocalizationString>
           </nuxt-link>
@@ -19,9 +19,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
-
+import { mapState } from "vuex"
 import { groq } from '@nuxtjs/sanity'
 const schema = "settings"
 const query = groq`*[_type == "${schema}"]{
@@ -37,6 +35,7 @@ export default {
     sectionsArr: ["intro", "occupation", "resistance", "aftermath", "conclusion"],
     isExpanded: false,
   }),
+
   computed: {
     ...mapState("exhibitNav", {
       isExhibitNavVisible: (state) => state.isExhibitNavVisible,
@@ -140,6 +139,13 @@ export default {
 </script>
 
 <style lang="scss">
+.exhibit-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+
 .exhibit-nav>button {
   position: fixed;
   z-index: 999;

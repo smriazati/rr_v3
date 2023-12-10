@@ -91,7 +91,7 @@ export default {
   left: 0;
   animation: fadeIn 0.3s ease forwards;
   justify-content: center;
-  height: calc(100% - 54px);
+  height: calc(100%);
 
   @media (max-width: $collapse-bp) {
     height: 100%;
@@ -210,7 +210,7 @@ export default {
 
 .stories-modal {
   main.content>.row.title {
-    padding: 0 0 54px 0;
+    padding: 0 0 0 0;
   }
 
   main.content>.row:last-child {

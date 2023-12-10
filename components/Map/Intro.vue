@@ -52,7 +52,7 @@ export default {
   }),
   async fetch() {
     const data = await this.$sanity.fetch(query)
-    console.log('data is', data)
+    // console.log('data is', data)
     if (!data) { return }
     this.content = data
   },
@@ -198,8 +198,8 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
 
     @media (max-width: $collapse-bp) {
       text-align: center;

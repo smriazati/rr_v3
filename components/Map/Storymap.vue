@@ -72,9 +72,9 @@ export default {
 <style lang="scss">
 .map {
   width: 100%;
-  height: calc(100% - 54px);
+  height: calc(100%);
   width: 100vw;
-  height: calc(100vh - 54px);
+  height: calc(100vh);
 
   @media (max-width: $mobile-bp) {
     height: 100%;

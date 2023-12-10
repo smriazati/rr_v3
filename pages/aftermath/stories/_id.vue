@@ -64,7 +64,7 @@ export default {
         color: #000;
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 54px);
+        min-height: calc(100vh);
         width: 100%;
         position: absolute;
         top: 0;
