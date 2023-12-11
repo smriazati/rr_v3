@@ -37,6 +37,7 @@ export default {
   async fetch() {
     this.content = await this.$sanity.fetch(query)
   },
+  fetchOnServer: false,
   data: () => ({
     content: ''
   }),

@@ -49,6 +49,7 @@ export default {
         if (!data.showLanguagePicker) { return }
         this.showLanguagePicker = data.showLanguagePicker
     },
+    fetchOnServer: false,
     props: {
         string: {
             type: String,

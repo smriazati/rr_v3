@@ -38,6 +38,7 @@ export default {
   async fetch() {
     this.labels = await this.$sanity.fetch(query)
   },
+  fetchOnServer: false,
   props: {
     vidId: {
       type: String,

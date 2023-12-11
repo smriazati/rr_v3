@@ -22,6 +22,7 @@ export default {
         if (!data) { return }
         this.sections = data.sections;
     },
+    fetchOnServer: false,
     computed: {
         sectionTitle() {
             if (!this.sections) { return }

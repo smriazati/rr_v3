@@ -35,6 +35,7 @@ export default {
         if (!data.content) { return }
         this.content = data.content
     },
+    fetchOnServer: false,
     data: () => ({
         content: '',
     }),

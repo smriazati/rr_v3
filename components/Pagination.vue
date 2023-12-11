@@ -47,6 +47,7 @@ export default {
   async fetch() {
     this.labels = await this.$sanity.fetch(query)
   },
+  fetchOnServer: false,
   computed: {
     ...mapState("localization", {
       activeLanguage: (state) => state.activeLanguage,

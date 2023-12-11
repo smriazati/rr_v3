@@ -78,6 +78,7 @@ export default {
   async fetch() {
     this.data = await this.$sanity.fetch(query)
   },
+  fetchOnServer: false,
   props: {
     markersData: {
       type: Array,

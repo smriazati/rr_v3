@@ -34,6 +34,7 @@ export default {
             "sections": content.sections
         }`)
     },
+    fetchOnServer: false,
     data: () => ({
         content: '',
     }),
