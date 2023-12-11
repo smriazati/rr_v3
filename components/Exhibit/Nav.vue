@@ -3,8 +3,7 @@
     <button :class="isExpanded ? 'expanded' : 'collapsed'" class="flat" @click="toggleMenu">
       <ExhibitNavToggleButton></ExhibitNavToggleButton>
     </button>
-    <nav :class="isExpanded ? 'expanded' : 'collapsed'" v-show="isExhibitNavVisible" class="exhibit-nav-wrapper"
-      ref="navWrapper">
+    <nav :class="isExpanded ? 'expanded' : 'collapsed'" class="exhibit-nav-wrapper" ref="navWrapper">
       <LocalizationLanguagePicker></LocalizationLanguagePicker>
       <ul ref="navLinks" v-if="sections" class="nav-links">
         <li v-for="(item, index) in sections" :key="index" :class="activeSectionKey == sectionsArr[index] ? 'active' : ''"
@@ -84,39 +83,6 @@ export default {
   methods: {
     toggleMenu() {
       this.isExpanded = !this.isExpanded;
-      if (this.isExpanded) {
-        this.openMenuAnimation();
-      } else {
-        this.closeMenuAnimation();
-      }
-    },
-    setMenuAnimation() {
-      const gsap = this.$gsap;
-      const ref = this.$refs.navWrapper;
-      // console.log(ref, "set");
-
-      gsap.set(ref, {
-        x: "-100vw",
-      });
-    },
-    openMenuAnimation() {
-      const gsap = this.$gsap;
-      const ref = this.$refs.navWrapper;
-      // console.log(ref, "open");
-
-      gsap.to(ref, {
-        x: "0vw",
-        duration: 0.3,
-      });
-    },
-    closeMenuAnimation() {
-      const gsap = this.$gsap;
-      const ref = this.$refs.navWrapper;
-      // console.log(ref, "close");
-      gsap.to(ref, {
-        x: "-100vw",
-        duration: 0.3,
-      });
     },
   },
   mounted() {
@@ -125,16 +91,13 @@ export default {
       const links = nav.querySelectorAll("li");
       if (links) {
         links.forEach((link) => {
-          // console.log(link);
           link.addEventListener("click", () => {
             this.isExpanded = false;
           });
         });
       }
     }
-    if (window.innerWidth < 768) {
-      this.setMenuAnimation();
-    }
+
   },
 };
 </script>

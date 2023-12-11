@@ -1,6 +1,6 @@
 <template>
     <div class="language-picker-wrapper">
-        <div>
+        <div v-if="showLanguagePicker">
             <div class="dropdown-wrapper">
                 <div class="dropdown-active">
                     <div class="wrapper">
@@ -30,23 +30,16 @@
 <script>
 
 import { mapState } from "vuex";
-
 import { groq } from '@nuxtjs/sanity'
-const schema = "settings"
-const query = groq`*[_type == "${schema}"]{
-  showLanguagePicker
-}[0]`
+
 
 
 export default {
-    data: () => ({
-        showLanguagePicker: '',
-        isExpanded: false
-    }),
     async fetch() {
+        const query = groq`*[_type == "settings"]{
+          showLanguagePicker
+        }[0]`
         const data = await this.$sanity.fetch(query)
-        if (!data) { return }
-        if (!data.showLanguagePicker) { return }
         this.showLanguagePicker = data.showLanguagePicker
     },
     fetchOnServer: false,
@@ -58,6 +51,7 @@ export default {
     },
     data() {
         return {
+            showLanguagePicker: true,
             isExpanded: false,
             languages: {
                 "en": {
