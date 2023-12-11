@@ -53,11 +53,4 @@ export default {
   max-width: 100vw;
   overflow-x: hidden;
 }
-
-.route-index,
-.route-1 {
-  .exhibit-nav {
-    opacity: 0;
-  }
-}
 </style>

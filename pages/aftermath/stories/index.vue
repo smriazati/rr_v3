@@ -16,6 +16,10 @@ export default {
         const content = $sanity.fetch(query)
         return content
     },
+    mounted() {
+        const body = document.querySelector('body');
+        body.style.height = 'auto'
+    },
     data() {
         return {
             name: "aftermath-stories",
@@ -33,6 +37,7 @@ export default {
 <style lang="scss">
 .route-aftermath-stories .stories-subjects-wrapper {
     padding-top: 100px;
+    min-height: 100vh;
 }
 
 .aftermath-stories {

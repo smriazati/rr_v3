@@ -32,8 +32,8 @@ export default {
     };
   },
   mounted() {
-    this.setNewAnim();
     this.$nextTick(() => {
+      this.setNewAnim();
       this.scrolledToEnd();
     })
   },
@@ -48,6 +48,13 @@ export default {
     panelNum() {
       return this.panels.length;
     },
+  },
+  beforeDestroy() {
+    // console.log('before destroy scroller');
+    const scrollTrigger = this.$ScrollTrigger;
+    const gsap = this.$gsap;
+    scrollTrigger.killAll();
+    gsap.set("body", { height: "auto" });
   },
   methods: {
     goToSection(i) {

@@ -50,6 +50,7 @@ export default {
     async fetch() {
         this.subjects = await this.$sanity.fetch(query)
     },
+    fetchOnServer: false,
     data: () => ({
         subjects: ''
     }),

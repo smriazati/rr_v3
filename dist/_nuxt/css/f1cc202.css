@@ -1,0 +1,1 @@
+@keyframes bounceIn{0%{transform:translateY(0)}to{transform:translateY(100px)}}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}.content-text h2{display:flex;justify-content:center;margin-top:15px}@media(max-width:768px){.content-text{margin:0 auto;max-width:90%;padding:0 30px}}.col p:not(:last-child){margin-bottom:30px}

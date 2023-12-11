@@ -28,6 +28,10 @@ export default {
       name: "introduction-stories",
     };
   },
+  mounted() {
+    const body = document.querySelector('body');
+    body.style.height = 'auto'
+  },
   head() {
     return {
       title: this.$setPageTitle(this.pageMetadata)
