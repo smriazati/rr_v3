@@ -3,6 +3,7 @@
     <button :class="isExpanded ? 'expanded' : 'collapsed'" class="flat" @click="toggleMenu">
       <ExhibitNavToggleButton></ExhibitNavToggleButton>
     </button>
+
     <nav :class="isExpanded ? 'expanded' : 'collapsed'" class="exhibit-nav-wrapper" ref="navWrapper">
       <LocalizationLanguagePicker></LocalizationLanguagePicker>
       <ul ref="navLinks" v-if="sections" class="nav-links">
@@ -167,6 +168,12 @@ export default {
       font-size: 18px;
     }
   }
+}
+
+.exhibit-nav .language-picker-wrapper {
+  padding: 15px;
+  background: #070707;
+  margin-bottom: 30px;
 }
 
 .exhibit-nav nav {

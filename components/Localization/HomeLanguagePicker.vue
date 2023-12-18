@@ -1,5 +1,5 @@
 <template>
-    <div class="language-picker-wrapper">
+    <div class="home-language-picker-wrapper">
         <div v-if="showLanguagePicker">
             <div class="dropdown-wrapper">
                 <div class="dropdown-active">
@@ -82,8 +82,8 @@ export default {
 </script>
 
 <style lang="scss">
-.language-picker-wrapper .label,
-.language-picker-wrapper button {
+.home-language-picker-wrapper .label,
+.home-language-picker-wrapper button {
     text-transform: uppercase;
     font-size: 14px;
     letter-spacing: 0.03em;
@@ -94,11 +94,16 @@ export default {
     }
 }
 
-.language-picker-wrapper .dropdown-wrapper .dropdown-options.hide {
+.home-language-picker-wrapper .dropdown-wrapper .dropdown-options.hide {
     display: none;
 }
 
-.language-picker-wrapper {
+.home-language-picker-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 999;
+    padding: 20px;
 
     .dropdown-active .wrapper {
         display: flex;

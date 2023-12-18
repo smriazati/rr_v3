@@ -14,32 +14,7 @@ export default {
       page: this.$route.name,
     };
   },
-  scrollToTop: true,
-  mounted() {
-    this.hideNavInIntroduction();
-  },
-  watch: {
-    $route: function (value) {
-      this.page = value.name;
-      this.hideNavInIntroduction();
-    },
-  },
-  computed: {
-    ...mapState("exhibitNav", {
-      isExhibitNavVisible: (state) => state.isExhibitNavVisible,
-    }),
-  },
-  methods: {
-    hideNavInIntroduction() {
-      if (this.page === "1" || this.page === "index") {
-        this.$store.commit("exhibitNav/hideExhibitNav");
-      } else {
-        if (!this.isExhibitNavVisible) {
-          this.$store.commit("exhibitNav/showExhibitNav");
-        }
-      }
-    },
-  },
+  scrollToTop: true
 };
 </script>
 

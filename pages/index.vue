@@ -32,6 +32,7 @@ const schema = "intro0"
 const query = groq`*[_type == "${schema}"][0]`
 
 export default {
+  layout: 'home',
   asyncData({ $sanity }) {
     const content = $sanity.fetch(query);
     return content;
@@ -55,6 +56,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 100vh;
 
   header {
     flex: 2;
