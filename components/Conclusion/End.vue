@@ -1,8 +1,8 @@
 <template>
   <div class="conclusion-ending-slide">
-    <!-- <div class="bg-image">
+    <div class="bg-image">
       <img src="/icons/tree.svg" alt="Tree icon" />
-    </div> -->
+    </div>
     <div class="text-wrapper centered">
       <p v-if="content.title" class="h1">
         <LocalizationString :string="content.title"></LocalizationString>
@@ -11,7 +11,7 @@
         <LocalizationString :string="content.subhead"></LocalizationString>
       </p>
       <nav>
-        <button ref="button" class="light full-width" v-if="content.btnText">
+        <button ref="button" class="bright full-width" v-if="content.btnText">
           <nuxt-link :to="{ path: '/', query: $route.query }">
             <LocalizationString :string="content.btnText"></LocalizationString>
           </nuxt-link>
@@ -33,56 +33,51 @@ export default {
 </script>
 <style lang="scss">
 .conclusion.page .conclusion-ending-slide {
-  margin-top: 25vh;
-  background: #192912;
+  background: #f5f5f5;
+  padding-top: 400px;
   height: 100vh;
+  max-height: 100vh;
+  padding-bottom: 25%;
+
+  padding-bottom: 25vh;
+  // @media (min-width: $collapse-bp) {
+  //   margin-bottom: 54px;
+  // }
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
 
-
-  &:before {
-    content: "";
-    background-image: url(/icons/tree.svg);
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: grayscale(0.9) blur(3px) brightness(2);
+  .bg-image {
     opacity: 0.3;
-    position: absolute;
-    height: 150%;
     width: 100%;
-    top: -5%;
+    height: 100%;
 
-    @media (max-width: $collapse-bp) {
-      top: -25%;
+    img {
+      width: 100%;
+      height: 100%;
+      filter: grayscale(1) brightness(3);
+      object-fit: cover;
     }
   }
 
   .text-wrapper {
     position: relative;
+  }
 
-    .h1 {
-      font-size: 72px;
-      line-height: 80px;
-      font-weight: 700;
-      letter-spacing: 2%;
+  p {
+    color: $gray;
+    display: flex;
+    justify-content: center;
 
-      @media (max-width: $collapse-bp) {
-        font-size: 30px;
-        line-height: 30px;
-      }
+    &.small {
+      @include pStyle($gray);
     }
+  }
 
-    p:not(.h1) {
-      max-width: 55ch;
+  @media (max-width: 960px) {
+    padding-top: 50vh;
+    padding-bottom: 60px;
+
+    button.align-left {
       margin: 0 auto;
-
-      @media (max-width: $collapse-bp) {
-        font-size: 18px;
-        line-height: 22px;
-      }
     }
   }
 }

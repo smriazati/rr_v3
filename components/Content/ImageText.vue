@@ -23,6 +23,9 @@ export default {
 }
 
 .content-image-text {
+    figure {
+        padding: 20px;
+    }
 
     .image-wrapper,
     figure {

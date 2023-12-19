@@ -143,32 +143,32 @@ export default {
 
   position: relative;
 
-  &:not(.playing) {
-    &:after {
-      content: '▶';
-      font-size: 120px;
+  // &:not(.playing) {
+  //   &:after {
+  //     content: '▶';
+  //     font-size: 120px;
 
-      color: #FFF;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: $sage;
-      transition: .3s ease all;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-    }
+  //     color: #FFF;
+  //     display: flex;
+  //     justify-content: center;
+  //     align-items: center;
+  //     background: $sage;
+  //     transition: .3s ease all;
+  //     position: absolute;
+  //     width: 100%;
+  //     height: 100%;
+  //     top: 0;
+  //     left: 0;
+  //   }
 
-    &:hover {
-      cursor: pointer;
+  //   &:hover {
+  //     cursor: pointer;
 
-      &:after {
-        background: #192912;
-      }
-    }
-  }
+  //     &:after {
+  //       background: #192912;
+  //     }
+  //   }
+  // }
 
 }
 
@@ -178,6 +178,10 @@ export default {
 }
 
 .vimeo-component {
+  button {
+    display: none !important;
+  }
+
   .pauseBtn {
     z-index: 100;
     margin: 0;

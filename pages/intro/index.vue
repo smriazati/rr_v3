@@ -9,13 +9,11 @@
         <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
       </div>
       <div class="text-scroller-wrapper" v-if="panels">
-        <SystemTextScroller :panels="panels" @scrolled-to-end="showPagination()" />
+        <SystemTextScroller :panels="panels" :pagination="nav" />
       </div>
-      <div v-show="isPaginationVisible">
-        <div v-if="nav">
+      <!-- <div v-if="nav">
           <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />
-        </div>
-      </div>
+        </div> -->
     </div>
   </div>
 </template>
@@ -35,7 +33,6 @@ export default {
   data() {
     return {
       name: "introduction",
-      isPaginationVisible: false,
       wrapperHeight: null,
     };
   },
@@ -67,13 +64,7 @@ export default {
     setWrapperHeight() {
       if (!this.panels) { return }
       this.wrapperHeight = window.innerHeight * this.panels.length;
-    },
-    showPagination() {
-      this.isPaginationVisible = true;
-    },
-    hidePagination() {
-      this.isPaginationVisible = false;
-    },
+    }
   },
 };
 </script>

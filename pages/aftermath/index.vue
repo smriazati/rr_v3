@@ -9,12 +9,7 @@
                 <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
             </div>
             <div class="text-scroller-wrapper" v-if="panels">
-                <SystemTextScroller :panels="panels" @scrolled-to-end="showPagination()" />
-            </div>
-            <div v-show="isPaginationVisible">
-                <div v-if="nav">
-                    <Pagination v-if="nav?.next" link="/aftermath/stories" :message="nav.next" />
-                </div>
+                <SystemTextScroller :panels="panels" :pagination="nav" />
             </div>
         </div>
     </div>
@@ -34,7 +29,6 @@ export default {
     data() {
         return {
             name: "aftermath",
-            isPaginationVisible: false,
             wrapperHeight: null,
         };
     },
@@ -52,13 +46,7 @@ export default {
     methods: {
         setWrapperHeight() {
             this.wrapperHeight = window.innerHeight * this.panels.length;
-        },
-        showPagination() {
-            this.isPaginationVisible = true;
-        },
-        hidePagination() {
-            this.isPaginationVisible = false;
-        },
+        }
     },
 };
 </script>

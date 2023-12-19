@@ -314,7 +314,7 @@ export default {
     @include pBigStyle();
   }
 
-  figure p {
+  .bg-image p {
     font-size: 14px;
     letter-spacing: .02px;
     line-height: 18px;
@@ -324,7 +324,7 @@ export default {
     }
   }
 
-  blockquote {
+  figure blockquote {
     @media (max-width: $nav-bp) {
       font-size: 32px;
       line-height: 38px;

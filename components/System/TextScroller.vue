@@ -12,6 +12,11 @@
           <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-down" />
         </button>
       </div>
+      <div v-if="index === panels.length - 1" class="pagination-wrapper">
+        <div v-if="pagination">
+          <Pagination v-if="pagination?.next" link="/intro/stories" :message="pagination.next" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -23,6 +28,9 @@ export default {
       type: Array,
       required: true,
     },
+    pagination: {
+      type: Object
+    }
   },
   data() {
     return {
@@ -158,6 +166,13 @@ body {
   height: auto;
 }
 
+.text-scroller .pagination {
+  position: relative;
+  bottom: unset;
+  right: unset;
+}
+
+
 .text-scroller-wrapper {
   position: relative;
   z-index: 20;
@@ -182,9 +197,9 @@ body {
     padding: 0 15px;
     // position: sticky;
     // top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
     // background: rgba(10, 10, 10, 0.6);
 
     position: fixed;
@@ -193,6 +208,21 @@ body {
     height: 100%;
     top: 0;
     left: 0;
+
+
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 15% 1fr 15%;
+
+    .text-wrapper {
+      grid-row: 2 / 3;
+    }
+
+    .pagination-wrapper {
+      grid-row: 3 /4;
+      max-width: 300px;
+      margin: 0 auto;
+    }
 
     .text-wrapper {
       display: grid;
