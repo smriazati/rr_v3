@@ -1,5 +1,5 @@
 <template>
-    <div class="stories-page-wrapper">
+    <div class="aftermath-stories-page-wrapper">
         <StoriesSubjects :title="title" :subtitle="subhead" :subjectCTA="subjectCTA" route="aftermath" />
     </div>
 </template>
@@ -36,27 +36,21 @@ export default {
   
 <style lang="scss">
 .route-aftermath-stories .stories-subjects-wrapper {
-    padding-top: 100px;
     min-height: 100vh;
 }
 
-.aftermath-stories {
-    @media (max-width: $collapse-bp) {
-        padding-top: 60px;
+.aftermath-stories-page-wrapper {
+    margin-top: 50px;
+    padding: 0 30px;
+
+    .stories-subjects-wrapper {
+        padding-right: 0px;
     }
+}
 
-    position: relative;
-
-
-
-    .text-wrapper {
-        padding: 30px;
-        max-width: 60ch;
-        /* margin-bottom: 60px; */
-
-        >*:last-child {
-            margin-bottom: 0px;
-        }
+@media (max-height: 700px) {
+    img {
+        width: 300px;
     }
 }
 </style>

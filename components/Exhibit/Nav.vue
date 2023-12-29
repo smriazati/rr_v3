@@ -109,6 +109,10 @@ export default {
   top: 0;
   left: 0;
   z-index: 999;
+
+  @media (min-width: 300px) {
+    min-width: 300px;
+  }
 }
 
 .exhibit-nav>button {
@@ -121,6 +125,7 @@ export default {
 
 .exhibit-nav-wrapper {
   position: fixed;
+  overflow: scroll;
   z-index: 111;
   background: #31572A;
   height: 100%;
@@ -141,6 +146,11 @@ export default {
   .nav-links {
     li {
       padding: 15px;
+
+      @media (max-height: 500px) {
+        padding: 5px 15px;
+      }
+
       background: #31572A;
       transition: .3s ease all;
 
@@ -172,8 +182,15 @@ export default {
 
 .exhibit-nav .language-picker-wrapper {
   padding: 15px;
+
+
+
   background: #070707;
   margin-bottom: 30px;
+
+  @media (max-height: 500px) {
+    margin-bottom: 15px;
+  }
 }
 
 .exhibit-nav nav {

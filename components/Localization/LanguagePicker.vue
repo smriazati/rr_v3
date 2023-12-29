@@ -4,7 +4,7 @@
             <div class="dropdown-wrapper">
                 <div class="dropdown-active">
                     <div class="wrapper">
-                        <p class="label" @click="toggleDropdown">Choose Language</p>
+                        <p class="label" @click="toggleDropdown">English / Ukrainian</p>
                         <div class="arrow-down"></div>
                     </div>
                 </div>

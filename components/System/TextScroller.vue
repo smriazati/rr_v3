@@ -2,21 +2,27 @@
   <div class="text-scroller" ref="textScroller">
     <div class="panel" v-for="(item, index) in panels" :key="index">
       <div class="text-wrapper light centered flex-col">
-        <p>
-          <LocalizationString :string="item"></LocalizationString>
-        </p>
+        <div class="wrapper">
+          <p>
+            <LocalizationString :string="item"></LocalizationString>
+          </p>
+          <div v-if="index === panels.length - 1" class="pagination-wrapper">
+            <div v-if="pagination">
+              <Pagination v-if="pagination?.next" :link="`/${route}/stories`" :message="pagination.next" />
+            </div>
+          </div>
+        </div>
+
         <button class="flat up" v-if="index !== 0" @click="goToSection(index - 1)">
           <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-up" />
         </button>
         <button class="flat down" v-if="index < panelNum - 1" @click="goToSection(index + 1)">
           <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-down" />
         </button>
+
+
       </div>
-      <div v-if="index === panels.length - 1" class="pagination-wrapper">
-        <div v-if="pagination">
-          <Pagination v-if="pagination?.next" link="/intro/stories" :message="pagination.next" />
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -30,6 +36,10 @@ export default {
     },
     pagination: {
       type: Object
+    },
+    route: {
+      type: String,
+      required: true,
     }
   },
   data() {
@@ -212,16 +222,20 @@ body {
 
     display: grid;
     grid-template-columns: 100%;
-    grid-template-rows: 15% 1fr 15%;
+    grid-template-rows: 5% 1fr 5%;
 
     .text-wrapper {
       grid-row: 2 / 3;
     }
 
     .pagination-wrapper {
-      grid-row: 3 /4;
       max-width: 300px;
       margin: 0 auto;
+      margin-top: 15px;
+
+      h3:not(.collapsed-mb) {
+        margin-bottom: 15px;
+      }
     }
 
     .text-wrapper {

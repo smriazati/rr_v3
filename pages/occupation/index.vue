@@ -8,7 +8,7 @@
         <div v-if="isIntroVisible" class="modal-container transparent">
             <MapIntro @close-modal="closeIntro" />
         </div>
-        <div v-show="areMapControlsActive">
+        <div v-show="areMapControlsActive" class="map-controls-outer-wrapper">
             <MapControls :markersData="markersData" @show-intro="showIntro()" />
         </div>
         <div v-if="isModalVisible" class="modal-container">
@@ -92,8 +92,8 @@ export default {
             }
         },
         viewedStories() {
-            if (!this.viewStories) { return }
-            if (this.viewedStories.length === this.markers.length) {
+            if (!this.viewedStories) { return }
+            if (this.viewedStories.length === this.markersData.length) {
                 this.viewedAllStories = true;
                 this.$store.commit("occupation/setFirstVisit");
             }
@@ -172,5 +172,26 @@ export default {
     max-width: 100vw;
     min-height: 100vh;
     overflow: hidden;
+
+    h1 {
+        justify-content: center;
+        text-align: center;
+
+        @media (max-width: 1100px) {
+            font-size: 48px;
+            line-height: 52px;
+        }
+    }
+
+    .map-controls-outer-wrapper {
+        position: absolute;
+        top: 20px;
+        left: 80px;
+
+        @media (max-height: 550px) {
+            overflow: scroll;
+            height: 100vh;
+        }
+    }
 }
 </style>

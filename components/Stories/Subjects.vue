@@ -1,7 +1,7 @@
 <template>
     <div class="stories-subjects-wrapper" id="stories">
         <div class="content-wrapper">
-            <div class="text-wrapper">
+            <div class="header-wrapper">
                 <h2 v-if="title" class="h1 title collapsed-mb">
                     <LocalizationString :string="title">
                     </LocalizationString>
@@ -12,25 +12,28 @@
                 </p>
             </div>
             <div class="card-row">
-                <nuxt-link class="card" v-for="(item, key, index) in subjects" :key="index"
+                <nuxt-link :class="`card card-${index + 1}`" v-for="(item, key, index) in subjects" :key="index"
                     :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
                     <figure class="image-wrapper">
                         <div class="img">
-                            <LocalizationImageNoCaption :img="item.img"></LocalizationImageNoCaption>
+                            <LocalizationImageNoCaption :img="item.img" :size="500"></LocalizationImageNoCaption>
                         </div>
                         <figcaption>
                             <LocalizationString :string="item.name"></LocalizationString>
                         </figcaption>
                     </figure>
-                    <div class="button-wrapper">
-                        <button ref="button" class="bright full-width" v-if="subjectCTA">
+                    <!-- <div class="button-wrapper">
+                        <div>
                             <nuxt-link :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
-                                <span>
+                                <span v-if="subjectCTA">
                                     <LocalizationString :string="subjectCTA"></LocalizationString>
                                 </span>
+                                <span v-else>
+                                    <span>Read more</span>
+                                </span>
                             </nuxt-link>
-                        </button>
-                    </div>
+                        </div>
+                    </div> -->
                 </nuxt-link>
             </div>
         </div>
@@ -76,7 +79,7 @@ export default {
             const routeKey = routeName.substr(0, routeName.indexOf('-'))
             return routeKey
         }
-    }
+    },
 };
 </script>
   
@@ -90,95 +93,102 @@ export default {
 }
 
 .stories-subjects-wrapper {
-    background: #000;
-    padding: 10% 10px;
-    text-align: center;
+    min-width: 100%;
+    width: 100%;
+    padding-right: 30px;
 
-    .content-wrapper {
-        max-width: 1080px;
-        margin: 0 auto;
+    h1,
+    .h1 {
+        font-size: 48px;
+        line-height: 52px;
+    }
 
-        .text-wrapper {
-            text-align: left;
+    .header-wrapper {
+        margin-bottom: 30px;
 
-            h2 {
-                justify-content: flex-start;
-            }
+        h2 {
+            margin-bottom: 5px;
+
+        }
+
+        p.small {
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        span {
+            text-align: center;
+            justify-content: center;
         }
     }
 
-    p {
-        display: flex;
-        font-size: 16px;
-        line-height: 20px;
-    }
+    figcaption {
+        margin-top: 15px;
 
-    .card-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        grid-gap: 30px;
-        // display: flex;
-        // flex-wrap: wrap;
-        // justify-content: center;
+        span {
+            justify-content: center;
+            text-align: center;
+            font-size: 18px;
+            line-height: 22px;
+            letter-spacing: 0.04em;
 
-        // @media (min-width: $collapse-bp) {
-        //     >*:not(:last-child) {
-        //         margin-right: 30px;
-        //     }
-        // }
+            // @media (max-width: 830px) {
+            //     font-size: 14px;
+            //     line-height: 16px;
+            // }
 
-        // @media (max-width: $collapse-bp) {
-        //     >*:not(:last-child) {
-        //         margin-bottom: 30px;
-        //     }
-        // }
-
-    }
-
-    .card {
-        background: #1F1F1F;
-
-        border-radius: 36px;
-        padding: 30px 10px;
-
-        img {
-            transform: scale(1);
-            transition: 1s ease-out all;
-            filter: grayscale(1)
-        }
-
-        overflow: hidden;
-
-        &:hover {
-            text-decoration: none;
-
-            span,
-            * {
-                text-decoration: none;
-            }
-
-            img {
-                transform: scale(1.08);
-                filter: grayscale(0);
-            }
-        }
-
-        figure {
-            display: flex;
-            flex-direction: column-reverse;
-
-            figcaption {
-                display: flex;
-                justify-content: center;
-                font-size: 26px;
-                line-height: 30px;
-                margin-bottom: 20px;
-            }
-        }
-
-        button {
-            margin-top: -30px;
+            text-transform: uppercase;
         }
     }
+}
+
+.card-row {
+    display: flex;
+    justify-content: center;
+
+    >*:not(:last-child) {
+        margin-right: 15px;
+    }
+
+    @media (max-width: 830px) {
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+
+        >* {
+            flex: 0 0 300px;
+            margin-bottom: 30px;
+        }
+    }
+}
+
+// card animations
+@keyframes slideIn {
+    0% {
+        transform: translateY(5px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.card {
+    transform: translateY(5px);
+    opacity: 0;
+}
+
+.card-1 {
+    animation: 2s ease-in forwards slideIn;
+}
+
+.card-2 {
+    animation: 2s .3s ease-in forwards slideIn;
+}
+
+.card-3 {
+    animation: 2s .55s ease-in forwards slideIn;
 }
 </style>

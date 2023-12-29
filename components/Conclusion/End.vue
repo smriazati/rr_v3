@@ -34,12 +34,15 @@ export default {
 <style lang="scss">
 .conclusion.page .conclusion-ending-slide {
   background: #f5f5f5;
-  padding-top: 400px;
+  // padding-top: 400px;
   height: 100vh;
   max-height: 100vh;
-  padding-bottom: 25%;
+  // padding-bottom: 25%;
 
-  padding-bottom: 25vh;
+  // padding-bottom: 25vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   // @media (min-width: $collapse-bp) {
   //   margin-bottom: 54px;
   // }

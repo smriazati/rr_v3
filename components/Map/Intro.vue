@@ -6,7 +6,7 @@
           <h1>
             <LocalizationString :string="content.title"></LocalizationString>
           </h1>
-          <h2>
+          <h2 v-if="content.subhead">
             <LocalizationString :string="content.subhead"></LocalizationString>
           </h2>
         </div>
@@ -163,7 +163,7 @@ export default {
 
     h1,
     h2 {
-      text-align: left;
+      // text-align: left;
       display: flex;
       justify-self: center;
 
@@ -174,6 +174,8 @@ export default {
 
     h1 {
       margin-top: 10px;
+      justify-content: center;
+      text-align: center;
     }
 
     h2 {

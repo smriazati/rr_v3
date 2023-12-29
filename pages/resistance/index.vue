@@ -1,20 +1,23 @@
 <template>
   <div :class="name" class="stories-page-wrapper resistance-page-wrapper ">
-    <div class="intro-text-wrapper text-wrapper">
-      <StoriesSubheadline></StoriesSubheadline>
-      <h1 class="center">
-        <LocalizationString :string="title"></LocalizationString>
-      </h1>
-      <p>
-        <LocalizationString :string="subtext"></LocalizationString>
-      </p>
-    </div>
+    <header class="intro-text-wrapper text-wrapper">
+      <div class="wrapper">
+        <StoriesSubheadline></StoriesSubheadline>
+        <h1 class="center">
+          <LocalizationString :string="title"></LocalizationString>
+        </h1>
+        <p>
+          <LocalizationString :string="subtext"></LocalizationString>
+        </p>
+        <div>
+          <LocalizationRte :content="instructions"></LocalizationRte>
+        </div>
+      </div>
+    </header>
 
     <div class="row-wrapper">
       <div class="row">
-        <div class="text-wrapper">
-          <LocalizationRte :content="instructions"></LocalizationRte>
-        </div>
+
         <div class="video-wrapper vimeo-component">
           <VimeoComponent vidId="650434994"></VimeoComponent>
         </div>
@@ -112,31 +115,61 @@ export default {
 
 <style lang="scss">
 .resistance-page-wrapper {
-  .pagination {
-    bottom: 82px;
-  }
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  min-width: 100%;
+  width: 100%;
+  grid-template-columns: 40% 60%;
+  grid-gap: 30px;
 
-  &.stories-page-wrapper .row-wrapper {
-    padding-bottom: 175px;
-  }
-
-  h1 {
+  @media (max-height: 600px) {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+
+    header {
+      margin: 30px auto;
+      max-width: 50ch;
+    }
   }
-}
 
-.stories-page-wrapper {
-  background: linear-gradient(180deg, #162D11 0%, #375132 100%);
-  flex: 100%;
+  padding: 0 15px;
 
-  .intro-text-wrapper {
-    max-width: 586px;
-    margin: 0 auto;
-    padding: 100px 10px;
+  @media (max-width: 680px) {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+  }
 
-    @media (max-width: $collapse-bp) {
-      padding: 100px 20px 0 20px;
+  .iframe-wrapper>div {
+    width: 95%;
+  }
+
+  .vimeo-component .iframe-wrapper {
+    box-shadow: none;
+  }
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    padding-left: 20px;
+
+    span {
+      justify-content: center;
+    }
+
+    .wrapper {
+      background: black;
+      border: 1px solid white;
+      padding: 30px;
+
+      >*:not(:last-child) {
+        margin-bottom: 15px;
+      }
+
+      p {
+        margin-bottom: 15px;
+      }
     }
 
     h2 {
@@ -145,70 +178,43 @@ export default {
     }
   }
 
-  .row-wrapper {
-    background: $gray;
-    padding: 10% 30px;
+  h1,
+  .h1 {
+    font-size: 48px;
+    line-height: 52px;
   }
 
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 1080px;
-    margin: 0 auto;
-    margin-bottom: 0;
-    align-items: center;
-
-    .text-wrapper {
-      @media (min-width: $collapse-bp) {
-        flex: 0 0 45ch;
-        padding: 0 30px;
-      }
-
-      @media (max-width: $collapse-bp) {
-        max-width: 100%;
-      }
-    }
-
-    .video-wrapper {
-      flex: 2;
-    }
-
-    .button-wrapper {
-      flex: 0 0 100%;
-      margin-top: 30px;
-    }
+  .subheadline {
+    font-size: 18px;
+    line-height: 22px;
   }
 
-
+  .pagination {
+    bottom: 15px;
+    right: 15px;
+  }
 }
 
-@media (max-width: $collapse-bp) {
-  .resistance-page-wrapper.stories-page-wrapper .row-wrapper {
-    padding-bottom: 0;
-  }
+@media (max-height: 600px) {
 
-  .resistance-page-wrapper.stories-page-wrapper .row {
-    margin-bottom: 0;
-  }
+  .resistance-page-wrapper {
 
-  .stories-page-wrapper .row-wrapper {
-    width: 100%;
-    padding: 10% 0 0 0;
+    display: flex;
+    flex-direction: column;
 
-
-    .text-wrapper,
-    .video-wrapper {
-      padding-left: 20px;
-      padding-right: 20px;
+    header {
+      margin: 30px auto;
+      max-width: 50ch;
     }
 
-    .pagination-wrapper {
-      flex: 0 0 100%;
-      margin-top: 30px;
-    }
-
-    .pagination-wrapper nav {
+    .pagination {
       position: relative;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .iframe-wrapper>div {
+      padding-top: 51.25%;
     }
   }
 }

@@ -9,7 +9,7 @@
         <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
       </div>
       <div class="text-scroller-wrapper" v-if="panels">
-        <SystemTextScroller :panels="panels" :pagination="nav" />
+        <SystemTextScroller :panels="panels" :pagination="nav" route="intro" />
       </div>
       <!-- <div v-if="nav">
           <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />

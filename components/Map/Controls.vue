@@ -1,42 +1,32 @@
 <template>
-  <div :class="isExpanded ? 'expanded' : 'collapsed'" class="map-controls">
-    <button v-if="!isExpanded" class="menu-toggle" @click="toggleMenu">
-      <span class="text">Open Map Menu</span>
-    </button>
-    <button v-else class="flat menu-toggle" @click="toggleMenu">
-      <span class="visually-hidden">Close Map Menu</span>
-      <SystemIcon type="close" color="light" :width="30" />
-    </button>
-    <h2 class="visually-hidden">Map controls</h2>
-    <div class="map-box-wrapper">
-      <nav class="map-options map-box" v-if="data.content">
-        <h3>
-          <LocalizationString :string="data.content.optionsTitle"></LocalizationString>
-        </h3>
-        <ul>
-          <li class="hover-cursor" @click="showIntro">
-            <span class="icon">
-              <img class="icon icon-instructions icon-light" src="/icons/instructions.svg"
-                alt="view instructions icon" /></span>
-            <LocalizationString :string="data.content.instructionsLabel"></LocalizationString>
-          </li>
-          <li class="hover-cursor" id="recenterMap">
-            <span class="icon">
-              <img class="icon icon-recenter icon-light" src="/icons/recenter.svg" alt="recenter the map icon" /></span>
-            <LocalizationString :string="data.content.recenterLabel"></LocalizationString>
-          </li>
-        </ul>
-      </nav>
-      <nav class="map-marker-list map-box">
-        <h3 v-if="data.content">
-          <LocalizationString :string="data.content.markersTitle"></LocalizationString>
-        </h3>
-        <ul v-if="markersSorted">
-          <MapControlsMarkerListItem v-for="(item, index) in  markersSorted " :key="index" :item="item" :index="index">
-          </MapControlsMarkerListItem>
-        </ul>
-      </nav>
-    </div>
+  <div class="map-controls-wrapper">
+    <nav class="map-options map-box" v-if="data.content">
+      <h3>
+        <LocalizationString :string="data.content.optionsTitle"></LocalizationString>
+      </h3>
+      <ul>
+        <li class="hover-cursor" @click="showIntro">
+          <span class="icon">
+            <img class="icon icon-instructions icon-light" src="/icons/instructions.svg"
+              alt="view instructions icon" /></span>
+          <LocalizationString :string="data.content.instructionsLabel"></LocalizationString>
+        </li>
+        <li class="hover-cursor" id="recenterMap">
+          <span class="icon">
+            <img class="icon icon-recenter icon-light" src="/icons/recenter.svg" alt="recenter the map icon" /></span>
+          <LocalizationString :string="data.content.recenterLabel"></LocalizationString>
+        </li>
+      </ul>
+    </nav>
+    <nav class="map-marker-list map-box">
+      <h3 v-if="data.content">
+        <LocalizationString :string="data.content.markersTitle"></LocalizationString>
+      </h3>
+      <ul v-if="markersSorted">
+        <MapControlsMarkerListItem v-for="(item, index) in  markersSorted " :key="index" :item="item" :index="index">
+        </MapControlsMarkerListItem>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -131,147 +121,38 @@ export default {
 </script>
 
 <style lang="scss">
-.map-controls {
-  .menu-toggle {
-    display: none;
+.map-controls-wrapper {
+  top: 0;
+  // padding: 80px 0px 40px 0;
+
+  h3 {
+    font-size: 18px;
+    letter-spacing: 0.03em;
+    background: black;
+    padding: 10px 20px;
   }
 
-  @media (max-width: $mobile-bp) {
-    .menu-toggle {
-      display: block;
-      // top: 0;
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      background: $gray;
-    }
 
-    &.expanded {
-      .menu-toggle {
-        position: relative;
-      }
-    }
-
-    &.collapsed {
-      background: transparent;
-      height: auto;
-      position: relative;
-
-      nav {
-        display: none;
-      }
-    }
-  }
-}
-
-.map-controls {
-  .map-box-wrapper {
-    @media (min-width: $collapse-bp) {
-      position: fixed;
-      left: 15px;
-      top: 150px;
-    }
-  }
-
-  .map-box {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-
-    h3 {
-      width: 100%;
-      padding: 10px 15px;
-      background: $sage;
-      color: $white;
-      text-align: center;
-      margin: 0;
-      letter-spacing: 1px;
-      @include pStyle();
-      text-transform: uppercase;
-      font-weight: 400;
-    }
-
-    ul {
-      width: 100%;
-
-      li {
-        // white-space: nowrap;
-        display: flex;
-        align-items: center;
-        background: $forest;
-
-        >* {
-          padding: 9px 15px;
-        }
-
-        >span:not(.icon) {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-        }
-
-        transition: 0.3s ease all;
-
-        >.icon {
-          transition: 0.3s ease all;
-          margin-right: 5px;
-
-          img {
-            height: 25px;
-            width: 25px;
-          }
-        }
-
-        &:hover {
-          background: $forest;
-          color: $white;
-        }
-      }
-    }
-  }
-
-  .map-options {
-    // position: fixed;
-    // width: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  ul {
+    background: #4d643f;
+    margin-bottom: 15px;
+    padding: 15px 20px;
 
     li {
-      padding-right: 30px;
+      font-size: 18px;
+      line-height: 22px;
     }
   }
 
-  .map-marker-list {
-    top: 300px;
-    margin-top: 30px;
-  }
-}
+  .map-marker-list ul li>span,
+  .map-options ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 
-.map-controls {
-  .hover-cursor {
-    transition: 0.3s ease all;
-
-    a,
-    span {
-      transition: 0.3s ease all;
-      color: white;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &:hover {
-      color: $white;
-
-      span {
-        color: $white;
-      }
+    .icon {
+      flex: 0 0 35px;
+      margin-right: 10px;
     }
   }
 }
@@ -321,12 +202,9 @@ $marker-color-5: #a16231;
   }
 
   li>* {
-    display: flex;
-    // margin-bottom: 15px;
-
     .icon {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       transition: 0.3s ease all;
       -webkit-mask-image: url("./assets/icons/pin.svg");
       mask-image: url("./assets/icons/pin.svg");
@@ -334,6 +212,7 @@ $marker-color-5: #a16231;
       mask-repeat: no-repeat;
       -webkit-mask-size: contain;
       mask-size: contain;
+      mask-position: center center;
     }
 
     &:not(.viewed-marker):hover {
@@ -351,51 +230,6 @@ $marker-color-5: #a16231;
         text-decoration: line-through;
         color: $gray;
       }
-    }
-  }
-}
-
-@media (max-width: $collapse-bp) {
-  .map-controls.expanded {
-    .map-options {
-      ul li>span:last-child {
-        justify-content: flex-start;
-        padding-left: 0;
-      }
-    }
-
-    background: rgba($gray, 0.9);
-    position: fixed;
-    z-index: 201;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    padding: 120px 0 80px 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .menu-toggle {
-      position: fixed;
-      z-index: 202;
-      top: 0;
-      right: 0;
-      left: unset;
-      width: 70px;
-      height: 70px;
-      padding: 11px;
-      background: transparent;
-
-      .icon {
-        padding: 0;
-      }
-    }
-
-    .map-box-wrapper {
-      width: calc(100% - 50px);
-      margin: 0 auto;
     }
   }
 }
