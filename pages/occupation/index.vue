@@ -183,15 +183,6 @@ export default {
         }
     }
 
-    .map-controls-outer-wrapper {
-        position: absolute;
-        top: 20px;
-        left: 80px;
 
-        @media (max-height: 550px) {
-            overflow: scroll;
-            height: 100vh;
-        }
-    }
 }
 </style>

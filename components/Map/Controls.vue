@@ -1,7 +1,7 @@
 <template>
   <div class="map-controls-wrapper">
     <nav class="map-options map-box" v-if="data.content">
-      <h3>
+      <h3 class="visually-hidden">
         <LocalizationString :string="data.content.optionsTitle"></LocalizationString>
       </h3>
       <ul>
@@ -121,6 +121,33 @@ export default {
 </script>
 
 <style lang="scss">
+.map-marker-list {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+
+  @media (max-height: 550px) {
+    overflow: scroll;
+    height: 100vh;
+  }
+}
+
+.map-controls-wrapper {
+
+  .map-options {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 70px;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+}
+
 .map-controls-wrapper {
   top: 0;
   // padding: 80px 0px 40px 0;
@@ -132,8 +159,15 @@ export default {
     padding: 10px 20px;
   }
 
+  .map-options ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
 
-  ul {
+  }
+
+  .map-marker-list ul {
     background: #4d643f;
     margin-bottom: 15px;
     padding: 15px 20px;
@@ -144,8 +178,23 @@ export default {
     }
   }
 
-  .map-marker-list ul li>span,
   .map-options ul li {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 5px 10px;
+
+    img {
+      width: 25px;
+      height: 25px;
+      margin-right: 10px;
+    }
+  }
+
+  .map-marker-list ul li>span {
     display: flex;
     align-items: center;
     margin-bottom: 10px;

@@ -57,7 +57,7 @@ export default {
         title: false,
         byline: false,
       },
-      isPlaying: false,
+      isPlaying: false
     };
   },
   methods: {
@@ -104,18 +104,21 @@ export default {
       this.$emit("on-vid-pausing", false);
       this.$refs.vid.pause();
     },
-    onVidLoaded() {
-      // console.log("loaded");
+    onVidLoaded(id) {
+      // console.log("loaded", id);
+
+      // this.timeToShowPagination = time;
     },
     onVidReady() {
       // console.log("ready now");
     },
-    onVidPlaying() {
-      // console.log("playing now");
+    onVidPlaying(event, data, player) {
+      console.log(event);
       if (!this.isPlaying) {
         this.isPlaying = true;
       }
-      this.$emit("on-vid-playing", true);
+
+      this.$emit("on-vid-playing", event.duration);
     },
     onVidPaused() {
       console.log("on vid paused now");
@@ -132,7 +135,7 @@ export default {
       this.$emit("on-vid-ended");
     },
     onVidTimeUpdate(event, data, player) {
-      //   console.log(event, data, player);
+      this.$emit("on-vid-time-update", event.seconds);
     },
   },
 };

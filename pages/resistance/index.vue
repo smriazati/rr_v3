@@ -19,7 +19,9 @@
       <div class="row">
 
         <div class="video-wrapper vimeo-component">
-          <VimeoComponent vidId="650434994"></VimeoComponent>
+          <VimeoComponent vidId="650434994" @on-vid-playing="onVidPlaying" @on-vid-ended="onVidEnded()"
+            @on-vid-time-update="onVidTimeUpdate">
+          </VimeoComponent>
         </div>
 
         <div v-if="isPaginationVisible" class="pagination-wrapper">
@@ -50,7 +52,7 @@ export default {
     return {
       name: "resistance",
       isFilmEnded: false,
-      isPaginationVisible: true,
+      isPaginationVisible: false,
       isFilmActive: false,
       isFilmPlaying: false,
       options: {
@@ -62,6 +64,9 @@ export default {
         title: false,
         byline: false,
       },
+
+      timeToShowPagination: undefined,
+      timeBeforeEnd: 10
     };
   },
   head() {
@@ -70,7 +75,17 @@ export default {
     }
   },
   methods: {
-    onFilmEnded() {
+    onVidPlaying(duration) {
+      // console.log(duration);
+      if (!this.timeToShowPagination) {
+        this.timeToShowPagination = duration - this.timeBeforeEnd;
+      }
+    },
+    onVidTimeUpdate(seconds) {
+      if (seconds < this.timeToShowPagination) { return }
+      this.showPagination();
+    },
+    onVidEnded() {
       this.isFilmEnded = true;
       this.showPagination();
     },
@@ -89,9 +104,6 @@ export default {
       this.isFilmActive = false;
       this.playBgVid();
       this.pauseFilm();
-    },
-    onFilmPlaying() {
-      this.isFilmPlaying = true;
     },
     pauseFilm() {
       this.$refs.vid.pause();
