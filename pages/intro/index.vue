@@ -5,9 +5,8 @@
       <ScrollProgressBar :height="wrapperHeight" :fullHeight="true" />
     </div>
     <div class="wrapper">
-      <!-- <div class="image-zoom-wrapper">
-        <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
-      </div> -->
+      <LocalizationBackgroundImage v-if="bgImg" :img="bgImg" :overlay="true" :overlayOpacity="0.8" />
+
 
       <div class="text-scroller-wrapper" v-if="panels">
         <SystemTextScroller :panels="panels" :pagination="nav" route="intro" />
