@@ -4,7 +4,7 @@
             <div class="dropdown-wrapper">
                 <div class="dropdown-active">
                     <div class="wrapper">
-                        <p class="label" @click="toggleDropdown">English / Ukrainian</p>
+                        <p class="label" @click="toggleDropdown">Language</p>
                         <div class="arrow-down"></div>
                     </div>
                 </div>
@@ -12,12 +12,21 @@
                     <ul class="wrapper">
                         <li :class="activeLanguage === 'en' ? 'active' : ''">
                             <button class="flat" @click="setActiveLanguage('en')">
-                                <span><img src="/images/flag_en.svg" alt="american flag"
-                                        height="30" /></span>English</button>
+                                <!-- <span><img src="/images/flag_en.svg" alt="american flag"
+                                        height="30" /></span> -->
+                                English</button>
                         </li>
                         <li :class="activeLanguage === 'uk' ? 'active' : ''">
-                            <button class="flat" @click="setActiveLanguage('uk')"><span><img src="/images/flag_uk.svg"
-                                        alt="ukrainian flag" height="30" /></span>украї́нська</button>
+                            <button class="flat" @click="setActiveLanguage('uk')">
+                                <!-- <span><img src="/images/flag_uk.svg"
+                                        alt="ukrainian flag" height="30" /></span> -->
+                                украї́нська</button>
+                        </li>
+                        <li :class="activeLanguage === 'es' ? 'active' : ''">
+                            <button class="flat" @click="setActiveLanguage('es')">
+                                <!-- <span>
+                                    <img src="/images/flag_uk.svg" alt="spanish flag" height="30" /></span> -->
+                                Español</button>
                         </li>
                     </ul>
                 </div>
