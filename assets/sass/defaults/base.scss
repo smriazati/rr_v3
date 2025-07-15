@@ -1,12 +1,22 @@
 @use '../imports/imports.scss' as *;
+@use "sass:color";
 
 body {
   font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif;
+  background-color: color.adjust($gray, $lightness: 10%);
+  width: 100%;
+  height: 100%;
+  @include pStyle;
+  // background: url("/images/tree-texture-big.jpg") no-repeat, rgba(86, 91, 84, 0.68);
+  // background: url(/images/tree-texture-big.jpg) no-repeat, rgb(143 187 124 / 20%);
+  // background-size: cover;
+  // background-attachment: fixed;
+  // background-blend-mode: lighten;
 }
 
-body {
-  @include pStyle;
-
+html {
+  width: 100%;
+  height: 100%;
 }
 
 * {
@@ -46,12 +56,6 @@ a {
 .introduction p,
 .introduction p a {
   @include pBigStyle(#fff);
-}
-
-html,
-body {
-  width: 100%;
-  height: 100%;
 }
 
 video,
@@ -175,6 +179,7 @@ figcaption,
     padding-bottom: 15px;
     padding-top: 30px;
     position: relative;
+    border-bottom: 0;
 
     p {
       margin-bottom: 0;
@@ -196,16 +201,6 @@ figcaption,
   }
 }
 
-
-body {
-  background-color: lighten($gray, 10);
-  // background: url("/images/tree-texture-big.jpg") no-repeat, rgba(86, 91, 84, 0.68);
-
-  // background: url(/images/tree-texture-big.jpg) no-repeat, rgb(143 187 124 / 20%);
-  // background-size: cover;
-  // background-attachment: fixed;
-  // background-blend-mode: lighten;
-}
 
 .sage {
   color: $sage;
@@ -316,7 +311,7 @@ body {
 }
 
 .muted {
-  color: lighten($gray, 70%);
+  color: color.adjust($gray, $lightness: 70%);
 }
 
 .call-out {
@@ -353,16 +348,6 @@ body {
   }
 }
 
-blockquote {
-  font-size: 120%;
-  line-height: 140%;
-  font-style: italic;
-  border-bottom: 0;
-  padding-bottom: 15px;
-  padding-top: 30px;
-  position: relative;
-}
-
 .subheadline {
   text-transform: uppercase;
   font-size: 24px;
@@ -375,9 +360,7 @@ blockquote {
 }
 
 
-body {
-  @include pStyle;
-}
+
 
 .text-wrapper {
   &.light {

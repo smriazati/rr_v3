@@ -1,202 +1,334 @@
 <template>
-  <div class="exhibit-nav">
-    <button :class="isExpanded ? 'expanded' : 'collapsed'" class="flat" @click="toggleMenu">
-      <ExhibitNavToggleButton></ExhibitNavToggleButton>
-    </button>
+  <nav class="exhibit-nav" :class="navClass">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <Logo />
+      </div>
 
-    <nav :class="isExpanded ? 'expanded' : 'collapsed'" class="exhibit-nav-wrapper" ref="navWrapper">
-      <LocalizationLanguagePicker></LocalizationLanguagePicker>
-      <ul ref="navLinks" v-if="sections" class="nav-links">
-        <li v-for="(item, index) in sections" :key="index" :class="activeSectionKey == sectionsArr[index] ? 'active' : ''"
-          @click="toggleMenu">
-          <nuxt-link :to="{ path: `/${sectionsArr[index]}`, query: $route.query }">
-            <LocalizationString :string="item"></LocalizationString>
-          </nuxt-link>
-        </li>
-      </ul>
-    </nav>
-  </div>
+      <div class="nav-menu">
+        <ul class="nav-list">
+          <li v-for="item in navItems" :key="item.id" class="nav-item">
+            <NuxtLink :to="item.path" class="nav-link" :class="{ 'active': isActive(item.path) }">
+              <String :string="item.label" />
+            </NuxtLink>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-actions">
+        <LanguagePicker />
+        <NavToggleButton @toggle="toggleMobileMenu" />
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div v-if="isMobileMenuOpen" class="mobile-menu-overlay" @click="closeMobileMenu">
+      <div class="mobile-menu" @click.stop>
+        <ul class="mobile-nav-list">
+          <li v-for="item in navItems" :key="item.id" class="mobile-nav-item">
+            <NuxtLink :to="item.path" class="mobile-nav-link" :class="{ 'active': isActive(item.path) }"
+              @click="closeMobileMenu">
+              <String :string="item.label" />
+            </NuxtLink>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { groq } from '@nuxtjs/sanity'
-const schema = "settings"
-const query = groq`*[_type == "${schema}"]{
-  "sections": siteNavLabels.sections
-}[0]`
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-export default {
-  async fetch() {
-    this.content = await this.$sanity.fetch(query)
-  },
-  fetchOnServer: false,
-  data: () => ({
-    content: '',
-    sectionsArr: ["intro", "occupation", "resistance", "aftermath", "conclusion"],
-    isExpanded: false,
-  }),
+/**
+ * Exhibit Navigation Component
+ * 
+ * Core Functions:
+ * - Displays main navigation for the exhibit
+ * - Handles mobile menu toggle and responsive design
+ * - Manages active navigation states
+ * - Integrates language picker and logo
+ * 
+ * Performance Optimizations:
+ * - Efficient route matching for active states
+ * - Optimized mobile menu interactions
+ * - Proper event cleanup
+ */
 
-  computed: {
-    ...mapState("exhibitNav", {
-      isExhibitNavVisible: (state) => state.isExhibitNavVisible,
-    }),
-    activeSectionKey() {
-      const path = this.$route.path;
-      const sections = this.sectionsArr.slice();
-      let activeSectionKey = "";
-      sections.forEach(item => {
-        if (path.includes(item)) {
-          activeSectionKey = item;
-        }
-      })
-      return activeSectionKey;
-    },
-    sections() {
-      if (!this.content) { return null }
-      if (!this.content.sections) { return null }
-      // sort intro, occupation, resistance, aftermath, conclusion
-      const orderedKeys = this.sectionsArr;
-      const sections = [];
-      const sectionsToSort = this.content.sections;
-      for (const key in sectionsToSort) {
-        if (sectionsToSort.hasOwnProperty(key)) {
-          if (key === orderedKeys[0]) {
-            sections[0] = sectionsToSort[key];
-          }
-          if (key === orderedKeys[1]) {
-            sections[1] = sectionsToSort[key];
-          }
-          if (key === orderedKeys[2]) {
-            sections[2] = sectionsToSort[key];
-          }
-          if (key === orderedKeys[3]) {
-            sections[3] = sectionsToSort[key];
-          }
-          if (key === orderedKeys[4]) {
-            sections[4] = sectionsToSort[key];
-          }
-        }
-      }
-      return sections
+// Props definition with TypeScript
+interface Props {
+  className?: string
+  variant?: 'default' | 'transparent' | 'solid'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  className: '',
+  variant: 'default'
+})
+
+// Router for navigation
+const route = useRoute()
+
+// Reactive state
+const isMobileMenuOpen = ref(false)
+const isScrolled = ref(false)
+
+// Navigation items configuration
+const navItems = [
+  {
+    id: 'intro',
+    path: '/intro',
+    label: {
+      en: 'Introduction',
+      uk: 'Вступ',
+      es: 'Introducción',
+      he: 'הקדמה'
     }
   },
-  methods: {
-    toggleMenu() {
-      this.isExpanded = !this.isExpanded;
-    },
-  },
-  mounted() {
-    const nav = this.$refs.navLinks;
-    if (nav) {
-      const links = nav.querySelectorAll("li");
-      if (links) {
-        links.forEach((link) => {
-          link.addEventListener("click", () => {
-            this.isExpanded = false;
-          });
-        });
-      }
+  {
+    id: 'occupation',
+    path: '/occupation',
+    label: {
+      en: 'Occupation',
+      uk: 'Окупація',
+      es: 'Ocupación',
+      he: 'כיבוש'
     }
-
   },
-};
+  {
+    id: 'resistance',
+    path: '/resistance',
+    label: {
+      en: 'Resistance',
+      uk: 'Опір',
+      es: 'Resistencia',
+      he: 'התנגדות'
+    }
+  },
+  {
+    id: 'aftermath',
+    path: '/aftermath',
+    label: {
+      en: 'Aftermath',
+      uk: 'Наслідки',
+      es: 'Consecuencias',
+      he: 'השלכות'
+    }
+  },
+  {
+    id: 'conclusion',
+    path: '/conclusion',
+    label: {
+      en: 'Conclusion',
+      uk: 'Висновок',
+      es: 'Conclusión',
+      he: 'סיכום'
+    }
+  }
+]
+
+// Generate navigation classes
+const navClass = computed(() => {
+  const classes = ['exhibit-nav']
+
+  if (props.className) {
+    classes.push(props.className)
+  }
+
+  if (props.variant) {
+    classes.push(`variant-${props.variant}`)
+  }
+
+  if (isScrolled.value) {
+    classes.push('scrolled')
+  }
+
+  if (isMobileMenuOpen.value) {
+    classes.push('mobile-open')
+  }
+
+  return classes.join(' ')
+})
+
+// Check if navigation item is active
+const isActive = (path: string) => {
+  return route.path.startsWith(path)
+}
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+// Close mobile menu
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
+
+// Handle scroll events
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50
+}
+
+// Handle keyboard events
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isMobileMenuOpen.value) {
+    closeMobileMenu()
+  }
+}
+
+// Initialize component
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  document.addEventListener('keydown', handleKeydown)
+})
+
+// Cleanup
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .exhibit-nav {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 999;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 
-  @media (min-width: 300px) {
-    min-width: 300px;
-  }
-}
-
-.exhibit-nav>button {
-  position: fixed;
-  z-index: 999;
-  top: 20px;
-  left: 20px;
-  filter: invert(1);
-}
-
-.exhibit-nav-wrapper {
-  position: fixed;
-  overflow: scroll;
-  z-index: 111;
-  background: #31572A;
-  height: 100%;
-
-  @media (max-width: $collapse-bp) {
-    width: 100%;
+  &.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
   }
 
-  padding: 70px 20px;
+  .nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;
 
-  @media (min-width: $collapse-bp) {
-    padding-top: 90px;
-  }
+    .nav-brand {
+      flex-shrink: 0;
+    }
 
-  display: flex;
-  flex-direction: column;
+    .nav-menu {
+      display: flex;
+      align-items: center;
 
-  .nav-links {
-    li {
-      padding: 15px;
+      .nav-list {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 30px;
 
-      @media (max-height: 500px) {
-        padding: 5px 15px;
-      }
+        .nav-item {
+          .nav-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+            transition: color 0.3s ease;
 
-      background: #31572A;
-      transition: .3s ease all;
+            &:hover {
+              color: #666;
+            }
 
-      &:hover,
-      &.active {
-        background: #000;
-
-        a {
-          color: #fff;
+            &.active {
+              color: #000;
+              font-weight: 600;
+            }
+          }
         }
       }
     }
 
-    li a {
-      color: #fff;
-      text-transform: uppercase;
-    }
-
-    li.main a {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    li.secondary a {
-      font-size: 18px;
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
   }
-}
 
-.exhibit-nav .language-picker-wrapper {
-  padding: 15px;
+  // Mobile menu overlay
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
 
+    .mobile-menu {
+      position: absolute;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
+      .mobile-nav-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
 
-  background: #070707;
-  margin-bottom: 30px;
+        .mobile-nav-item {
+          border-bottom: 1px solid #eee;
 
-  @media (max-height: 500px) {
-    margin-bottom: 15px;
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .mobile-nav-link {
+            display: block;
+            padding: 15px 0;
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            font-weight: 500;
+
+            &.active {
+              color: #000;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
   }
-}
 
-.exhibit-nav nav {
+  // Responsive design
+  @media (max-width: 768px) {
+    .nav-container {
+      .nav-menu {
+        display: none;
+      }
+    }
+  }
 
-  &.collapsed {
-    transform: translateX(-100vw);
+  // Variant styles
+  &.variant-transparent {
+    background: transparent;
+
+    &.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+    }
+  }
+
+  &.variant-solid {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 }
 </style>

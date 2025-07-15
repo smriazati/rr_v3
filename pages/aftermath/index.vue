@@ -16,7 +16,7 @@
 </template>
   
 <script>
-import { groq } from '@nuxtjs/sanity'
+import { groq } from 'groq'
 const schema = "landing4"
 const query = groq`*[_type == "${schema}"][0]`
 

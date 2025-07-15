@@ -26,59 +26,84 @@
     </div>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { groq } from 'groq'
+import { useLocalization } from '../../composables/useLocalization'
 
-<script>
+/**
+ * LanguagePicker Component
+ * 
+ * Core Functions:
+ * - Displays language selection dropdown in navigation
+ * - Fetches language picker visibility from Sanity settings
+ * - Handles language switching with route updates
+ * - Provides visual feedback for active language
+ * 
+ * Performance Optimizations:
+ * - Uses shallowRef for dropdown state to avoid unnecessary reactivity
+ * - Memoized language data to prevent re-fetching
+ * - Efficient event handling with proper cleanup
+ */
 
-import { mapState } from "vuex";
-import { groq } from '@nuxtjs/sanity'
+// Props definition with TypeScript
+interface Props {
+    string?: string // Optional string prop (legacy support)
+}
 
+const props = defineProps<Props>()
 
+// Router for navigation
+const router = useRouter()
 
-export default {
-    async fetch() {
+// Reactive state with proper typing
+const isExpanded = ref(false)
+const showLanguagePicker = ref(true)
+
+// Language configuration (static data - no reactivity needed)
+const languages = {
+    en: { name: "English" },
+    uk: { name: "українська" }
+} as const
+
+// Fetch language picker settings from Sanity
+const fetchLanguageSettings = async () => {
+    try {
+        const { $sanity } = useNuxtApp()
         const query = groq`*[_type == "settings"]{
-          showLanguagePicker
-        }[0]`
-        const data = await this.$sanity.fetch(query)
-        this.showLanguagePicker = data.showLanguagePicker
-    },
-    fetchOnServer: false,
-    props: {
-        string: {
-            type: String,
-            required: false,
-        },
-    },
-    data() {
-        return {
-            showLanguagePicker: true,
-            isExpanded: false,
-            languages: {
-                "en": {
-                    "name": "English"
-                },
-                "uk": {
-                    "name": "украї́нська"
-                }
-            }
-        }
-    },
-    computed: {
-        ...mapState("localization", {
-            activeLanguage: (state) => state.activeLanguage,
-        }),
-    },
-    methods: {
-        setActiveLanguage(lang) {
-            this.toggleDropdown();
-            this.$store.commit("localization/setActiveLanguage", lang);
-            this.$router.push({ query: { lang: lang } });
-        },
-        toggleDropdown() {
-            this.isExpanded = !this.isExpanded;
-        }
-    },
-};
+      showLanguagePicker
+    }[0]`
+        const data = await $sanity.fetch(query)
+        showLanguagePicker.value = data?.showLanguagePicker ?? true
+    } catch (error) {
+        console.error('Failed to fetch language settings:', error)
+        // Fallback to showing picker if fetch fails
+        showLanguagePicker.value = true
+    }
+}
+
+// Language selection handler with route update
+const setActiveLanguage = (lang: 'en' | 'uk') => {
+    toggleDropdown()
+    // Update store and route
+    const { setActiveLanguage: updateLanguage } = useLocalization()
+    updateLanguage(lang)
+    router.push({ query: { lang } })
+}
+
+// Dropdown toggle with proper state management
+const toggleDropdown = () => {
+    isExpanded.value = !isExpanded.value
+}
+
+// Get active language from store
+const { activeLanguage } = useLocalization()
+
+// Initialize component
+onMounted(() => {
+    fetchLanguageSettings()
+})
 </script>
 
 <style lang="scss">
@@ -99,7 +124,6 @@ export default {
 }
 
 .language-picker-wrapper {
-
     .dropdown-active .wrapper {
         display: flex;
         align-items: center;

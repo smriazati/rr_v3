@@ -1,166 +1,192 @@
 <template>
-    <figure class="image-zoomer">
-        <div class="image-zoomer" ref="imageZoomer">
-            <img :src="$urlFor(img.img.asset).width(1200)" :alt="alt" class="gsap-fade-in" />
+    <div class="image-zoomer-wrapper" @click="toggleZoom">
+        <img v-if="imageUrl" :src="imageUrl || ''" :alt="altText || ''" class="image-zoomer"
+            :class="{ 'zoomed': isZoomed }" />
+        <div v-if="isZoomed" class="zoom-overlay" @click="closeZoom">
+            <div class="zoom-content">
+                <img :src="fullImageUrl" :alt="altText || ''" class="full-image" />
+                <button class="close-button" @click="closeZoom">
+                    <Icon name="close" />
+                </button>
+            </div>
         </div>
-        <figcaption>
-            <p class="caption">{{ caption }}</p>
-            <p class="credit">{{ credit }}</p>
-        </figcaption>
-    </figure>
+    </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useLocalization } from '../../composables/useLocalization'
 
-export default {
-    props: {
-        height: {
-            type: Number,
-            required: false,
-        },
-        img: {
-            type: Object,
-            required: true,
+/**
+ * ImageZoomer Component
+ * 
+ * Core Functions:
+ * - Displays images with click-to-zoom functionality
+ * - Handles localized image content from Sanity
+ * - Provides full-screen zoom overlay
+ * - Supports keyboard navigation (ESC to close)
+ * 
+ * Performance Optimizations:
+ * - Lazy loading for full-size images
+ * - Efficient event handling with proper cleanup
+ * - Optimized image sizing for different zoom levels
+ */
+
+// Props definition with TypeScript
+interface Props {
+    image: {
+        asset?: {
+            _ref?: string
         }
-    },
-    computed: {
-        ...mapState("localization", {
-            activeLanguage: (state) => state.activeLanguage,
-        }),
-        alt() {
-            if (!this.img) { return "" }
-            if (!this.img.alt) { return "" }
-            const alt = this.img?.alt[this.activeLanguage]
-            if (alt) {
-                return alt
-            } else {
-                this.img?.alt["en"]
-            }
-        },
-        caption() {
-            if (!this.img) { return "" }
-            if (!this.img.caption) { return "" }
-            const caption = this.img?.caption[this.activeLanguage]
-            if (caption) {
-                return caption
-            } else {
-                this.img?.caption["en"]
-            }
-        },
-        credit() {
-            if (!this.img) { return "" }
-            if (!this.img.caption) { return "" }
-            const credit = this.img?.credit[this.activeLanguage]
-            if (credit) {
-                return credit
-            } else {
-                this.img?.credit["en"]
-            }
-        },
-    },
-    watch: {
-        height() {
-            this.setAnim();
-        },
-    },
-    mounted() {
-        this.setAnim();
-    },
-    methods: {
-        setAnim() {
-            // console.log("setting animation with", this.height);
-            const gsap = this.$gsap;
-            const img = this.$refs.imageZoomer;
-            const imgEl = img.querySelector('img');
-            gsap.to(imgEl, {
-                autoAlpha: 1,
-                duration: 3
-            })
+        alt?: string
+    }
+    size?: 'thumbnail' | 'medium' | 'large'
+    zoomLevel?: number
+}
 
-            gsap.set(img, {
-                scale: 3,
-                autoAlpha: 0.8,
-            });
+const props = withDefaults(defineProps<Props>(), {
+    size: 'medium',
+    zoomLevel: 2
+})
 
-            if (this.height) {
-                gsap.to(img, {
-                    scale: 1,
-                    autoAlpha: 1,
-                    scrollTrigger: {
-                        trigger: img,
-                        start: "top top",
-                        end: `+=${this.height}px`,
-                        scrub: 1.5,
-                    },
-                });
-            }
-        },
-    },
-};
+// Reactive state
+const isZoomed = ref(false)
+
+// Get active language from store
+const { activeLanguage } = useLocalization()
+
+// Generate thumbnail image URL
+const imageUrl = computed(() => {
+    if (!props.image?.asset?._ref) return null
+
+    const { $urlFor } = useNuxtApp()
+    const baseUrl = $urlFor(props.image.asset._ref)
+
+    // Size-specific parameters
+    const sizeParams = {
+        thumbnail: 'w=300&h=200&fit=crop',
+        medium: 'w=600&h=400&fit=crop',
+        large: 'w=800&h=600&fit=crop'
+    }
+
+    return `${baseUrl}?${sizeParams[props.size]}`
+})
+
+// Generate full-size image URL for zoom
+const fullImageUrl = computed(() => {
+    if (!props.image?.asset?._ref) return null
+
+    const { $urlFor } = useNuxtApp()
+    const baseUrl = $urlFor(props.image.asset._ref)
+
+    // Full size with quality optimization
+    return `${baseUrl}?w=1920&h=1080&fit=max&q=90`
+})
+
+// Generate localized alt text
+const altText = computed(() => {
+    if (props.image?.alt) {
+        return props.image.alt
+    }
+
+    // Fallback alt text based on language
+    const fallbackTexts: Record<string, string> = {
+        en: 'Click to zoom image',
+        uk: 'Натисніть для збільшення зображення',
+        es: 'Haga clic para ampliar la imagen',
+        he: 'לחץ להגדלת התמונה'
+    }
+
+    return fallbackTexts[activeLanguage.value] || fallbackTexts.en
+})
+
+// Toggle zoom state
+const toggleZoom = () => {
+    if (imageUrl.value) {
+        isZoomed.value = !isZoomed.value
+    }
+}
+
+// Close zoom overlay
+const closeZoom = () => {
+    isZoomed.value = false
+}
+
+// Handle keyboard events
+const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isZoomed.value) {
+        closeZoom()
+    }
+}
+
+// Add/remove keyboard listeners
+onMounted(() => {
+    document.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
-<style lang="scss">
-.image-zoom-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9;
+<style lang="scss" scoped>
+.image-zoomer-wrapper {
+    position: relative;
+    cursor: pointer;
 
     .image-zoomer {
-        position: relative;
-
-        &:after {
-            content: "";
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 10, 10, 0.4);
-            // transform: scale(3);
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
         width: 100%;
-        height: 100%;
-        position: relative;
+        height: auto;
+        transition: transform 0.3s ease;
 
-
-        img {
-            min-height: 100%;
-            min-width: 100%;
-            object-fit: cover;
+        &:hover {
+            transform: scale(1.02);
         }
 
-        figcaption {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            padding: 30px;
-            text-align: right;
-            flex-direction: column-reverse;
-            display: flex;
+        &.zoomed {
+            transform: scale(1.05);
+        }
+    }
 
+    .zoom-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-            @media (max-width: $collapse-bp) {
-                max-width: 30ch;
+        .zoom-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+
+            .full-image {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
             }
 
-            p {
-                font-size: 14px;
-                letter-spacing: .02px;
-                line-height: 18px;
+            .close-button {
+                position: absolute;
+                top: -40px;
+                right: 0;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 8px;
 
-                &.credit {
-                    font-size: 10px;
-                    position: relative;
-                    text-transform: uppercase;
+                &:hover {
+                    opacity: 0.8;
                 }
             }
         }
-
     }
 }
 </style>

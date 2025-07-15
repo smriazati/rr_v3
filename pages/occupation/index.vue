@@ -17,11 +17,11 @@
         </div>
     </div>
 </template>
-  
-<script>
-import { mapState } from "vuex";
 
-import { groq } from '@nuxtjs/sanity'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { groq } from 'groq'
+
 const query = groq`
 {
 "nav": *[_id == "settings2"]{
@@ -32,141 +32,149 @@ const query = groq`
   }
 }`
 
-export default {
-    asyncData({ $sanity }) {
-        const content = $sanity.fetch(query)
-        return content
-    },
-    data() {
-        return {
-            name: "occupation",
-            isPaginationVisible: false,
-            isIntroVisible: false,
-            isModalVisible: false,
-            viewedAllStories: false,
-            areMapControlsActive: false,
-            markersData: [
-                {
-                    id: 0,
-                    name: "judenrat",
-                    lat: 50.7003356,
-                    lng: 26.5719255,
-                },
-                {
-                    id: 1,
-                    name: "chomut_house",
-                    lat: 50.6988032,
-                    lng: 26.570062,
-                },
-                {
-                    id: 2,
-                    name: "synagogue",
-                    lat: 50.7082228,
-                    lng: 26.57203,
-                },
-                {
-                    id: 3,
-                    name: "gendarmerie",
-                    lat: 50.698633,
-                    lng: 26.5661871,
-                },
-                {
-                    id: 4,
-                    name: "ghetto",
-                    lat: 50.7002303,
-                    lng: 26.5713738,
-                },
-                {
-                    id: 5,
-                    name: "horyn_river",
-                    lat: 50.710556,
-                    lng: 26.557222,
-                },
-            ],
-        };
-    },
-    watch: {
-        activeStoryId() {
-            if (this.activeStoryId !== null) {
-                this.isModalVisible = true;
-            }
-        },
-        viewedStories() {
-            if (!this.viewedStories) { return }
-            if (this.viewedStories.length === this.markersData.length) {
-                this.viewedAllStories = true;
-                this.$store.commit("occupation/setFirstVisit");
-            }
-        },
-        isModalVisible() {
-            if (!this.isModalVisible && this.viewedAllStories) {
-                this.showPagination();
-            }
-        },
-        panAnimComplete() {
-            if (this.panAnimComplete) {
-                this.$store.commit(`occupation/setFlyoverComplete`);
-                // setTimeout(this.activateIntro, 1500);
-                this.showMapControls();
-            }
-        },
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.metadata.pageMetadata)
-        }
-    },
-    mounted() {
+// Fetch data
+const { data: content } = await useFetch('/api/sanity', {
+    query: { query }
+})
 
-        if (this.visitedOnce) {
-            this.areMapControlsActive = true;
-        }
+const nav = computed(() => content.value?.nav)
+const metadata = computed(() => content.value?.metadata)
 
-        this.showIntro();
-    },
-    methods: {
-        showPagination() {
-            this.isPaginationVisible = true;
-        },
-        closeModal() {
-            this.isModalVisible = false;
-            this.resetActiveStory();
-        },
-        resetActiveStory() {
-            this.$store.commit("occupation/resetActiveStory");
-        },
-        closeIntro() {
-            this.isIntroVisible = false;
+// Component state
+const name = ref("occupation")
+const isPaginationVisible = ref(false)
+const isIntroVisible = ref(false)
+const isModalVisible = ref(false)
+const viewedAllStories = ref(false)
+const areMapControlsActive = ref(false)
+const storymap = ref()
 
-            // if visited once, click return button. if visited first, click pan to button
-            if (this.visitedOnce || this.areMapControlsActive) {
-                const showMap = this.$refs.storymap.$refs.onReturnButton;
-                showMap.click();
-            } else {
-                const panToMap = this.$refs.storymap.$refs.panToButton;
-                panToMap.click();
-            }
-            // console.log(panToMap, showMap);
-        },
-        showIntro() {
-            this.isIntroVisible = true;
-        },
-        showMapControls() {
-            this.areMapControlsActive = true;
-        },
-    },
+// Pinia store
+const occupationStore = useOccupationStore()
 
-    computed: {
-        ...mapState("occupation", {
-            activeStoryId: (state) => state.activeStory,
-            viewedStories: (state) => state.viewedStories,
-            panAnimComplete: (state) => state.panAnimComplete,
-            visitedOnce: (state) => state.visitedOnce,
-        }),
+// Computed properties from store
+const activeStoryId = computed(() => occupationStore.activeStory)
+const viewedStories = computed(() => occupationStore.viewedStories)
+const panAnimComplete = computed(() => occupationStore.panAnimComplete)
+const visitedOnce = computed(() => occupationStore.visitedOnce)
+
+// Static data
+const markersData = ref([
+    {
+        id: 0,
+        name: "judenrat",
+        lat: 50.7003356,
+        lng: 26.5719255,
     },
-};
+    {
+        id: 1,
+        name: "chomut_house",
+        lat: 50.6988032,
+        lng: 26.570062,
+    },
+    {
+        id: 2,
+        name: "synagogue",
+        lat: 50.7082228,
+        lng: 26.57203,
+    },
+    {
+        id: 3,
+        name: "gendarmerie",
+        lat: 50.698633,
+        lng: 26.5661871,
+    },
+    {
+        id: 4,
+        name: "ghetto",
+        lat: 50.7002303,
+        lng: 26.5713738,
+    },
+    {
+        id: 5,
+        name: "horyn_river",
+        lat: 50.710556,
+        lng: 26.557222,
+    },
+])
+
+// Watchers
+watch(activeStoryId, (newValue) => {
+    if (newValue !== null) {
+        isModalVisible.value = true
+    }
+})
+
+watch(viewedStories, (newValue) => {
+    if (!newValue) return
+    if (newValue.length === markersData.value.length) {
+        viewedAllStories.value = true
+        occupationStore.setFirstVisit()
+    }
+})
+
+watch(isModalVisible, (newValue) => {
+    if (!newValue && viewedAllStories.value) {
+        showPagination()
+    }
+})
+
+watch(panAnimComplete, (newValue) => {
+    if (newValue) {
+        occupationStore.setFlyoverComplete()
+        showMapControls()
+    }
+})
+
+// Methods
+const showPagination = () => {
+    isPaginationVisible.value = true
+}
+
+const closeModal = () => {
+    isModalVisible.value = false
+    resetActiveStory()
+}
+
+const resetActiveStory = () => {
+    occupationStore.resetActiveStory()
+}
+
+const closeIntro = () => {
+    isIntroVisible.value = false
+
+    // if visited once, click return button. if visited first, click pan to button
+    if (visitedOnce.value || areMapControlsActive.value) {
+        const showMap = storymap.value?.$refs?.onReturnButton
+        showMap?.click()
+    } else {
+        const panToMap = storymap.value?.$refs?.panToButton
+        panToMap?.click()
+    }
+}
+
+const showIntro = () => {
+    isIntroVisible.value = true
+}
+
+const showMapControls = () => {
+    areMapControlsActive.value = true
+}
+
+// Lifecycle
+onMounted(() => {
+    if (visitedOnce.value) {
+        areMapControlsActive.value = true
+    }
+    showIntro()
+})
+
+// Page metadata
+useHead(() => ({
+    title: useSetPageTitle(metadata.value?.pageMetadata)
+}))
 </script>
-  
+
 <style lang="scss">
 .occupation {
     max-width: 100vw;
@@ -182,7 +190,5 @@ export default {
             line-height: 52px;
         }
     }
-
-
 }
 </style>

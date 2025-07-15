@@ -11,62 +11,69 @@
     </div>
   </div>
 </template>
-<script>
-// TUCHYN: 50.711008, 26.573502
-export default {
-  props: {
-    animActive: {
-      type: Boolean,
-    },
-    markers: {
-      type: Array,
-    },
-    visitedOnce: {
-      type: Boolean,
-    },
-  },
-  mounted() {
-    // set map start location
 
-    // animate
-    if (!this.visitedOnce) {
-      this.$maps.showMap(
-        this.$refs.map,
-        this.nc.lat,
-        this.nc.lng,
-        this.markers,
-        "tuchyn"
-      );
-      // if (this.animActive) {
-      // //   setTimeout(() => {
-      // //     // this.$refs.panToButton.click();
-      // //   }, 2500);
-      // }
-    } else {
-      // don't animate
-      this.$maps.showMap(
-        this.$refs.map,
-        this.tuchyn.lat,
-        this.tuchyn.lng,
-        this.markers,
-        "tuchyn"
-      );
-      // this.$refs.onReturnButton.click();
-    }
-  },
-  data() {
-    return {
-      tuchyn: {
-        lat: "50.711008",
-        lng: "26.573502",
-      },
-      nc: {
-        lat: "35.7596",
-        lng: "-79.0193",
-      },
-    };
-  },
-};
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+// TUCHYN: 50.711008, 26.573502
+
+// Props
+interface Props {
+  animActive?: boolean
+  markers?: any[]
+  visitedOnce?: boolean
+}
+
+const props = defineProps<Props>()
+
+// Component refs
+const panToButton = ref<HTMLButtonElement>()
+const onReturnButton = ref<HTMLButtonElement>()
+const map = ref<HTMLElement>()
+
+// Component state
+const tuchyn = ref({
+  lat: "50.711008",
+  lng: "26.573502",
+})
+
+const nc = ref({
+  lat: "35.7596",
+  lng: "-79.0193",
+})
+
+// Lifecycle
+onMounted(() => {
+  // set map start location
+
+  // animate
+  if (!props.visitedOnce) {
+    const { $maps } = useNuxtApp()
+    $maps.showMap(
+      map.value,
+      nc.value.lat,
+      nc.value.lng,
+      props.markers,
+      "tuchyn"
+    )
+    // if (props.animActive) {
+    // //   setTimeout(() => {
+    // //     // panToButton.value?.click();
+    // //   }, 2500);
+    // }
+  } else {
+    // don't animate
+    const { $maps } = useNuxtApp()
+    $maps.showMap(
+      map.value,
+      tuchyn.value.lat,
+      tuchyn.value.lng,
+      props.markers,
+      "tuchyn"
+    )
+    // onReturnButton.value?.click();
+  }
+})
 </script>
 
 <style lang="scss">

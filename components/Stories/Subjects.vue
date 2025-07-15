@@ -39,51 +39,39 @@
         </div>
     </div>
 </template>
-  
-<script>
 
-import { groq } from '@nuxtjs/sanity'
-const schema = "subjects"
-const query = groq`*[_type == "${schema}"]{
-    subject1, subject2, subject3
-  }[0]`
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import groq from 'groq'
 
+// Props
+interface Props {
+    subtitle?: any
+    title?: any
+    subjectCTA?: any
+    route?: string
+}
+const props = defineProps<Props>()
 
-export default {
-    async fetch() {
-        this.subjects = await this.$sanity.fetch(query)
-    },
-    fetchOnServer: false,
-    data: () => ({
-        subjects: ''
-    }),
-    props: {
-        subtitle: {
-            type: Object,
-        },
-        title: {
-            type: Object,
-        },
-        subjectCTA: {
-            type: Object
-        },
-        route: {
-            type: String
-        }
-    },
-    computed: {
-        routeSection() {
-            if (!this.$route) { return }
-            if (!this.$route.name) { return }
-            const routeName = this.$route.name
-            const routeKey = routeName.substr(0, routeName.indexOf('-'))
-            return routeKey
-        }
-    },
-};
+const subjects = ref<any>('')
+
+const fetchSubjects = async () => {
+    const { $sanity } = useNuxtApp()
+    subjects.value = await $sanity.fetch(groq`*[_type == "subjects"]{ subject1, subject2, subject3 }[0]`)
+}
+
+fetchSubjects()
+
+const routeSection = computed(() => {
+    const route = useRoute()
+    if (!route || !route.name) return ''
+    const routeName = route.name as string
+    const routeKey = routeName.substr(0, routeName.indexOf('-'))
+    return routeKey
+})
 </script>
-  
-<style lang="scss" >
+
+<style lang="scss">
 .subject-name {
     display: flex;
 

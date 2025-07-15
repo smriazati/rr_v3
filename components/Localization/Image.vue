@@ -1,81 +1,74 @@
 <template>
     <figure>
-        <div v-if="src !== ''">
-            <div v-if="size || height" class="image-wrapper">
-                <img :src="$urlFor(src).width(size).height(height)" :alt="alt" />
-            </div>
-            <div v-else class="image-wrapper">
-                <img :src="$urlFor(src)" :alt="alt" />
-            </div>
+        <div v-if="src !== '' && !size">
+            <img :src="$urlFor(src)" :alt="alt" />
         </div>
-
-        <figcaption>
-            <p class="caption">{{ caption }}</p>
-            <p class="credit">{{ credit }}</p>
+        <div v-if="src !== '' && size">
+            <img :src="$urlFor(src).width(size)" :alt="alt" />
+        </div>
+        <figcaption v-if="caption || credit">
+            <p v-if="caption" class="caption">{{ caption }}</p>
+            <p v-if="credit" class="credit">{{ credit }}</p>
         </figcaption>
     </figure>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { SanityImage } from '../../types/sanity'
 
-export default {
-    props: {
-        img: {
-            type: Object,
-            required: true,
-        },
-        size: {
-            type: Number,
-            required: false
-        },
-        height: {
-            type: Number,
-            required: false
-        }
-    },
-    computed: {
-        ...mapState("localization", {
-            activeLanguage: (state) => state.activeLanguage,
-        }),
-        src() {
-            if (!this.img) { return "" }
-            if (!this.img.img) { return "" }
-            return this.img.img.asset
-        },
-        alt() {
-            if (!this.img) { return "" }
-            if (!this.img.alt) { return "" }
-            const alt = this.img?.alt[this.activeLanguage]
-            if (alt) {
-                return alt
-            } else {
-                this.img?.alt["en"]
-            }
-        },
-        caption() {
-            if (!this.img) { return "" }
-            if (!this.img.caption) { return "" }
-            const caption = this.img?.caption[this.activeLanguage]
-            if (caption) {
-                return caption
-            } else {
-                this.img?.caption["en"]
-            }
-        },
-        credit() {
-            if (!this.img) { return "" }
-            if (!this.img.credit) { return "" }
-            const credit = this.img?.credit[this.activeLanguage]
-            if (credit) {
-                return credit
-            } else {
-                this.img?.credit["en"]
-            }
-        }
-    }
-};
+/**
+ * LocalizationImage Component
+ * 
+ * Core Functions:
+ * - Displays localized images with captions and credits
+ * - Provides fallback to English if translation is missing
+ * - Handles image sizing and optimization via Sanity
+ * - Renders proper alt text, captions, and credits
+ * 
+ * Performance Optimizations:
+ * - Computed properties for efficient language switching
+ * - Conditional rendering to avoid unnecessary DOM elements
+ * - Efficient image URL generation
+ */
+
+// Props with TypeScript typing
+interface Props {
+    img: SanityImage
+    size?: number
+}
+
+const props = defineProps<Props>()
+
+// Get store and active language (using any for now to avoid type issues)
+const store = useNuxtApp().$store as any
+const activeLanguage = computed(() => store?.state?.localization?.activeLanguage || 'en')
+
+// Computed properties for image data with fallbacks
+const src = computed(() => {
+    if (!props.img?.img?.asset) return ''
+    return props.img.img.asset
+})
+
+const alt = computed(() => {
+    if (!props.img?.alt) return ''
+    const lang = activeLanguage.value as keyof typeof props.img.alt
+    return props.img.alt[lang] || props.img.alt.en || ''
+})
+
+const caption = computed(() => {
+    if (!props.img?.caption) return ''
+    const lang = activeLanguage.value as keyof typeof props.img.caption
+    return props.img.caption[lang] || props.img.caption.en || ''
+})
+
+const credit = computed(() => {
+    if (!props.img?.credit) return ''
+    const lang = activeLanguage.value as keyof typeof props.img.credit
+    return props.img.credit[lang] || props.img.credit.en || ''
+})
 </script>
+
 <style lang="scss" scoped>
 figure {
     display: flex;

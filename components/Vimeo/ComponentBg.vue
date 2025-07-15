@@ -5,7 +5,7 @@
   >
     <div v-if="vidId" ref="vidWrapper" class="vid-wrapper vid-background">
       <client-only>
-        <vimeo-player
+        <!-- <vimeo-player
           class="video-foreground"
           ref="player"
           :key="vidId"
@@ -15,60 +15,40 @@
           @ready="onVidReady"
           @playing="onVidPlaying"
         >
-        </vimeo-player>
+        </vimeo-player> -->
+        <div class="video-foreground" style="background:#222; color:#fff; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">Vimeo player placeholder</div>
       </client-only>
     </div>
   </div>
 </template>
 
-<script>
-// https://github.com/dobromir-hristov/vue-vimeo-player
+<script setup lang="ts">
+import { ref } from 'vue'
 
-export default {
-  props: {
-    vidId: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      options: {
-        controls: false,
-        loop: true,
-        autoplay: true,
-        muted: true,
-        portrait: false,
-        title: false,
-        byline: false,
-      },
-      isVidPlaying: false,
-    };
-  },
-  methods: {
-    onVidLoaded() {
-      // console.log("loaded");
-    },
-    onVidReady() {
-      // console.log("ready now");
-      // this.isVidReady = true;
-      // this.$emit("on-vid-ready");
-    },
-    onVidPlaying() {
-      // console.log("playing now");
-      this.isVidPlaying = true;
-      // this.$emit("on-vid-playing");
-    },
-    onVidEnded() {
-      // console.log("ended now");
-      //   this.activateReplay();
-      // this.$emit("on-vid-end");
-    },
-    onVidTimeUpdate(event, data, player) {
-      //   console.log(event, data, player);
-    },
-  },
-};
+interface Props {
+  vidId: string
+}
+
+defineProps<Props>()
+
+const isVidPlaying = ref(false)
+const options = {
+  controls: false,
+  loop: true,
+  autoplay: true,
+  muted: true,
+  portrait: false,
+  title: false,
+  byline: false,
+}
+
+function onVidLoaded() {}
+function onVidReady() {}
+function onVidPlaying() {
+  isVidPlaying.value = true
+}
+function onVidEnded() {}
+function onVidTimeUpdate(event: any, data: any, player: any) {}
 </script>
 
 <style lang="scss">

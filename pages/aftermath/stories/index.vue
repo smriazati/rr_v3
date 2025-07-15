@@ -4,10 +4,8 @@
     </div>
 </template>
 
-</template>
-  
 <script>
-import { groq } from '@nuxtjs/sanity'
+import { groq } from 'groq'
 const schema = "intro4"
 const query = groq`*[_type == "${schema}"][0]`
 
@@ -32,8 +30,8 @@ export default {
     },
 };
 </script>
-  
-  
+
+
 <style lang="scss">
 .route-aftermath-stories .stories-subjects-wrapper {
     min-height: 100vh;
@@ -54,4 +52,3 @@ export default {
     }
 }
 </style>
-  

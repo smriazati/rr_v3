@@ -28,50 +28,46 @@
     </nav>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import groq from 'groq'
 
-import { groq } from '@nuxtjs/sanity'
 const schema = "settings"
 const query = groq`*[_type == "${schema}"]{
   "prev": siteNavLabels.prev,
   "next": siteNavLabels.next
 }[0]`
 
+// Props
+interface Props {
+    message: any
+    link: string
+    hash: string
+    back?: boolean
+}
 
-export default {
-    data: () => ({
-        labels: '',
-        isCollapsed: false,
-    }),
-    async fetch() {
-        this.labels = await this.$sanity.fetch(query)
-    },
-    fetchOnServer: false,
-    computed: {
-        ...mapState("localization", {
-            activeLanguage: (state) => state.activeLanguage,
-        }),
-    },
-    props: {
-        message: {
-            type: Object,
-            required: true,
-        },
-        link: {
-            type: String,
-            required: true,
-        },
-        hash: {
-            type: String,
-            required: true,
-        },
-        back: {
-            type: Boolean,
-            required: false,
-        },
-    },
-};
+const props = defineProps<Props>()
+
+// Component state
+const labels = ref('')
+const isCollapsed = ref(false)
+
+// Pinia store
+const localizationStore = useLocalizationStore()
+
+// Computed properties
+const activeLanguage = computed(() => localizationStore.activeLanguage)
+
+// Fetch data
+const fetchData = async () => {
+    const { $sanity } = useNuxtApp()
+    labels.value = await $sanity.fetch(query)
+}
+
+// Lifecycle
+onMounted(() => {
+    fetchData()
+})
 </script>
 <style lang='scss'>
 @keyframes slideIn {

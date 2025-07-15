@@ -18,10 +18,10 @@
   </header>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import groq from 'groq'
 
-import { groq } from '@nuxtjs/sanity'
 const query = groq`
 {
   "settings": *[_id == "settings"][0]{
@@ -33,56 +33,58 @@ const query = groq`
 }
 `
 
-export default {
-  async fetch() {
-    this.content = await this.$sanity.fetch(query)
-  },
-  fetchOnServer: false,
-  data: () => ({
-    content: ''
-  }),
-  props: {
-    subjectId: {
-      type: String,
-    },
-    sectionId: {
-      type: String,
-    }
-  },
-  computed: {
-    ...mapState("localization", {
-      activeLanguage: (state) => state.activeLanguage,
-    }),
-    activeSection() {
-      const section = {
-        title: ''
-      }
-      if (!this.sectionId) { return section }
-      if (!this.content.settings) { return section }
-      if (!this.content.settings.sections) { return section }
+// Props
+interface Props {
+  subjectId?: string
+  sectionId?: string
+}
 
-      section.title = this.content.settings.sections[this.sectionId]
-      return section
-    },
-    activeSubject() {
-      const subject = {
-        name: '',
-        image: ''
-      }
-      if (!this.subjectId) { return subject }
-      if (!this.content.subjects) { return subject }
-      subject.name = this.content.subjects[this.subjectId]?.name
-      subject.image = this.content.subjects[this.subjectId]?.img
-      return subject
-    },
-  },
-  mounted() {
+const props = defineProps<Props>()
 
-  },
-  methods: {
+// Component state
+const header = ref()
+const content = ref<any>('')
 
-  },
-};
+// Pinia store
+const localizationStore = useLocalizationStore()
+
+// Computed properties
+const activeLanguage = computed(() => localizationStore.activeLanguage)
+
+const activeSection = computed(() => {
+  const section = {
+    title: ''
+  }
+  if (!props.sectionId) return section
+  if (!content.value?.settings) return section
+  if (!content.value.settings.sections) return section
+
+  section.title = content.value.settings.sections[props.sectionId]
+  return section
+})
+
+const activeSubject = computed(() => {
+  const subject = {
+    name: '',
+    image: ''
+  }
+  if (!props.subjectId) return subject
+  if (!content.value?.subjects) return subject
+  subject.name = content.value.subjects[props.subjectId]?.name
+  subject.image = content.value.subjects[props.subjectId]?.img
+  return subject
+})
+
+// Fetch data
+const fetchData = async () => {
+  const { $sanity } = useNuxtApp()
+  content.value = await $sanity.fetch(query)
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style lang="scss">

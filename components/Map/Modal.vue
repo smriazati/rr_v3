@@ -18,70 +18,74 @@
   </div>
 </template>
 
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import groq from 'groq'
 
-<script>
-
-import { groq } from '@nuxtjs/sanity'
 const schema = "settings2"
 const query = groq`*[_type == "${schema}"]{
   backBtnText
 }[0]`
 
+// Props
+interface Props {
+  activeStoryId: number
+}
 
-export default {
-  data: () => ({
-    content: '',
-    isCollapsed: false,
-  }),
-  async fetch() {
-    this.content = await this.$sanity.fetch(query)
-  },
-  fetchOnServer: false,
-  props: {
-    activeStoryId: {
-      type: Number,
-      required: true,
-    }
-  },
-  mounted() {
-    const wrapper = this.$refs.wrapper;
+const props = defineProps<Props>()
 
-    if (wrapper) {
-      wrapper.focus();
-    }
-    this.initLightbox();
-    // this.setAnim();
-  },
-  computed: {
-    modalCloseBtnText() {
-      if (!this.content) { return }
-      if (!this.content.backBtnText) {
-        return
-      }
-      return this.content.backBtnText
-    }
-  },
-  methods: {
-    closeModal() {
-      this.$emit("close-modal");
-    },
-    initLightbox() {
-      const boxes = document.querySelectorAll("figure:not(.no-lb)");
-      if (!boxes) {
-        return;
-      }
-      // console.log(boxes);
-      boxes.forEach((box) => {
-        box.classList.add("hover-cursor");
-        box.addEventListener("click", () => {
-          box.classList.toggle("lightbox-expanded");
-        });
-      });
-    },
-  },
-};
+// Emits
+const emit = defineEmits<{
+  'close-modal': []
+}>()
+
+// Component state
+const wrapper = ref<HTMLElement>()
+const content = ref<any>('')
+const isCollapsed = ref(false)
+
+// Computed properties
+const modalCloseBtnText = computed(() => {
+  if (!content.value) return
+  if (!content.value.backBtnText) {
+    return
+  }
+  return content.value.backBtnText
+})
+
+// Methods
+const closeModal = () => {
+  emit("close-modal")
+}
+
+const initLightbox = () => {
+  const boxes = document.querySelectorAll("figure:not(.no-lb)")
+  if (!boxes) {
+    return
+  }
+  boxes.forEach((box) => {
+    box.classList.add("hover-cursor")
+    box.addEventListener("click", () => {
+      box.classList.toggle("lightbox-expanded")
+    })
+  })
+}
+
+// Fetch data
+const fetchData = async () => {
+  const { $sanity } = useNuxtApp()
+  content.value = await $sanity.fetch(query)
+}
+
+// Lifecycle
+onMounted(() => {
+  if (wrapper.value) {
+    wrapper.value.focus()
+  }
+  initLightbox()
+  fetchData()
+})
 </script>
-
 
 <style lang="scss">
 .modal-container {
@@ -129,12 +133,15 @@ export default {
 }
 
 .modal-wrapper {
+  color: white;
+  border: 0;
+  outline: 0;
+  height: 100%;
+  overflow-y: scroll;
+
   &:not(.transparent) {
     background: black;
   }
-
-  // background: black;
-  color: white;
 
   &:not(.full-width) {
     width: 1280px;
@@ -149,16 +156,10 @@ export default {
     justify-content: center;
   }
 
-  border: 0;
-  outline: 0;
-
   @media (max-width: 1280px) {
     width: 90%;
     max-width: 90%;
   }
-
-  height: 100%;
-  overflow-y: scroll;
 
   h1,
   h2,
@@ -171,43 +172,6 @@ export default {
   outline: 0;
   border: none;
 }
-
-// @media (max-width: $mobile-bp) and (orientation: landscape) {
-//   .story-container .image-wrapper figure {
-//     // max-height: 80vh;
-//     overflow: hidden;
-//     display: flex;
-//     flex-direction: column;
-
-//     img {
-//       flex: 0 0 400px;
-//       object-fit: contain;
-//       overflow: hidden;
-//     }
-//   }
-// }
-
-// .story-container {
-//   display: grid;
-//   max-width: 1000px;
-//   margin: 0 auto;
-//   grid-template-columns: minmax(200px, 50ch) 2fr;
-//   // @media (min-width: 1280px) {
-//   //   grid-template-columns: 1fr 2fr;
-//   // }
-//   grid-gap: 30px;
-
-//   .image-wrapper {
-//     figure {
-//       margin-bottom: 30px;
-//     }
-//   }
-
-//   @media (max-width: $mobile-bp) {
-//     display: flex;
-//     flex-direction: column;
-//   }
-// }
 
 .stories-modal {
   main.content>.row.title {

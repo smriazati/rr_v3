@@ -21,31 +21,47 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    content: {
-      type: Object,
-      required: true,
-    }
-  },
+<script setup lang="ts">
+import { ref } from 'vue'
+
+/**
+ * ConclusionEnd Component
+ * 
+ * Core Functions:
+ * - Displays the final conclusion slide with tree background
+ * - Provides navigation back to the homepage
+ * - Handles localized content for title, subtitle, and button text
+ * - Creates a visually appealing ending experience
+ * 
+ * Performance Optimizations:
+ * - Static background image for fast loading
+ * - Conditional rendering to avoid unnecessary DOM elements
+ * - Minimal reactivity for optimal performance
+ */
+
+// Props with TypeScript typing
+interface Props {
+  content: {
+    title?: any
+    subhead?: any
+    btnText?: any
+  }
 }
+
+const props = defineProps<Props>()
+
+// Template refs
+const button = ref<HTMLElement>()
 </script>
+
 <style lang="scss">
 .conclusion.page .conclusion-ending-slide {
   background: #f5f5f5;
-  // padding-top: 400px;
   height: 100vh;
   max-height: 100vh;
-  // padding-bottom: 25%;
-
-  // padding-bottom: 25vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  // @media (min-width: $collapse-bp) {
-  //   margin-bottom: 54px;
-  // }
   position: relative;
 
   .bg-image {

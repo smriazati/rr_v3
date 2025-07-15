@@ -25,27 +25,27 @@
     </div>
 </template>
 
-<script>
-import { groq } from '@nuxtjs/sanity'
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import groq from 'groq'
 
-export default {
-    async fetch() {
-        const data = await this.$sanity.fetch(groq`*[_id == "marker${this.activeStoryId + 1}"][0]`)
-        if (!data) { return }
-        if (!data.content) { return }
-        this.content = data.content
-    },
-    fetchOnServer: false,
-    data: () => ({
-        content: '',
-    }),
-    props: {
-        activeStoryId: {
-            type: Number,
-            required: true,
-        },
-    },
+// Props
+interface Props {
+    activeStoryId: number
 }
+const props = defineProps<Props>()
+
+const content = ref<any>('')
+
+const fetchContent = async () => {
+    const { $sanity } = useNuxtApp()
+    const data = await $sanity.fetch(groq`*[_id == "marker${props.activeStoryId + 1}"][0]`)
+    if (!data) return
+    if (!data.content) return
+    content.value = data.content
+}
+
+watch(() => props.activeStoryId, fetchContent, { immediate: true })
 </script>
 <style lang="scss">
 .storymap-modal-content .title h1 {

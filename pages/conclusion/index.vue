@@ -55,7 +55,7 @@
 
 <script>
 
-import { groq } from '@nuxtjs/sanity'
+import { groq } from 'groq'
 const schema = "intro5"
 const query = groq`*[_type == "${schema}"][0]`
 

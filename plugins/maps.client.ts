@@ -1,18 +1,23 @@
-export default function (context, inject) {
+export default defineNuxtPlugin(() => {
+    const config = useRuntimeConfig()
     let isLoaded = false
-    let waiting = []
+    let waiting: any[] = []
 
     addScript()
-    inject('maps', {
-        showMap
-    })
 
+    return {
+        provide: {
+            maps: {
+                showMap
+            }
+        }
+    }
 
     function addScript() {
         const script = document.createElement('script')
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${context.env.mapsApi}&libraries=places&callback=initGoogleMaps`
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${config.public.mapsApi}&libraries=places&callback=initGoogleMaps`
         script.async = true
-        window.initGoogleMaps = initGoogleMaps
+            ; (window as any).initGoogleMaps = initGoogleMaps
         document.head.appendChild(script)
     }
 
@@ -26,25 +31,18 @@ export default function (context, inject) {
         waiting = []
     }
 
-    // function centerMap(lat, lng) {
-    //     const position = new window.google.maps.LatLng(parseFloat(m.lat), parseFloat(m.lng))
-    //     console.log(position, lat, lng, 'hi')
-    // }
-
-
-    function showMap(canvas, lat, lng, markers, storymapName) {
-        // console.log('here comes the map', canvas, lat, lng, markers)
+    function showMap(canvas: HTMLElement, lat: string, lng: string, markers: any[], storymapName: string) {
         if (!isLoaded) {
             waiting.push({
                 fn: showMap,
-                arguments,
+                arguments: [canvas, lat, lng, markers, storymapName],
             })
             return
         }
+
         const mapOptions = {
-            // mapId: 'bdf928a0003b84ce',
             zoom: 8,
-            center: new window.google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
+            center: new (window as any).google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
             disableDefaultUI: true,
             zoomControl: true,
             mapTypeId: 'hybrid',
@@ -65,26 +63,24 @@ export default function (context, inject) {
             },
             ]
         }
-        const map = new window.google.maps.Map(canvas, mapOptions)
-        // console.log('map', map);
+
+        const map = new (window as any).google.maps.Map(canvas, mapOptions)
 
         function showMarkers() {
-
-            function mapMarkerIcon(color) {
+            function mapMarkerIcon(color: string) {
                 const mapMarkerIcon = {
                     path: "M257.6,546.7C315.7,477.5,439,320.1,439,231c0-116.5-94.5-211-211-211S17,114.5,17,231c0,89.1,123.3,246.5,181.4,315.7L228,740L257.6,546.7z",
                     fillColor: color,
                     fillOpacity: 1,
                     strokeWeight: 2,
                     strokeColor: "#000",
-                    // rotation: 30,
                     scale: 0.1,
-                    anchor: new google.maps.Point(15, 30),
+                    anchor: new (window as any).google.maps.Point(15, 30),
                 };
                 return mapMarkerIcon;
             }
 
-            const bounds = new window.google.maps.LatLngBounds()
+            const bounds = new (window as any).google.maps.LatLngBounds()
             const colors = [
                 '#54a131',
                 '#70a131',
@@ -95,11 +91,9 @@ export default function (context, inject) {
             ]
             const markerSeenColor = "#131313";
 
-            markers.forEach((m, i) => {
-                // console.log(m.id)
-                // console.log(i)
-                const position = new window.google.maps.LatLng(parseFloat(m.lat), parseFloat(m.lng))
-                const marker = new window.google.maps.Marker({
+            markers.forEach((m: any, i: number) => {
+                const position = new (window as any).google.maps.LatLng(parseFloat(m.lat), parseFloat(m.lng))
+                const marker = new (window as any).google.maps.Marker({
                     position,
                     icon: mapMarkerIcon(colors[i]),
                     clickable: true,
@@ -115,44 +109,38 @@ export default function (context, inject) {
                     }
                 });
 
-
                 marker.addListener("mouseout", () => {
                     if (!markerSeen) {
                         marker.setIcon(mapMarkerIcon(colors[i]))
-                        // console.log('mouseout', m.id);
                     }
                 });
 
                 marker.addListener("click", () => {
-                    // console.log('clicked', m.id);
                     marker.setIcon(mapMarkerIcon(markerSeenColor))
                     markerSeen = true;
-                    context.store.commit(`occupation/setActiveStory`, m.id);
+                    // Note: You'll need to update this to use Pinia or the new store pattern
+                    // context.store.commit(`occupation/setActiveStory`, m.id);
                 });
-
 
                 // add listeners to map controls navigation
                 const mapControlListItem = document.getElementById(`marker-${m.id}`);
                 if (mapControlListItem) {
-
                     // click event
-                    google.maps.event.addDomListener(mapControlListItem, "click", () => {
+                    (window as any).google.maps.event.addDomListener(mapControlListItem, "click", () => {
                         markerSeen = true;
                         marker.setIcon(mapMarkerIcon(markerSeenColor))
                     });
 
                     // hover event 
-                    google.maps.event.addDomListener(mapControlListItem, "mouseover", () => {
+                    (window as any).google.maps.event.addDomListener(mapControlListItem, "mouseover", () => {
                         if (!markerSeen) {
                             marker.setIcon(mapMarkerIcon("#fff"))
                         }
                     });
 
-
-                    google.maps.event.addDomListener(mapControlListItem, "mouseout", () => {
+                    (window as any).google.maps.event.addDomListener(mapControlListItem, "mouseout", () => {
                         if (!markerSeen) {
                             marker.setIcon(mapMarkerIcon(colors[i]))
-                            // console.log('mouseout', m.id);
                         }
                     });
                 }
@@ -161,40 +149,32 @@ export default function (context, inject) {
                 bounds.extend(position)
             })
 
-
-
             const centerButton = document.getElementById("recenterMap");
             if (centerButton) {
-                google.maps.event.addDomListener(centerButton, "click", () => {
+                (window as any).google.maps.event.addDomListener(centerButton, "click", () => {
                     console.log('clicking center button')
                     map.fitBounds(bounds, 150)
                 });
             }
 
             map.fitBounds(bounds, 150)
-
-
-
-
         }
-
 
         const panToButton = document.getElementById("panToButton");
 
         if (panToButton) {
-
             const zoomOutNCDuration = 3000;
             const panToUkraineDelay = zoomOutNCDuration;
             const panToUkraineDuration = 1500;
             const zoomInTuchynDelay = panToUkraineDelay + panToUkraineDuration;
             const zoomInTuchynDuration = 1500;
-            const animationDelay = 2500; // from timer in component 
+            const animationDelay = 2500;
             const animationDuration = zoomInTuchynDelay + zoomInTuchynDuration + animationDelay;
 
-            function animateMapZoomOut(map, targetZoom) {
+            function animateMapZoomOut(map: any, targetZoom: number) {
                 var currentZoom = arguments[2] || map.getZoom();
                 if (currentZoom != targetZoom) {
-                    google.maps.event.addListenerOnce(map, 'zoom_changed', function (event) {
+                    (window as any).google.maps.event.addListenerOnce(map, 'zoom_changed', function (event: any) {
                         animateMapZoomOut(map, targetZoom, currentZoom - (targetZoom < currentZoom ? 1 : -1));
                     });
                     setTimeout(function () { map.setZoom(currentZoom) }, 100);
@@ -202,62 +182,50 @@ export default function (context, inject) {
             }
 
             function zoomOutNC() {
-                animateMapZoomOut(map, 3);
+                animateMapZoomOut(map, 3)
             }
 
             function panToUkraine() {
-                // 50.704437, 26.564082
-                const tuchynLatLng = new google.maps.LatLng(50.70456877384163, 26.564873);
-                setTimeout(() => { map.panTo(tuchynLatLng) }, panToUkraineDelay);
+                const tuchyn = new (window as any).google.maps.LatLng(50.711008, 26.573502)
+                map.panTo(tuchyn)
             }
 
-            function animateMapZoomIn(map, targetZoom) {
+            function animateMapZoomIn(map: any, targetZoom: number) {
                 var currentZoom = arguments[2] || map.getZoom();
                 if (currentZoom != targetZoom) {
-                    google.maps.event.addListenerOnce(map, 'zoom_changed', function (event) {
-                        animateMapZoomIn(map, targetZoom, currentZoom + (targetZoom > currentZoom ? 1 : -1));
+                    (window as any).google.maps.event.addListenerOnce(map, 'zoom_changed', function (event: any) {
+                        animateMapZoomIn(map, targetZoom, currentZoom - (targetZoom < currentZoom ? 1 : -1));
                     });
-                    setTimeout(function () { map.setZoom(currentZoom) }, 300);
+                    setTimeout(function () { map.setZoom(currentZoom) }, 100);
                 }
             }
+
             function zoomInTuchyn() {
-                setTimeout(() => { animateMapZoomIn(map, 16) }, zoomInTuchynDelay);
+                animateMapZoomIn(map, 8)
             }
 
             function animationComplete() {
-                setTimeout(() => {
-                    // setTimeout (() => {showMarkers()}, 2000)
-                    showMarkers();
-                    context.store.commit(`occupation/setPanAnimComplete`); // animation TIMER complete
-                }, animationDuration);
+                showMarkers()
             }
 
             function panningAnimation() {
-                context.store.commit(`occupation/resetPanAnimComplete`); // animation TIMER complete
-
-                zoomOutNC();
-                panToUkraine();
-                zoomInTuchyn();
-                animationComplete();
+                setTimeout(zoomOutNC, 0)
+                setTimeout(panToUkraine, panToUkraineDelay)
+                setTimeout(zoomInTuchyn, zoomInTuchynDelay)
+                setTimeout(animationComplete, animationDuration)
             }
-
-
-            google.maps.event.addDomListener(panToButton, "click", () => {
-                panningAnimation();
-            });
 
             function onReturnVisit() {
-                // context.store.commit(`occupation/setPanAnimComplete`);
-                showMarkers();
+                showMarkers()
             }
 
-            const onReturnButton = document.getElementById('onReturnButton')
-            google.maps.event.addDomListener(onReturnButton, "click", () => {
-                // console.log('clicked it');
-                onReturnVisit();
-            });
+            if (storymapName === 'tuchyn') {
+                panningAnimation()
+            } else {
+                onReturnVisit()
+            }
+        } else {
+            showMarkers()
         }
     }
-
-
-}
+}) 

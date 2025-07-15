@@ -26,87 +26,82 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import groq from 'groq'
 
-import { mapState } from "vuex";
-
-import { groq } from '@nuxtjs/sanity'
 const schema = "subjects"
 const query = groq`*[_type == "${schema}"]{
   subject1, subject2, subject3
 }[0]`
 
+// Props
+interface Props {
+  sectionIndex: number
+  subtitle?: any
+  title?: any
+}
 
-export default {
-  async fetch() {
-    this.subjects = await this.$sanity.fetch(query)
-  },
-  fetchOnServer: false,
-  data: () => ({
-    subjects: ''
-  }),
-  props: {
-    sectionIndex: {
-      type: Number,
-      required: true,
-    },
-    subtitle: {
-      type: Object,
-    },
-    title: {
-      type: Object,
-    },
-  },
-  mounted() {
-    this.setAnimation();
-  },
-  methods: {
-    setAnimation() {
-      const gsap = this.$gsap;
-      const ScrollTrigger = this.$ScrollTrigger;
-      const figures = gsap.utils.toArray(".image-col");
-      if (!figures) {
-        return;
-      }
-      figures.forEach((figure, i) => {
-        const img = figure.querySelector("img");
-        const caption = figure.querySelector("figcaption");
-        // console.log(img);
-        const captionDelay = 0.3;
-        const itemDelay = i * 0.5;
+const props = defineProps<Props>()
 
-        gsap.set(img, {
-          autoAlpha: 0,
-          y: 50,
-          scale: 0.9,
-        });
-        gsap.set(caption, {
-          autoAlpha: 0,
-          scale: 0.9,
-          // y: -50,
-        });
+// Component state
+const subjects = ref('')
 
-        gsap.to(img, {
-          autoAlpha: 1,
-          scale: 1,
-          y: 0,
-          delay: itemDelay,
-          duration: 1,
-          ease: "power2.out",
-        });
+// Fetch data
+const fetchData = async () => {
+  const { $sanity } = useNuxtApp()
+  subjects.value = await $sanity.fetch(query)
+}
 
-        gsap.to(caption, {
-          autoAlpha: 1,
-          scale: 1,
-          duration: 1,
-          y: 0,
-          ease: "power2.out",
-          delay: itemDelay + captionDelay,
-        });
-      });
-    },
-  },
-};
+// Methods
+const setAnimation = () => {
+  const gsap = useNuxtApp().$gsap
+  const ScrollTrigger = useNuxtApp().$ScrollTrigger
+  const figures = gsap.utils.toArray(".image-col")
+  if (!figures) {
+    return
+  }
+  figures.forEach((figure: any, i: number) => {
+    const img = figure.querySelector("img")
+    const caption = figure.querySelector("figcaption")
+    const captionDelay = 0.3
+    const itemDelay = i * 0.5
+
+    gsap.set(img, {
+      autoAlpha: 0,
+      y: 50,
+      scale: 0.9,
+    })
+    gsap.set(caption, {
+      autoAlpha: 0,
+      scale: 0.9,
+    })
+
+    gsap.to(img, {
+      autoAlpha: 1,
+      scale: 1,
+      y: 0,
+      delay: itemDelay,
+      duration: 1,
+      ease: "power2.out",
+    })
+
+    gsap.to(caption, {
+      autoAlpha: 1,
+      scale: 1,
+      duration: 1,
+      y: 0,
+      ease: "power2.out",
+      delay: itemDelay + captionDelay,
+    })
+  })
+}
+
+// Lifecycle
+onMounted(() => {
+  fetchData()
+  setAnimation()
+})
 </script>
 
 <style lang='scss'>

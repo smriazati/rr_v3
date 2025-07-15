@@ -1,123 +1,129 @@
 <template>
-    <div class="aftermath-stories">
-        <div v-if="content">
-            <main ref="content" class="content">
-                <div class="row section gsap-fade-in" v-for="item in content.sections" :key="item._key"
-                    :class="item._type == 'contentImgFull' ? 'dark' : ''">
-                    <div v-if="item._type == 'contentImgText'">
-                        <ContentImageText :content="item"></ContentImageText>
-                    </div>
-                    <div v-if="item._type == 'contentImgFull'">
-                        <ContentImageFull :content="item"></ContentImageFull>
-                    </div>
-                    <div v-if="item._type == 'contentText'" class="context-text-wrapper">
-                        <ContentText :content="item"></ContentText>
-                    </div>
-                    <div v-if="item._type == 'contentVideo'" class="content-video">
-                        <ContentVideo :content="item"></ContentVideo>
-                    </div>
-                    <div v-if="item._type == 'contentQuote'" class="content-quote">
-                        <ContentQuote :quote="item"></ContentQuote>
-                    </div>
-                </div>
-            </main>
+  <div class="aftermath-stories">
+    <div v-if="content">
+      <main ref="content" class="content">
+        <div class="row section gsap-fade-in" v-for="item in content.sections" :key="item._key"
+          :class="item._type == 'contentImgFull' ? 'dark' : ''">
+          <div v-if="item._type == 'contentImgText'">
+            <ContentImageText :content="item"></ContentImageText>
+          </div>
+          <div v-if="item._type == 'contentImgFull'">
+            <ContentImageFull :content="item"></ContentImageFull>
+          </div>
+          <div v-if="item._type == 'contentText'" class="context-text-wrapper">
+            <ContentText :content="item"></ContentText>
+          </div>
+          <div v-if="item._type == 'contentVideo'" class="content-video">
+            <ContentVideo :content="item"></ContentVideo>
+          </div>
+          <div v-if="item._type == 'contentQuote'" class="content-quote">
+            <ContentQuote :quote="item"></ContentQuote>
+          </div>
         </div>
+      </main>
     </div>
-</div></template>
+  </div>
+</template>
 
-<script>
-import { groq } from '@nuxtjs/sanity'
+<script setup lang="ts">
+import { ref, watch, nextTick, onMounted } from 'vue'
+import groq from 'groq'
 
-export default {
-    async fetch() {
-        this.content = await this.$sanity.fetch(groq`*[_id == "${this.schema}"][0]{
-            "sections": content.sections
-        }`)
-    },
-    fetchOnServer: false,
-    data: () => ({
-        content: '',
-    }),
-    props: {
-        schema: {
-            type: String,
-            required: true,
+interface Props {
+  schema: string
+}
+
+const props = defineProps<Props>()
+
+const content = ref('')
+const contentRef = ref<HTMLElement>()
+
+// Fetch data
+const { $sanity } = useNuxtApp()
+const fetchData = async () => {
+  content.value = await $sanity.fetch(groq`*[_id == "${props.schema}"][0]{
+    "sections": content.sections
+  }`)
+}
+
+// Fetch on client side only
+onMounted(() => {
+  fetchData()
+})
+
+// Watch for content changes and set up animations
+watch(content, () => {
+  if (content.value !== '') {
+    nextTick(() => {
+      setAnim()
+    })
+  }
+})
+
+// Animation setup
+const setAnim = () => {
+  const { $gsap } = useNuxtApp()
+  const gsap = $gsap
+
+  if (!contentRef.value) return
+
+  const sections = contentRef.value.querySelectorAll(".section")
+  if (!sections) return
+
+  sections.forEach((panel, i) => {
+    if (i === 0) {
+      gsap.set(panel, {
+        autoAlpha: 0,
+        y: 150,
+      })
+
+      gsap.to(panel, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 1
+      })
+    } else {
+      gsap.set(panel, {
+        autoAlpha: 0,
+        y: 150,
+      })
+
+      gsap.to(panel, {
+        autoAlpha: 1,
+        y: 0,
+        scrollTrigger: {
+          trigger: panel,
+          start: `top+=150px bottom`,
+          end: `+=300px`,
+          scrub: 1.1,
         },
-    },
-    watch: {
-        content() {
-            if (this.content !== '') {
-                this.$nextTick(() => {
-                    this.setAnim();
-                })
-            }
-        }
-    },
-    methods: {
-        setAnim() {
-            const gsap = this.$gsap;
-            const content = this.$refs.content;
-            if (!content) { return }
-            const sections = content.querySelectorAll(".section");
-            console.log(sections);
-            if (!sections) { return }
-            sections.forEach((panel, i) => {
-
-                if (i === 0) {
-                    gsap.set(panel, {
-                        autoAlpha: 0,
-                        y: 150,
-                    });
-
-                    gsap.to(panel, {
-                        autoAlpha: 1,
-                        y: 0,
-                        duration: 1
-                    })
-                } else {
-                    gsap.set(panel, {
-                        autoAlpha: 0,
-                        y: 150,
-                    });
-
-                    gsap.to(panel, {
-                        autoAlpha: 1,
-                        y: 0,
-                        scrollTrigger: {
-                            trigger: panel,
-                            start: `top+=150px bottom`,
-                            end: `+=300px`,
-                            scrub: 1.1,
-                        },
-                    });
-                }
-            });
-        },
+      })
     }
-} 
+  })
+}
 </script>
 
 <style lang="scss">
 .aftermath-stories blockquote {
-    margin-bottom: 60px;
+  margin-bottom: 60px;
 
-    figcaption {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
+  figcaption {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
 }
 
 .aftermath-stories .content-quote {
-    max-width: 55ch;
-    text-align: center;
+  max-width: 55ch;
+  text-align: center;
 }
 
 .aftermath-stories {
-    @media (max-width: $collapse-bp) {
-        .context-text-wrapper {
-            padding: 0 30px;
-        }
+  @media (max-width: $collapse-bp) {
+    .context-text-wrapper {
+      padding: 0 30px;
     }
+  }
 }
 </style>

@@ -5,19 +5,17 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup lang="ts">
+import { computed } from 'vue'
 
-export default {
-  data() {
-    return {
-      page: this.$route.name,
-    };
-  },
+const route = useRoute()
+const page = computed(() => route.name)
+
+// Enable scroll to top behavior
+definePageMeta({
   scrollToTop: true
-};
+})
 </script>
-
 
 <style lang="scss">
 .default-layout {

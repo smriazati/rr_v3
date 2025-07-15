@@ -1,18 +1,14 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+const route = useRoute()
+const page = computed(() => route.name)
+</script>
+
 <template>
   <div class="admin-layout" :class="`route-${page}`">
     <nuxt />
   </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      page: this.$route.name,
-    };
-  },
-};
-</script>
 
 <style lang="scss">
 .admin-layout {

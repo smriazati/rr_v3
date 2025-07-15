@@ -17,7 +17,7 @@
 </template>
   
 <script>
-import { groq } from '@nuxtjs/sanity'
+import { groq } from 'groq'
 
 
 

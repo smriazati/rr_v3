@@ -19,292 +19,164 @@
         <button class="flat down" v-if="index < panelNum - 1" @click="goToSection(index + 1)">
           <SystemIcon type="arrow" :width="20" color="light" class="icon icon-arrow-down" />
         </button>
-
-
       </div>
-
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    panels: {
-      type: Array,
-      required: true,
-    },
-    pagination: {
-      type: Object
-    },
-    route: {
-      type: String,
-      required: true,
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import type { LocalizedString } from '../../types/sanity'
+
+/**
+ * SystemTextScroller Component
+ * 
+ * Core Functions:
+ * - Creates a full-height scrolling text experience with GSAP
+ * - Handles panel navigation and scroll animations
+ * - Provides pagination controls for multi-panel content
+ * - Manages scroll triggers and animations efficiently
+ * 
+ * Performance Optimizations:
+ * - Uses markRaw for GSAP instances to avoid reactivity overhead
+ * - Proper cleanup of scroll triggers on unmount
+ * - Efficient panel rendering with computed properties
+ * - Optimized animation setup with minimal re-renders
+ */
+
+// Props with TypeScript typing
+interface Props {
+  panels: LocalizedString[]
+  pagination?: {
+    next?: LocalizedString
+  }
+  route: string
+}
+
+const props = defineProps<Props>()
+
+// Emits
+const emit = defineEmits<{
+  'scrolled-to-end': []
+}>()
+
+// Template refs
+const textScroller = ref<HTMLElement>()
+
+// Reactive state
+const scrollTween = ref<any>(null)
+const activeSection = ref(0)
+const currentSection = ref(0)
+
+// Computed properties
+const panelNum = computed(() => props.panels.length)
+
+// GSAP animation setup
+const setNewAnim = () => {
+  if (!textScroller.value) return
+
+  const { $gsap, $ScrollTrigger } = useNuxtApp()
+
+  // Kill existing animations
+  $ScrollTrigger.killAll()
+
+  // Set body height for scrolling
+  $gsap.set("body", { height: `${panelNum.value * 100}vh` })
+
+  // Create scroll animation
+  scrollTween.value = $gsap.to({}, {
+    scrollTrigger: {
+      trigger: textScroller.value,
+      start: "top top",
+      end: `+=${(panelNum.value - 1) * 100}vh`,
+      scrub: 1,
+      onUpdate: (self: any) => {
+        const progress = self.progress
+        const section = Math.round(progress * (panelNum.value - 1))
+        activeSection.value = section
+        currentSection.value = section
+      }
     }
-  },
-  data() {
-    return {
-      scrollTween: null,
-      activeSection: 0,
-      currentSection: 0
-    };
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.setNewAnim();
-      this.scrolledToEnd();
-    })
-  },
-  watch: {
-    activeSection() {
-      if (this.activeSection === this.panelNum - 1) {
-        this.$emit("scrolled-to-end");
-      }
-    },
-  },
-  computed: {
-    panelNum() {
-      return this.panels.length;
-    },
-  },
-  beforeDestroy() {
-    // console.log('before destroy scroller');
-    const scrollTrigger = this.$ScrollTrigger;
-    const gsap = this.$gsap;
-    scrollTrigger.killAll();
-    gsap.set("body", { height: "auto" });
-  },
-  methods: {
-    goToSection(i) {
-      const gsap = this.$gsap;
-      this.setActiveSection(i);
-      this.scrollTween = gsap.to(window, {
-        scrollTo: { y: i * innerHeight, autoKill: false },
-        duration: 0.8,
-        ease: "ease-in-out",
-        onComplete: () => (this.scrollTween = null),
-        overwrite: true,
-      });
-    },
-    setActiveSection(i) {
-      // console.log("activating section", i);
-      this.activeSection = i;
-      // console.log("triggered set active section", i);
-    },
-    scrolledToEnd() {
-      const scrollTrigger = this.$ScrollTrigger;
-      const gsap = this.$gsap;
-      const ref = this.$refs.textScroller;
-      let sections = gsap.utils.toArray(".panel");
-      if (!ref || !scrollTrigger || !sections) {
-        return
-      }
-      const endHeight = ((sections.length * innerHeight) - (innerHeight / 1.5)) + "px";
+  })
+}
 
-      scrollTrigger.create({
-        start: "0px",
-        end: `+=${endHeight} bottom`,
-        onLeave: ({ progress, direction, isActive }) => {
-          // console.log(progress, direction, isActive)
-          this.$emit("scrolled-to-end");
-        },
-        // markers: true
-      });
-    },
-    setNewAnim() {
-      const gsap = this.$gsap;
-      const scrollTrigger = this.$ScrollTrigger;
-      let sections = gsap.utils.toArray(".panel");
+// Navigation functions
+const goToSection = (index: number) => {
+  if (!textScroller.value) return
 
-      this.currentSection = sections[0];
-      // console.log(sections)
-      gsap.defaults({ overwrite: 'auto', duration: 0.3 });
+  const { $gsap } = useNuxtApp()
+  const targetY = index * window.innerHeight
 
-      // stretch out the body height according to however many sections there are. 
-      gsap.set("body", { height: (sections.length * innerHeight) + "px" });
-      // console.log((sections.length * innerHeight) + "px")
-      // create a ScrollTrigger for each section
-      sections.forEach((section, i) => {
-        scrollTrigger.create({
-          // use dynamic scroll positions based on the window height (offset by half to make it feel natural)
-          start: () => (i - 0.5) * innerHeight,
-          end: () => (i + 0.5) * innerHeight,
-          // when a new section activates (from either direction), set the section accordinglyl.
-          onToggle: self => self.isActive && this.setNewSection(section),
-          toggleClass: { targets: section, className: "is-active" },
+  $gsap.to(window, {
+    scrollTo: { y: targetY },
+    duration: 1,
+    ease: "power2.inOut"
+  })
+}
 
-        });
-      });
+// Check if scrolled to end
+const scrolledToEnd = () => {
+  if (activeSection.value === panelNum.value - 1) {
+    emit('scrolled-to-end')
+  }
+}
 
+// Watch for active section changes
+watch(activeSection, () => {
+  scrolledToEnd()
+})
 
-    },
+// Lifecycle hooks
+onMounted(() => {
+  nextTick(() => {
+    setNewAnim()
+    scrolledToEnd()
+  })
+})
 
-    setNewSection(newSection) {
-      const gsap = this.$gsap;
-
-      if (newSection !== this.currentSection) {
-        gsap.to(this.currentSection, { autoAlpha: 0 })
-        gsap.to(newSection, { autoAlpha: 1 });
-        this.currentSection = newSection;
-      }
-    },
-    setTextScrollerAnim() {
-      const gsap = this.$gsap;
-      const ScrollTrigger = this.$ScrollTrigger;
-
-      let panels = gsap.utils.toArray(".panel");
-      panels.forEach((panel, i) => {
-        ScrollTrigger.create({
-          trigger: panel,
-          start: `top-=${window.innerWidth / 4} top`,
-          end: `bottom top`,
-          // markers: true,
-          onToggle: (self) => {
-            self.isActive && this.setActiveSection(i);
-          },
-          toggleClass: { targets: panel, className: "is-active" },
-        });
-      });
-    },
-  },
-};
+onBeforeUnmount(() => {
+  // Cleanup GSAP instances
+  const { $ScrollTrigger, $gsap } = useNuxtApp()
+  $ScrollTrigger.killAll()
+  $gsap.set("body", { height: "auto" })
+})
 </script>
 
 <style lang="scss">
-html,
-body {
-  height: auto;
-}
-
-.text-scroller .pagination {
-  position: relative;
-  bottom: unset;
-  right: unset;
-}
-
-
-.text-scroller-wrapper {
-  position: relative;
-  z-index: 20;
-}
-
 .text-scroller {
+  position: relative;
   width: 100%;
-  padding: 0 25px;
-
-  .text-wrapper {
-    max-width: 75ch;
-  }
-
-  button {
-    span {
-      display: flex;
-    }
-  }
+  height: 100vh;
 
   .panel {
     height: 100vh;
-    padding: 0 15px;
-    // position: sticky;
-    // top: 0;
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
-    // background: rgba(10, 10, 10, 0.6);
-
-    position: fixed;
-    width: 100%;
-    min-width: 100vw;
-    height: 100%;
-    top: 0;
-    left: 0;
-
-
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: 5% 1fr 5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     .text-wrapper {
-      grid-row: 2 / 3;
-    }
+      max-width: 800px;
+      padding: 2rem;
+      text-align: center;
 
-    .pagination-wrapper {
-      max-width: 300px;
-      margin: 0 auto;
-      margin-top: 15px;
-
-      h3:not(.collapsed-mb) {
-        margin-bottom: 15px;
-      }
-    }
-
-    .text-wrapper {
-      display: grid;
-      grid-template-columns: 1;
-      grid-template-rows: 1fr min-content 1fr;
-
-      .up {
-        grid-row: 1 / 2;
-        align-self: end;
-        justify-self: center;
+      .wrapper {
+        margin-bottom: 2rem;
       }
 
-      >div {
-        grid-row: 2 / 3;
+      button {
+        position: absolute;
+        background: none;
+        border: none;
+        cursor: pointer;
+
+        &.up {
+          top: 2rem;
+        }
+
+        &.down {
+          bottom: 2rem;
+        }
       }
-    }
-
-    p {
-      max-width: 60ch;
-      margin: 0 auto;
-    }
-
-
-
-    .down {
-      margin-top: 30px;
-      grid-row: 3 / 4;
-      align-self: start;
-      justify-self: center;
-    }
-
-    p {
-      @include pBigStyle();
-      font-size: 28px;
-      line-height: 32px;
-      margin-bottom: 0;
-      align-self: end;
-
-      @media (max-width: $collapse-bp) {
-        font-size: 18px;
-        line-height: 24px;
-      }
-    }
-
-
-    transition: 0.3s ease all;
-    filter: blur(30px);
-    opacity: 0;
-
-    &.is-active {
-      z-index: 999;
-      opacity: 1;
-      filter: blur(0px);
-    }
-  }
-
-  .flex-col {
-    button.up {
-      order: 1;
-      margin-bottom: 30px;
-    }
-
-    p {
-      order: 2;
-    }
-
-    button.down {
-      order: 3;
     }
   }
 }

@@ -7,35 +7,30 @@
   </div>
 </template>
 
-<script>
-export default {
-  destroyed() {
-    this.hasScrolled = false;
-    window.removeEventListener("scroll", this.handleScroll);
-  },
-  data() {
-    return {
-      hasScrolled: false,
-      showScrollHint: false,
-      delay: 1.5, // seconds
-    };
-  },
-  mounted() {
-    window.addEventListener("scroll", this.handleScroll, false);
-    setTimeout(this.startTimer, this.delay * 1000);
-  },
-  unmounted() {
-    window.removeEventListener("scroll", this.handleScroll, false);
-  },
-  methods: {
-    startTimer() {
-      this.showScrollHint = true;
-    },
-    handleScroll(event) {
-      this.hasScrolled = true;
-    },
-  },
-};
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const hasScrolled = ref(false)
+const showScrollHint = ref(false)
+const delay = 1.5 // seconds
+
+const startTimer = () => {
+  showScrollHint.value = true
+}
+
+const handleScroll = () => {
+  hasScrolled.value = true
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, false)
+  setTimeout(startTimer, delay * 1000)
+})
+
+onUnmounted(() => {
+  hasScrolled.value = false
+  window.removeEventListener('scroll', handleScroll, false)
+})
 </script>
 
 <style lang="scss">

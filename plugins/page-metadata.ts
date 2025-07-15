@@ -1,6 +1,10 @@
-export default (context, inject) => {
-    function setPageTitle(data) {
-        const activeLanguage = this.$store.state.localization.activeLanguage
+import type { PageMetadata } from '../types/sanity'
+
+export default defineNuxtPlugin(() => {
+    const { $store } = useNuxtApp()
+
+    function setPageTitle(data: any) {
+        const activeLanguage = $store.state.localization.activeLanguage
         const titleInActiveLang = data?.pageTitle[activeLanguage];
 
         let baseName = '';
@@ -12,5 +16,9 @@ export default (context, inject) => {
         return finalTitle;
     }
 
-    inject('setPageTitle', setPageTitle)
-}
+    return {
+        provide: {
+            setPageTitle
+        }
+    }
+}) 

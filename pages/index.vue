@@ -25,29 +25,22 @@
   </div>
 </template>
 
-<script>
-
-import { groq } from '@nuxtjs/sanity'
+<script setup lang="ts">
+// groq is auto-imported in Nuxt 3
 const schema = "intro0"
 const query = groq`*[_type == "${schema}"][0]`
 
-export default {
-  layout: 'home',
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query);
-    return content;
-  },
-  data() {
-    return {
-      name: "home"
-    };
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-};
+// Fetch data
+const { $sanity } = useNuxtApp()
+const content = await $sanity.fetch(query)
+
+// Extract data from content
+const { title, subhead, ctaText } = content || {}
+
+// Set page metadata
+useHead({
+  title: 'Home'
+})
 </script>
 
 <style lang="scss">
@@ -123,4 +116,3 @@ export default {
 
 }
 </style>
-
