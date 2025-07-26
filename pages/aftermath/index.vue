@@ -14,44 +14,46 @@
         </div>
     </div>
 </template>
-  
-<script>
-import { groq } from 'groq'
-const schema = "landing4"
-const query = groq`*[_type == "${schema}"][0]`
 
-export default {
-    asyncData({ $sanity }) {
-        const content = $sanity.fetch(query)
-        return content
-    },
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+import groq from 'groq'
 
-    data() {
-        return {
-            name: "aftermath",
-            wrapperHeight: null,
-        };
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.pageMetadata)
-        }
-    },
-    mounted() {
-        this.setWrapperHeight();
-        window.addEventListener("resize", () => {
-            this.setWrapperHeight();
-        });
-    },
-    methods: {
-        setWrapperHeight() {
-            this.wrapperHeight = window.innerHeight * this.panels.length;
-        }
-    },
-};
+const name = ref('aftermath')
+const wrapperHeight = ref<number | null>(null)
+const wrapper = ref<HTMLElement | null>(null)
+
+const query = groq`*[_type == "landing4"][0]`
+const { data: content } = await useSanityQuery<any>(query)
+
+const bgImg = computed(() => content.value?.bgImg)
+const panels = computed(() => content.value?.panels)
+const nav = computed(() => content.value?.nav)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+function setWrapperHeight() {
+    if (panels.value) {
+        wrapperHeight.value = window.innerHeight * panels.value.length
+    }
+}
+
+onMounted(() => {
+    setWrapperHeight()
+    window.addEventListener('resize', setWrapperHeight)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', setWrapperHeight)
+})
+
+useHead(() => ({
+    title: useSetPageTitle(pageMetadata)
+}))
 </script>
-  
+
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .aftermath {
     .text-wrapper {
         p {

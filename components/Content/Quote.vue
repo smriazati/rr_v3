@@ -1,15 +1,15 @@
 <template>
     <figure>
         <blockquote v-if="quote">
-            <div>
+            <div class="quote">
                 <p>
                     <LocalizationQuote :string="quote.quote"></LocalizationQuote>
                 </p>
             </div>
-            <figcaption>
+            <div>
                 <LocalizationString :string="quote.attribution">
                 </LocalizationString>
-            </figcaption>
+            </div>
         </blockquote>
     </figure>
 </template>
@@ -41,7 +41,7 @@ const props = defineProps<Props>()
 </script>
 
 <style lang="scss" scoped>
-figcaption {
+div.caption {
     display: flex;
     justify-content: center;
     margin-top: 15px;

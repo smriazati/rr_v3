@@ -12,8 +12,8 @@
                 </p>
             </div>
             <div class="card-row">
-                <nuxt-link :class="`card card-${index + 1}`" v-for="(item, key, index) in subjects" :key="index"
-                    :to="{ path: `/${routeSection}/stories/${index + 1}`, query: $route.query }">
+                <nuxt-link :class="`card card-${index + 1}`" v-for="(item, index) in subjects" :key="index"
+                    :to="`/${routeSection}/stories/${index + 1}`">
                     <figure class="image-wrapper">
                         <div class="img">
                             <LocalizationImageNoCaption :img="item.img" :size="500"></LocalizationImageNoCaption>
@@ -44,6 +44,7 @@
 import { ref, computed } from 'vue'
 import groq from 'groq'
 
+
 // Props
 interface Props {
     subtitle?: any
@@ -53,25 +54,19 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-const subjects = ref<any>('')
-
-const fetchSubjects = async () => {
-    const { $sanity } = useNuxtApp()
-    subjects.value = await $sanity.fetch(groq`*[_type == "subjects"]{ subject1, subject2, subject3 }[0]`)
-}
-
-fetchSubjects()
+const { data: subjects } = await useSanityQuery<any>(groq`*[_type == "subjects"]{ subject1, subject2, subject3 }[0]`)
 
 const routeSection = computed(() => {
-    const route = useRoute()
-    if (!route || !route.name) return ''
-    const routeName = route.name as string
+    if (!props.route) return ''
+    const routeName = props.route as string
     const routeKey = routeName.substr(0, routeName.indexOf('-'))
     return routeKey
 })
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .subject-name {
     display: flex;
 

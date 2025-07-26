@@ -57,9 +57,6 @@ export default defineNuxtConfig({
         '/': { prerender: true }
     },
 
-    // Auto-import components
-    components: true,
-
     // Modules
     modules: [
         '@pinia/nuxt',
@@ -83,6 +80,7 @@ export default defineNuxtConfig({
     // Sanity configuration
     sanity: {
         projectId: 'hxa1vf8p',
+        dataset: 'production',
         apiVersion: '2021-10-21'
     },
 
@@ -90,9 +88,6 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             mapsApi: process.env.GOOGLEMAPSAPI,
-            sanityProjectId: 'hxa1vf8p',
-            sanityDataset: 'production',
-            sanityApiVersion: '2021-10-21'
         }
     },
 

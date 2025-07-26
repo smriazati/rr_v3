@@ -53,26 +53,17 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      name: "table-of-contents",
-    };
-  },
-  head() {
-    return {
-      title: this.name
-        .replace(/-/g, " ")
-        .split(" ")
-        .map((word) => {
-          return word[0].toUpperCase() + word.substring(1);
-        })
-        .join(" "),
-    };
-  },
-  layout: "admin",
-};
+<script setup lang="ts">
+import { useHead } from 'nuxt/app'
+import { ref } from 'vue'
+
+const name = ref('table-of-contents')
+
+useHead(() => ({
+  title: name.value
+}))
+
+definePageMeta({ layout: 'admin' })
 </script>
 
 <style lang="scss">
@@ -90,4 +81,3 @@ export default {
   }
 }
 </style>
-

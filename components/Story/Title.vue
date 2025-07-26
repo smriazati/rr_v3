@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import groq from 'groq'
 
 const query = groq`
@@ -41,9 +41,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Component state
-const header = ref()
-const content = ref<any>('')
+const { data: content } = await useSanityQuery<any>(query)
 
 // Pinia store
 const localizationStore = useLocalizationStore()
@@ -73,17 +71,6 @@ const activeSubject = computed(() => {
   subject.name = content.value.subjects[props.subjectId]?.name
   subject.image = content.value.subjects[props.subjectId]?.img
   return subject
-})
-
-// Fetch data
-const fetchData = async () => {
-  const { $sanity } = useNuxtApp()
-  content.value = await $sanity.fetch(query)
-}
-
-// Lifecycle
-onMounted(() => {
-  fetchData()
 })
 </script>
 

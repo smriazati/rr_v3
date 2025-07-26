@@ -4,7 +4,7 @@
             <div class="dropdown-wrapper">
                 <div class="dropdown-active">
                     <div class="wrapper">
-                        <p class="label" @click="toggleDropdown">English / Ukrainian</p>
+                        <p class="label" @click="toggleDropdown">Select Language</p>
                         <div class="arrow-down"></div>
                     </div>
                 </div>
@@ -12,12 +12,27 @@
                     <ul class="wrapper">
                         <li :class="activeLanguage === 'en' ? 'active' : ''">
                             <button class="flat" @click="setActiveLanguage('en')">
-                                <span><img src="/images/flag_en.svg" alt="american flag"
-                                        height="30" /></span>English</button>
+                                <!-- <span>
+                                    <img src="/images/flag_en.svg" alt="american flag" height="30" />
+                                </span> -->
+                                <span>English</span>
+                            </button>
                         </li>
                         <li :class="activeLanguage === 'uk' ? 'active' : ''">
-                            <button class="flat" @click="setActiveLanguage('uk')"><span><img src="/images/flag_uk.svg"
-                                        alt="ukrainian flag" height="30" /></span>украї́нська</button>
+                            <button class="flat" @click="setActiveLanguage('uk')">
+                                <!-- <span>
+                                    <img src="/images/flag_uk.svg" alt="ukrainian flag" height="30" />
+                                </span> -->
+                                <span>украї́нська</span>
+                            </button>
+                        </li>
+                        <li :class="activeLanguage === 'es' ? 'active' : ''">
+                            <button class="flat" @click="setActiveLanguage('es')">
+                                <!-- <span>
+                                    <img src="/images/flag_uk.svg" alt="spanish flag" height="30" />
+                                </span> -->
+                                <span>Español</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -29,7 +44,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { groq } from 'groq'
 import { useLocalization } from '../../composables/useLocalization'
 
 /**
@@ -48,43 +62,32 @@ import { useLocalization } from '../../composables/useLocalization'
  */
 
 // Props definition with TypeScript
-interface Props {
-    string?: string // Optional string prop (legacy support)
-}
+// interface Props {
+//     string?: string // Optional string prop (legacy support)
+// }
 
-const props = defineProps<Props>()
+// const props = defineProps<Props>()
 
 // Router for navigation
 const router = useRouter()
 
 // Reactive state with proper typing
 const isExpanded = ref(false)
-const showLanguagePicker = ref(true)
-
-// Language configuration (static data - no reactivity needed)
-const languages = {
-    en: { name: "English" },
-    uk: { name: "українська" }
-} as const
 
 // Fetch language picker settings from Sanity
-const fetchLanguageSettings = async () => {
-    try {
-        const { $sanity } = useNuxtApp()
-        const query = groq`*[_type == "settings"]{
-      showLanguagePicker
-    }[0]`
-        const data = await $sanity.fetch(query)
-        showLanguagePicker.value = data?.showLanguagePicker ?? true
-    } catch (error) {
-        console.error('Failed to fetch language settings:', error)
-        // Fallback to showing picker if fetch fails
-        showLanguagePicker.value = true
-    }
-}
+const query = groq`*[_type == "settings"]{ showLanguagePicker }[0]`
+const { data } = await useSanityQuery<any>(query)
+
+const showLanguagePicker = computed(() => data.value?.showLanguagePicker ?? true)
+
+// Language configuration (static data - no reactivity needed)
+// const languages = {
+//     en: { name: "English" },
+//     uk: { name: "українська" }
+// } as const
 
 // Language selection handler with route update
-const setActiveLanguage = (lang: 'en' | 'uk') => {
+const setActiveLanguage = (lang: 'en' | 'uk' | 'es') => {
     toggleDropdown()
     // Update store and route
     const { setActiveLanguage: updateLanguage } = useLocalization()
@@ -102,7 +105,7 @@ const { activeLanguage } = useLocalization()
 
 // Initialize component
 onMounted(() => {
-    fetchLanguageSettings()
+    // fetchLanguageSettings() // This line is removed as per the edit hint
 })
 </script>
 

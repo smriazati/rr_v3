@@ -1,53 +1,45 @@
 <template>
-    <div ref="wrapper" class="story-wrapper">
-        <div ref="storyWrapper">
-            <StoriesIntro :subjectId="`subject${this.$route.params.id}`" sectionId="intro"
-                :schema="`story1_${this.$route.params.id}`" />
-        </div>
-        <div class="pagination-row flex-row" v-show="isPaginationVisible">
-            <PaginationHash link="/intro/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
-            <Pagination link="/occupation" :message="nav?.nav?.next" />
-        </div>
+  <div ref="wrapper" class="story-wrapper">
+    <div ref="storyWrapper">
+      <StoriesIntro :subjectId="`subject${id}`" sectionId="intro" :schema="`story1_${id}`" />
     </div>
+    <div class="pagination-row flex-row" v-show="isPaginationVisible">
+      <PaginationHash link="/intro/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
+      <Pagination link="/occupation" :message="nav?.nav?.next" />
+    </div>
+  </div>
 </template>
-  
-<script>
-import { groq } from 'groq'
 
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import groq from 'groq'
 
-export default {
-    asyncData({ $sanity, params }) {
+const name = ref('intro-stories')
+const isPaginationVisible = ref(true)
 
-        const schema = "settings1"
-        const query = groq`
+const route = useRoute()
+const id = computed(() => route.params.id)
+
+const query = computed(() => groq`
 {
-    "nav": *[_id == "${schema}"]{
-        nav
-    }[0],
-    "metadata": *[_id == "story1_${params.id}"][0]{
-        pageMetadata
-    }
+  "nav": *[_id == "settings1"]{
+    nav
+  }[0],
+  "metadata": *[_id == "story1_${id.value}"][0]{
+    pageMetadata
+  }
+}`)
+
+const { data: result } = await useSanityQuery<any>(query)
+
+const nav = computed(() => result.value?.nav)
+const metadata = computed(() => result.value?.metadata)
+
+function showPagination() {
+  isPaginationVisible.value = true
 }
-`
-        const data = $sanity.fetch(query)
-        return data
-    },
-    data() {
-        return {
-            name: "intro-stories",
-            isPaginationVisible: true
-        };
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.metadata.pageMetadata)
-        }
-    },
-    methods: {
-        showPagination() {
-            this.isPaginationVisible = true;
-        },
-    },
-};
+
+useHead(() => ({
+  title: useSetPageTitle(metadata.value?.pageMetadata)
+}))
 </script>
-  

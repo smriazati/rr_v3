@@ -54,7 +54,10 @@ const props = defineProps<Props>()
 const button = ref<HTMLElement>()
 </script>
 
+
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .conclusion.page .conclusion-ending-slide {
   background: #f5f5f5;
   height: 100vh;

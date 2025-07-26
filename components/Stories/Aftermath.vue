@@ -35,21 +35,12 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const content = ref('')
-const contentRef = ref<HTMLElement>()
-
-// Fetch data
-const { $sanity } = useNuxtApp()
-const fetchData = async () => {
-  content.value = await $sanity.fetch(groq`*[_id == "${props.schema}"][0]{
+const query = computed(() => groq`*[_id == "${props.schema}"][0]{
     "sections": content.sections
   }`)
-}
+const { data: content } = useSanityQuery<any>(query)
 
-// Fetch on client side only
-onMounted(() => {
-  fetchData()
-})
+const contentRef = ref<HTMLElement>()
 
 // Watch for content changes and set up animations
 watch(content, () => {
@@ -104,6 +95,8 @@ const setAnim = () => {
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .aftermath-stories blockquote {
   margin-bottom: 60px;
 

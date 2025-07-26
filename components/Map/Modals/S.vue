@@ -35,17 +35,8 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-const content = ref<any>('')
-
-const fetchContent = async () => {
-    const { $sanity } = useNuxtApp()
-    const data = await $sanity.fetch(groq`*[_id == "marker${props.activeStoryId + 1}"][0]`)
-    if (!data) return
-    if (!data.content) return
-    content.value = data.content
-}
-
-watch(() => props.activeStoryId, fetchContent, { immediate: true })
+const query = computed(() => groq`*[_id == "marker${props.activeStoryId + 1}"][0]`)
+const { data: content } = useSanityQuery<any>(query)
 </script>
 <style lang="scss">
 .storymap-modal-content .title h1 {

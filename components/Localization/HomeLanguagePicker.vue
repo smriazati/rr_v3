@@ -58,29 +58,18 @@ const router = useRouter()
 
 // Reactive state with proper typing
 const isExpanded = ref(false)
-const showLanguagePicker = ref(true)
+
+// Fetch language picker settings from Sanity
+const query = groq`*[_type == "settings"]{ showLanguagePicker }[0]`
+const { data } = await useSanityQuery<any>(query)
+
+const showLanguagePicker = computed(() => data.value?.showLanguagePicker ?? true)
 
 // Language configuration (static data - no reactivity needed)
 const languages = {
     en: { name: "English" },
     uk: { name: "українська" }
 } as const
-
-// Fetch language picker settings from Sanity
-const fetchLanguageSettings = async () => {
-    try {
-        const { $sanity } = useNuxtApp()
-        const query = groq`*[_type == "settings"]{
-      showLanguagePicker
-    }[0]`
-        const data = await $sanity.fetch(query)
-        showLanguagePicker.value = data?.showLanguagePicker ?? true
-    } catch (error) {
-        console.error('Failed to fetch language settings:', error)
-        // Fallback to showing picker if fetch fails
-        showLanguagePicker.value = true
-    }
-}
 
 // Language selection handler with route update
 const setActiveLanguage = (lang: 'en' | 'uk') => {
@@ -98,11 +87,6 @@ const toggleDropdown = () => {
 
 // Get active language from store
 const { activeLanguage } = useLocalization()
-
-// Initialize component
-onMounted(() => {
-    fetchLanguageSettings()
-})
 </script>
 
 <style lang="scss">

@@ -15,48 +15,41 @@
 
     </div>
 </template>
-  
-<script>
-import { groq } from 'groq'
 
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import groq from 'groq'
 
+const name = ref('aftermath-stories-individual')
+const sectionId = ref('aftermath')
+const isPaginationVisible = ref(true)
 
+const route = useRoute()
+const id = computed(() => route.params.id)
 
-export default {
-    asyncData({ $sanity, params }) {
+const query = computed(() => groq`
+{
+  "nav": *[_id == "settings4"]{
+    nav
+  }[0],
+  "metadata": *[_id == "story4_${id.value}"][0]{
+    pageMetadata
+  }
+}`)
 
-        const schema = "settings4"
-        const query = groq`
-        {
-            "nav": *[_id == "${schema}"]{
-                nav
-            }[0],
-            "metadata": *[_id == "story4_${params.id}"][0]{
-                pageMetadata
-            }
-        }
-        `
+const { data: result } = await useSanityQuery<any>(query)
 
-        const nav = $sanity.fetch(query)
-        return nav
-    },
-    data() {
-        return {
-            name: "aftermath-stories-individual",
-            sectionId: "aftermath",
-            isPaginationVisible: true,
-        };
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.metadata?.pageMetadata)
-        }
-    }
-};
+const nav = computed(() => result.value?.nav)
+const metadata = computed(() => result.value?.metadata)
+
+// Set page metadata
+useHead(() => ({
+    title: useSetPageTitle(metadata.value?.pageMetadata)
+}))
 </script>
-  
-  
-  
+
+
+
 <style lang="scss">
 .story-wrapper {
     .page-grid {
@@ -187,4 +180,3 @@ export default {
     }
 }
 </style>
-  

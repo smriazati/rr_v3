@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 const route = useRoute()
-const page = computed(() => route.name)
 </script>
 
 <template>
-  <div class="admin-layout" :class="`route-${page}`">
-    <nuxt />
+  <div class="admin-layout" :class="`route-${route.name}`">
+    <NuxtPage />
   </div>
 </template>
 

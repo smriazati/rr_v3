@@ -37,45 +37,44 @@
         </div>
     </div>
 </template>
-  
-<script>
 
-import { groq } from 'groq'
-const schema = "talkback2"
-const query = groq`*[_type == "${schema}"][0]`
+<script setup lang="ts">
+import { ref } from 'vue'
+import groq from 'groq'
 
-export default {
-    asyncData({ $sanity }) {
-        const content = $sanity.fetch(query)
-        return content
-    },
-    data() {
-        return {
-            name: "occupation-talkback",
-            areDefsVisible: false,
-            isPaginationVisible: false,
-        };
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.pageMetadata)
-        }
-    },
-    methods: {
-        toggleDefs() {
-            this.areDefsVisible = !this.areDefsVisible;
-            if (!this.isPaginationVisible) {
-                this.showPagination();
-            }
-        },
-        showPagination() {
-            this.isPaginationVisible = true;
-        },
-    },
-};
+const name = ref('occupation-talkback')
+const areDefsVisible = ref(false)
+const isPaginationVisible = ref(false)
+
+const query = groq`*[_type == "talkback2"][0]`
+const { data: content } = await useSanityQuery<any>(query)
+
+const title = computed(() => content.value?.title)
+const instructions = computed(() => content.value?.instructions)
+const terms = computed(() => content.value?.terms)
+const hideBtnText = computed(() => content.value?.hideBtnText)
+const showBtnText = computed(() => content.value?.showBtnText)
+const nav = computed(() => content.value?.nav)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+function toggleDefs() {
+    areDefsVisible.value = !areDefsVisible.value
+    if (!isPaginationVisible.value) {
+        showPagination()
+    }
+}
+function showPagination() {
+    isPaginationVisible.value = true
+}
+
+useHead(() => ({
+    title: useSetPageTitle(pageMetadata)
+}))
 </script>
-  
+
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .occupation-talkback {
 
     h1,

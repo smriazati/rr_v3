@@ -31,6 +31,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import groq from 'groq'
+// @ts-ignore
+import { useLocalizationStore } from '@/stores/localization'
 
 const schema = "settings"
 const query = groq`*[_type == "${schema}"]{
@@ -48,28 +50,17 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Component state
-const labels = ref('')
-const isCollapsed = ref(false)
+const { data: labels } = await useSanityQuery<any>(query)
 
 // Pinia store
 const localizationStore = useLocalizationStore()
 
 // Computed properties
 const activeLanguage = computed(() => localizationStore.activeLanguage)
-
-// Fetch data
-const fetchData = async () => {
-    const { $sanity } = useNuxtApp()
-    labels.value = await $sanity.fetch(query)
-}
-
-// Lifecycle
-onMounted(() => {
-    fetchData()
-})
 </script>
 <style lang='scss'>
+@use '~/assets/sass/imports/imports.scss' as *;
+
 @keyframes slideIn {
     from {
         opacity: 0;

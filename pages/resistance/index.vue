@@ -37,92 +37,84 @@
 </template>
 
 
-<script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import groq from 'groq'
 
-import { groq } from 'groq'
-const schema = "intro3"
-const query = groq`*[_type == "${schema}"][0]`
+const name = ref('resistance')
+const isFilmEnded = ref(false)
+const isPaginationVisible = ref(false)
+const isFilmActive = ref(false)
+const isFilmPlaying = ref(false)
+const options = {
+  controls: true,
+  loop: false,
+  autoplay: false,
+  muted: false,
+  portrait: false,
+  title: false,
+  byline: false,
+}
+const timeToShowPagination = ref<number | undefined>(undefined)
+const timeBeforeEnd = 10
 
-export default {
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query)
-    return content
-  },
-  data() {
-    return {
-      name: "resistance",
-      isFilmEnded: false,
-      isPaginationVisible: false,
-      isFilmActive: false,
-      isFilmPlaying: false,
-      options: {
-        controls: true,
-        loop: false,
-        autoplay: false,
-        muted: false,
-        portrait: false,
-        title: false,
-        byline: false,
-      },
+// Data fetching
+const query = groq`*[_type == "intro3"][0]`
+const { data: content } = await useSanityQuery<any>(query)
 
-      timeToShowPagination: undefined,
-      timeBeforeEnd: 10
-    };
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-  methods: {
-    onVidPlaying(duration) {
-      // console.log(duration);
-      if (!this.timeToShowPagination) {
-        this.timeToShowPagination = duration - this.timeBeforeEnd;
-      }
-    },
-    onVidTimeUpdate(seconds) {
-      if (seconds < this.timeToShowPagination) { return }
-      this.showPagination();
-    },
-    onVidEnded() {
-      this.isFilmEnded = true;
-      this.showPagination();
-    },
-    showPagination() {
-      this.isPaginationVisible = true;
-    },
-    hidePagination() {
-      this.isPaginationVisible = false;
-    },
-    showFilm() {
-      this.isFilmActive = true;
-      this.pauseBgVid();
-      this.playFilm();
-    },
-    hideFilm() {
-      this.isFilmActive = false;
-      this.playBgVid();
-      this.pauseFilm();
-    },
-    pauseFilm() {
-      this.$refs.vid.pause();
-    },
-    playFilm() {
-      this.$refs.vid.play();
-    },
-    pauseBgVid() {
-      if (this.$refs.vidBg) {
-        this.$refs.vidBg.$refs.player.pause();
-      }
-    },
-    playBgVid() {
-      if (this.$refs.vidBg) {
-        this.$refs.vidBg.$refs.player.play();
-      }
-    },
-  },
-};
+// Extract data for template
+const title = computed(() => content.value?.title)
+const subtext = computed(() => content.value?.subtext)
+const instructions = computed(() => content.value?.instructions)
+const nav = computed(() => content.value?.nav)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+// Set page metadata
+useHead(() => ({
+  title: useSetPageTitle(pageMetadata)
+}))
+
+function onVidPlaying(duration: number) {
+  if (!timeToShowPagination.value) {
+    timeToShowPagination.value = duration - timeBeforeEnd
+  }
+}
+function onVidTimeUpdate(seconds: number) {
+  if (seconds < (timeToShowPagination.value ?? 0)) return
+  showPagination()
+}
+function onVidEnded() {
+  isFilmEnded.value = true
+  showPagination()
+}
+function showPagination() {
+  isPaginationVisible.value = true
+}
+function hidePagination() {
+  isPaginationVisible.value = false
+}
+function showFilm() {
+  isFilmActive.value = true
+  pauseBgVid()
+  playFilm()
+}
+function hideFilm() {
+  isFilmActive.value = false
+  playBgVid()
+  pauseFilm()
+}
+function pauseFilm() {
+  // Not implemented: would need a ref to the video player
+}
+function playFilm() {
+  // Not implemented: would need a ref to the video player
+}
+function pauseBgVid() {
+  // Not implemented: would need a ref to the background video player
+}
+function playBgVid() {
+  // Not implemented: would need a ref to the background video player
+}
 </script>
 
 <style lang="scss">

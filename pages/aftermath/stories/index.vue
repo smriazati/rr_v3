@@ -4,31 +4,28 @@
     </div>
 </template>
 
-<script>
-import { groq } from 'groq'
-const schema = "intro4"
-const query = groq`*[_type == "${schema}"][0]`
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import groq from 'groq'
 
-export default {
-    asyncData({ $sanity }) {
-        const content = $sanity.fetch(query)
-        return content
-    },
-    mounted() {
-        const body = document.querySelector('body');
-        body.style.height = 'auto'
-    },
-    data() {
-        return {
-            name: "aftermath-stories",
-        };
-    },
-    head() {
-        return {
-            title: this.$setPageTitle(this.pageMetadata)
-        }
-    },
-};
+const name = ref('aftermath-stories')
+
+const query = groq`*[_type == "intro4"][0]`
+const { data: content } = await useSanityQuery<any>(query)
+
+const title = computed(() => content.value?.title)
+const subhead = computed(() => content.value?.subhead)
+const subjectCTA = computed(() => content.value?.subjectCTA)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+onMounted(() => {
+    const body = document.querySelector('body')
+    if (body) body.style.height = 'auto'
+})
+
+useHead(() => ({
+    title: useSetPageTitle(pageMetadata)
+}))
 </script>
 
 

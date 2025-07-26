@@ -11,7 +11,7 @@
       </p>
     </div>
     <div class="image-wrapper flex-row align-center">
-      <nuxt-link class="image-col" v-for="(item, key, index) in subjects" :key="index"
+      <nuxt-link class="image-col" v-for="(item, index) in subjects" :key="index"
         :to="`/${sectionIndex}/stories/${index + 1}`">
         <figure class="">
           <div class="img">
@@ -44,14 +44,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Component state
-const subjects = ref('')
-
-// Fetch data
-const fetchData = async () => {
-  const { $sanity } = useNuxtApp()
-  subjects.value = await $sanity.fetch(query)
-}
+const { data: subjects } = await useSanityQuery<any>(query)
 
 // Methods
 const setAnimation = () => {
@@ -99,12 +92,13 @@ const setAnimation = () => {
 
 // Lifecycle
 onMounted(() => {
-  fetchData()
   setAnimation()
 })
 </script>
 
 <style lang='scss'>
+@use '~/assets/sass/imports/imports.scss' as *;
+
 // set anim
 .story-landing-page-images {
 

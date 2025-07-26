@@ -1,140 +1,53 @@
 <template>
-    <button class="nav-toggle-button" :class="{ 'active': isActive }" @click="toggleMenu" :aria-label="ariaLabel"
-        :aria-expanded="isActive">
-        <div class="hamburger-icon">
-            <span class="line line-1"></span>
-            <span class="line line-2"></span>
-            <span class="line line-3"></span>
-        </div>
-    </button>
+    <div>
+        <span class="text visually-hidden">View Menu</span>
+        <span class="menu-button">
+            <svg viewBox="0 0 100 80" width="36" height="36" aria-hidden="true" focusable="false">
+                <rect class="line-1" width="64" height="10"></rect>
+                <rect class="line-2" y="30" width="80" height="10"></rect>
+                <rect class="line-3" y="60" width="64" height="10"></rect>
+            </svg>
+        </span>
+    </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-
-/**
- * NavToggleButton Component
- * 
- * Core Functions:
- * - Provides hamburger menu toggle for mobile navigation
- * - Handles accessibility attributes
- * - Emits toggle events to parent components
- * - Provides smooth animation transitions
- * 
- * Performance Optimizations:
- * - Efficient click handling
- * - Optimized CSS animations
- * - Proper accessibility support
- */
-
-// Props definition with TypeScript
-interface Props {
-    isOpen?: boolean
-    className?: string
+<style lang="scss">
+.menu-button .line-1 {
+    top: 0px;
+    transform-origin: left center;
+    position: relative;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    isOpen: false,
-    className: ''
-})
-
-// Emits definition
-const emit = defineEmits<{
-    toggle: [value: boolean]
-}>()
-
-// Reactive state
-const isActive = ref(props.isOpen)
-
-// Generate aria label based on state
-const ariaLabel = computed(() => {
-    return isActive.value ? 'Close navigation menu' : 'Open navigation menu'
-})
-
-// Toggle menu state
-const toggleMenu = () => {
-    isActive.value = !isActive.value
-    emit('toggle', isActive.value)
+.menu-button .line-2 {
+    top: 18px;
+    transform-origin: left center;
+    position: relative;
 }
 
-// Watch for prop changes
-watch(() => props.isOpen, (newValue: boolean) => {
-    isActive.value = newValue
-})
-</script>
+.menu-button .line-3 {
+    top: 36px;
+    transform-origin: left center;
+    position: relative;
+}
 
-<style lang="scss" scoped>
-.nav-toggle-button {
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    transition: all 0.3s ease;
+/* Expanded state: parent or button has .expanded class */
+.expanded .menu-button .line-1 {
+    transform: rotate(45deg);
+    top: -3px;
+    left: 8px;
+    position: relative;
+}
 
-    &:hover {
-        opacity: 0.8;
-    }
+.expanded .menu-button .line-2 {
+    width: 0%;
+    opacity: 0;
+    transition: width 0.3s ease, opacity 0.3s ease;
+}
 
-    &:focus {
-        outline: 2px solid #007bff;
-        outline-offset: 2px;
-    }
-
-    .hamburger-icon {
-        position: relative;
-        width: 24px;
-        height: 18px;
-
-        .line {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #333;
-            transition: all 0.3s ease;
-            transform-origin: center;
-
-            &.line-1 {
-                top: 0;
-            }
-
-            &.line-2 {
-                top: 8px;
-            }
-
-            &.line-3 {
-                top: 16px;
-            }
-        }
-    }
-
-    // Active state animations
-    &.active {
-        .hamburger-icon {
-            .line-1 {
-                transform: rotate(45deg) translate(6px, 6px);
-            }
-
-            .line-2 {
-                opacity: 0;
-                transform: scaleX(0);
-            }
-
-            .line-3 {
-                transform: rotate(-45deg) translate(6px, -6px);
-            }
-        }
-    }
-
-    // Show on mobile devices
-    @media (max-width: 768px) {
-        display: flex;
-    }
+.expanded .menu-button .line-3 {
+    transform: rotate(-45deg) translateY(6px) translateX(2px);
+    top: 39px;
+    left: 8px;
+    position: relative;
 }
 </style>

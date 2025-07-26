@@ -39,9 +39,10 @@ const emit = defineEmits<{
   'close-modal': []
 }>()
 
+const { data: content } = await useSanityQuery<any>(query)
+
 // Component state
 const wrapper = ref<HTMLElement>()
-const content = ref<any>('')
 const isCollapsed = ref(false)
 
 // Computed properties
@@ -71,23 +72,18 @@ const initLightbox = () => {
   })
 }
 
-// Fetch data
-const fetchData = async () => {
-  const { $sanity } = useNuxtApp()
-  content.value = await $sanity.fetch(query)
-}
-
 // Lifecycle
 onMounted(() => {
   if (wrapper.value) {
     wrapper.value.focus()
   }
   initLightbox()
-  fetchData()
 })
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .modal-container {
   display: flex;
   position: fixed;

@@ -1,27 +1,34 @@
 <template>
-  <div class="exhibit-homepage-wrapper">
-    <header class="flex-col align-center">
-      <div class="text-wrapper centered">
-        <h1 class="subheadline">
-          <div v-if="subhead">
-            <LocalizationString :string="subhead"></LocalizationString>
-          </div>
-        </h1>
-        <h2 class="h1 collapsed-mb">
-          <div v-if="title">
-            <LocalizationString :string="title"></LocalizationString>
-          </div>
-        </h2>
-      </div>
-      <button ref="button" class="light full-width">
-        <nuxt-link :to="{ path: `/intro`, query: $route.query }">
-          <div v-if="ctaText">
-            <LocalizationString :string="ctaText"></LocalizationString>
-          </div>
-        </nuxt-link>
-      </button>
-    </header>
-    <ExhibitLandingPageFooter></ExhibitLandingPageFooter>
+  <div class="default-layout home-layout route-home">
+    <ExhibitNav />
+    <div class="home-language-picker">
+      <LocalizationLanguagePicker></LocalizationLanguagePicker>
+    </div>
+
+    <div class="exhibit-homepage-wrapper">
+      <header class="flex-col align-center">
+        <div class="text-wrapper centered">
+          <h1 class="subheadline">
+            <div v-if="subhead">
+              <LocalizationString :string="subhead"></LocalizationString>
+            </div>
+          </h1>
+          <h2 class="h1 collapsed-mb">
+            <div v-if="title">
+              <LocalizationString :string="title"></LocalizationString>
+            </div>
+          </h2>
+        </div>
+        <button ref="button" class="light full-width">
+          <nuxt-link :to="{ path: `/intro`, query: $route.query }">
+            <div v-if="ctaText">
+              <LocalizationString :string="ctaText"></LocalizationString>
+            </div>
+          </nuxt-link>
+        </button>
+      </header>
+      <ExhibitLandingPageFooter></ExhibitLandingPageFooter>
+    </div>
   </div>
 </template>
 
@@ -31,11 +38,13 @@ const schema = "intro0"
 const query = groq`*[_type == "${schema}"][0]`
 
 // Fetch data
-const { $sanity } = useNuxtApp()
-const content = await $sanity.fetch(query)
+const { data: content } = await useSanityQuery<any>(query)
 
 // Extract data from content
-const { title, subhead, ctaText } = content || {}
+const title = computed(() => content.value?.title)
+const subhead = computed(() => content.value?.subhead)
+const ctaText = computed(() => content.value?.ctaText)
+
 
 // Set page metadata
 useHead({
@@ -44,6 +53,25 @@ useHead({
 </script>
 
 <style lang="scss">
+.default-layout {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.home-layout {
+  .home-language-picker {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 999;
+    padding: 20px;
+  }
+}
+
 .exhibit-homepage-wrapper {
   flex: 2;
   display: flex;

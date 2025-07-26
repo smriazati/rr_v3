@@ -44,32 +44,29 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import groq from 'groq'
 
-import { groq } from 'groq'
-const schema = "talkback3"
-const query = groq`*[_type == "${schema}"][0]`
+const name = ref('resistance-talkback')
+const galleryCount = ref(12)
 
-export default {
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query)
-    return content
-  },
-  data() {
-    return {
-      name: "resistance-talkback",
-      galleryCount: 12,
-    };
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-};
+const query = groq`*[_type == "talkback3"][0]`
+const { data: content } = await useSanityQuery<any>(query)
+
+const main = computed(() => content.value?.main)
+const question = computed(() => content.value?.question)
+const nav = computed(() => content.value?.nav)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+useHead(() => ({
+  title: useSetPageTitle(pageMetadata)
+}))
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .resistance-talkback {
   width: 100%;
   height: 100%;

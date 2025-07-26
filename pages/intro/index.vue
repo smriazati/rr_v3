@@ -19,58 +19,52 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import groq from 'groq'
 
-import { groq } from 'groq'
-const schema = "landing1"
-const query = groq`*[_type == "${schema}"][0]`
+const name = ref('introduction')
+const wrapperHeight = ref<number | null>(null)
+const wrapper = ref<HTMLElement | null>(null)
 
-export default {
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query)
-    return content
-  },
+interface SanityContent {
+  panels: any[]
+  nav: Record<string, any>
+  pageMetadata: Record<string, any>
+}
 
-  data() {
-    return {
-      name: "introduction",
-      wrapperHeight: null,
-    };
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-  mounted() {
-    this.setWrapperHeight();
-    window.addEventListener(
-      "resize",
-      () => {
-        this.setWrapperHeight();
-      },
-      false
-    );
-  },
-  unmounted() {
-    window.removeEventListener(
-      "resize",
-      () => {
-        this.setWrapperHeight();
-      },
-      false
-    );
-  },
-  methods: {
-    setWrapperHeight() {
-      if (!this.panels) { return }
-      this.wrapperHeight = window.innerHeight * this.panels.length;
-    }
-  },
-};
+const query = groq`*[_type == "landing1"][0]`
+const { data: content } = await useSanityQuery<SanityContent>(query)
+
+const panels = computed(() => content.value?.panels)
+const nav = computed(() => content.value?.nav)
+// const pageMetadata = computed(() => content.value?.pageMetadata)
+
+function setWrapperHeight() {
+  if (panels.value) {
+    wrapperHeight.value = window.innerHeight * panels.value.length
+  }
+}
+
+onMounted(() => {
+  setWrapperHeight()
+  window.addEventListener('resize', setWrapperHeight)
+  console.log('Sanity content:', content.value)
+
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', setWrapperHeight)
+})
+
+// useHead(() => ({
+//   title: useSetPageTitle(pageMetadata)
+// }))
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .introduction {
   &.text-scroller-page .wrapper .nuxt-content p {
     background: transparent !important;

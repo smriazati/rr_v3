@@ -3,6 +3,7 @@
     <header class="intro-text-wrapper">
       <div class="wrapper">
         <StoriesSubheadline></StoriesSubheadline>
+        hi
         <h1 class="center">
           <LocalizationString :string="title"></LocalizationString>
         </h1>
@@ -13,33 +14,30 @@
   </div>
 </template>
 
-<script>
-import { groq } from 'groq'
-const schema = "intro1"
-const query = groq`*[_type == "${schema}"][0]`
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import groq from 'groq'
 
+const name = 'introduction-stories'
 
-export default {
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query)
-    return content
-  },
+const query = groq`*[_type == "intro1"][0]`
+const { data: content } = await useSanityQuery<any>(query)
 
-  data() {
-    return {
-      name: "introduction-stories",
-    };
-  },
-  mounted() {
-    const body = document.querySelector('body');
-    body.style.height = 'auto'
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-};
+const title = computed(() => content.value?.title)
+const mainText = computed(() => content.value?.mainText)
+const subhead = computed(() => content.value?.subhead)
+const subheadText = computed(() => content.value?.subheadText)
+const subjectCTA = computed(() => content.value?.subjectCTA)
+const pageMetadata = computed(() => content.value?.pageMetadata)
+
+onMounted(() => {
+  const body = document.querySelector('body')
+  if (body) body.style.height = 'auto'
+})
+
+useHead(() => ({
+  title: useSetPageTitle(pageMetadata)
+}))
 </script>
 
 <style lang="scss">
@@ -96,4 +94,3 @@ export default {
   }
 }
 </style>
-

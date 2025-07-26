@@ -1,360 +1,101 @@
+<script setup lang="ts">
+import type { LocalizedString } from '~/types/sanity'
+
+interface FooterLogo {
+    _key: string
+    link?: string
+    img?: any // you can replace `any` with your actual Sanity image schema type if known
+}
+
+interface FooterData {
+    warning?: LocalizedString
+    logos?: FooterLogo[]
+}
+
+const query = groq`*[_type == "intro0"]{ logos, warning }[0]`
+const { data } = useSanityQuery<FooterData>(query)
+console.log(data)
+</script>
 <template>
-    <footer class="landing-page-footer" :class="footerClass">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <Logo />
-                    </div>
-                    <div class="footer-description">
-                        <String :string="description" />
-                    </div>
-                </div>
+    <footer ref="warning">
+        <div v-if="data" class="landing-page-footer">
+            <p class="small muted mb-0" v-if="data.warning">
+                <LocalizationString :string="data.warning" />
+            </p>
 
-                <div class="footer-section">
-                    <h3 class="footer-title">
-                        <String :string="title" />
-                    </h3>
-                    <div class="footer-links">
-                        <ul class="links-list">
-                            <li v-for="link in footerLinks" :key="link.id" class="link-item">
-                                <NuxtLink :to="link.path" class="footer-link">
-                                    <String :string="link.label" />
-                                </NuxtLink>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="footer-section">
-                    <h3 class="footer-title">
-                        <String :string="contactTitle" />
-                    </h3>
-                    <div class="contact-info">
-                        <p v-if="contactEmail" class="contact-item">
-                            <a :href="`mailto:${contactEmail}`" class="contact-link">
-                                {{ contactEmail }}
+            <div class="logo-wrapper" v-if="data.logos">
+                <ul>
+                    <li v-for="item in data.logos" :key="item._key">
+                        <span v-if="item.img">
+                            <a :href="item.link" target="_blank" rel="noopener">
+                                <LocalizationImageNoCaption :img="item.img" />
                             </a>
-                        </p>
-                        <p v-if="contactPhone" class="contact-item">
-                            <a :href="`tel:${contactPhone}`" class="contact-link">
-                                {{ contactPhone }}
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <div class="copyright">
-                    <String :string="copyright" />
-                </div>
-                <div class="footer-actions">
-                    <LanguagePicker />
-                </div>
+                        </span>
+                    </li>
+                </ul>
             </div>
         </div>
     </footer>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
+<style lang="scss" scoped>
+@use '~/assets/sass/imports/imports.scss' as *;
 
-/**
- * LandingPageFooter Component
- * 
- * Core Functions:
- * - Displays comprehensive footer for landing pages
- * - Handles localized footer content from Sanity
- * - Provides navigation links and contact information
- * - Integrates language picker and logo
- * 
- * Performance Optimizations:
- * - Efficient content rendering
- * - Optimized link handling
- * - Responsive design implementation
- */
+.landing-page-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    width: 100%;
+    background: $gray;
+    z-index: 112;
 
-// Props definition with TypeScript
-interface Props {
-    title?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    description?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    contactTitle?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    contactEmail?: string
-    contactPhone?: string
-    copyright?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    links?: Array<{
-        id: string
-        path: string
-        label: {
-            en?: string
-            uk?: string
-            es?: string
-            he?: string
+    >* {
+        &:not(:last-child) {
+            margin-right: 1rem;
         }
-    }>
-    variant?: 'default' | 'dark' | 'minimal'
-    className?: string
+    }
+
+    @media (min-width: 50ch) {
+        >*:first-child {
+            flex: 0 0 50ch;
+        }
+    }
+
+    @media (min-width: $collapse-bp) {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+    }
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    variant: 'default',
-    className: '',
-    links: () => []
-})
+p {
+    color: $white;
+    font-size: 14px;
+    line-height: 20px;
+}
 
-// Default footer links
-const defaultLinks = [
-    {
-        id: 'intro',
-        path: '/intro',
-        label: {
-            en: 'Introduction',
-            uk: 'Вступ',
-            es: 'Introducción',
-            he: 'הקדמה'
-        }
-    },
-    {
-        id: 'occupation',
-        path: '/occupation',
-        label: {
-            en: 'Occupation',
-            uk: 'Окупація',
-            es: 'Ocupación',
-            he: 'כיבוש'
-        }
-    },
-    {
-        id: 'resistance',
-        path: '/resistance',
-        label: {
-            en: 'Resistance',
-            uk: 'Опір',
-            es: 'Resistencia',
-            he: 'התנגדות'
-        }
-    },
-    {
-        id: 'aftermath',
-        path: '/aftermath',
-        label: {
-            en: 'Aftermath',
-            uk: 'Наслідки',
-            es: 'Consecuencias',
-            he: 'השלכות'
-        }
+ul {
+    list-style: none;
+}
+
+/* Use deep selector so styles apply inside child components */
+.logo-wrapper ::v-deep ul {
+    display: flex;
+
+    >*:not(:last-child) {
+        margin-right: 2rem;
     }
-]
+}
 
-// Use provided links or defaults
-const footerLinks = computed(() => {
-    return props.links.length > 0 ? props.links : defaultLinks
-})
+.logo-wrapper ::v-deep img {
+    max-height: 50px;
+}
 
-// Generate footer classes
-const footerClass = computed(() => {
-    const classes = ['landing-page-footer']
-
-    if (props.className) {
-        classes.push(props.className)
-    }
-
-    if (props.variant) {
-        classes.push(`variant-${props.variant}`)
-    }
-
-    return classes.join(' ')
-})
-</script>
-
-<style lang="scss" scoped>
-.landing-page-footer {
-    background: #f8f9fa;
-    padding: 60px 0 30px;
-    margin-top: 80px;
-
-    .footer-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-
-            .footer-section {
-                .footer-logo {
-                    margin-bottom: 20px;
-                }
-
-                .footer-description {
-                    font-size: 16px;
-                    line-height: 1.6;
-                    color: #666;
-                    margin-bottom: 20px;
-                }
-
-                .footer-title {
-                    font-size: 20px;
-                    font-weight: 600;
-                    margin-bottom: 20px;
-                    color: #333;
-                }
-
-                .footer-links {
-                    .links-list {
-                        list-style: none;
-                        margin: 0;
-                        padding: 0;
-
-                        .link-item {
-                            margin-bottom: 12px;
-
-                            .footer-link {
-                                text-decoration: none;
-                                color: #666;
-                                font-size: 16px;
-                                transition: color 0.3s ease;
-
-                                &:hover {
-                                    color: #333;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                .contact-info {
-                    .contact-item {
-                        margin-bottom: 12px;
-
-                        .contact-link {
-                            text-decoration: none;
-                            color: #666;
-                            font-size: 16px;
-                            transition: color 0.3s ease;
-
-                            &:hover {
-                                color: #333;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 30px;
-            border-top: 1px solid #e9ecef;
-
-            .copyright {
-                font-size: 14px;
-                color: #999;
-            }
-
-            .footer-actions {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-        }
-    }
-
-    // Variant styles
-    &.variant-dark {
-        background: #333;
-        color: white;
-
-        .footer-container {
-            .footer-content {
-                .footer-section {
-                    .footer-title {
-                        color: white;
-                    }
-
-                    .footer-description,
-                    .footer-links .links-list .link-item .footer-link,
-                    .contact-info .contact-item .contact-link {
-                        color: #ccc;
-
-                        &:hover {
-                            color: white;
-                        }
-                    }
-                }
-            }
-
-            .footer-bottom {
-                border-top-color: #555;
-
-                .copyright {
-                    color: #ccc;
-                }
-            }
-        }
-    }
-
-    &.variant-minimal {
-        background: transparent;
-        padding: 40px 0 20px;
-
-        .footer-container {
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 20px;
-            }
-
-            .footer-bottom {
-                justify-content: center;
-                flex-direction: column;
-                gap: 20px;
-            }
-        }
-    }
-
-    // Responsive design
-    @media (max-width: 768px) {
-        padding: 40px 0 20px;
-
-        .footer-container {
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-        }
+.logo-wrapper {
+    @media (max-width: $collapse-bp) {
+        margin-top: 15px;
     }
 }
 </style>

@@ -53,194 +53,172 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import groq from 'groq'
 
-import { groq } from 'groq'
-const schema = "intro5"
-const query = groq`*[_type == "${schema}"][0]`
+const name = ref('conclusion')
+const wrapperHeight = ref<number | null>(null)
+const page = ref<HTMLElement | null>(null)
+const grid = ref<HTMLElement | null>(null)
+const pin = ref<HTMLElement | null>(null)
+const footer = ref<HTMLElement | null>(null)
 
-export default {
-  asyncData({ $sanity }) {
-    const content = $sanity.fetch(query)
-    return content
-  },
-  data() {
-    return {
-      name: "conclusion",
-      wrapperHeight: null,
-    };
-  },
-  head() {
-    return {
-      title: this.$setPageTitle(this.pageMetadata)
-    }
-  },
-  mounted() {
-    this.setWrapperHeight();
-    this.setContentAnimation();
-    this.setPinningAnimation();
-    window.addEventListener("resize", () => {
-      this.setWrapperHeight();
-      this.setContentAnimation();
-      this.setPinningAnimation();
-    });
-  },
-  unmounted() {
-    window.removeEventListener("resize", () => {
-      this.setWrapperHeight();
-      this.setContentAnimation();
-      this.setPinningAnimation();
-    });
-  },
-  methods: {
-    setWrapperHeight() {
-      this.wrapperHeight = this.$refs.page.offsetHeight;
-    },
+// Data fetching
+const query = groq`*[_type == "intro5"][0]`
+const { data: content } = await useSanityQuery<any>(query)
 
-    setPinningAnimation() {
-      const ScrollTrigger = this.$ScrollTrigger;
-      const pin = this.$refs.pin;
-      const footer = this.$refs.footer;
-      // console.log(pin, footer);
-      ScrollTrigger.create({
-        trigger: pin,
-        pin: pin,
-        pinSpacing: false,
-        // markers: true,
-        start: `bottom bottom`,
-        endTrigger: footer,
-        end: `bottom bottom`,
-      });
-    },
-    setContentAnimation() {
-      const gsap = this.$gsap;
-      const grid = this.$refs.grid;
-      const pin = this.$refs.pin;
-      const header = grid.querySelector("header");
-      const monuments = grid.querySelector("section.monuments");
-      const unmarked = grid.querySelector("section.unmarked");
+// Extract content for template
+const featuredQuote = computed(() => content.value?.featuredQuote)
+const section1 = computed(() => content.value?.section1)
+const section2 = computed(() => content.value?.section2)
+const conclusion = computed(() => content.value?.conclusion)
+const pageMetadata = computed(() => content.value?.pageMetadata)
 
-      // First Row
-      const monumentsC1 = monuments.querySelector(".text-wrapper");
-      const monumentsC2 = monuments.querySelector(".image-wrapper.left");
-      const monumentsC3 = monuments.querySelector(".image-wrapper.under");
+// Fetch content
+onMounted(async () => {
+  setWrapperHeight()
+  setContentAnimation()
+  setPinningAnimation()
+  window.addEventListener('resize', handleResize)
+})
 
-      const scrub = 1.1;
-      const xDistance = 300;
-      const filterStart = "grayscale(1) brightness(0.3) contrast(3)";
-      const filterEnd = "grayscale(0) brightness(1) contrast(1)";
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 
-      gsap.set(monumentsC1, {
-        autoAlpha: 0,
-        x: xDistance,
-      });
+function handleResize() {
+  setWrapperHeight()
+  setContentAnimation()
+  setPinningAnimation()
+}
 
-      gsap.to(monumentsC1, {
-        autoAlpha: 1,
-        x: 0,
-        scrollTrigger: {
-          trigger: header,
-          start: `bottom-=${window.innerHeight / 2} top`,
-          end: `bottom-=${window.innerHeight / 6} top`,
-          scrub: scrub,
-        },
-      });
+function setWrapperHeight() {
+  if (page.value) {
+    wrapperHeight.value = page.value.offsetHeight
+  }
+}
 
-      gsap.set(monumentsC2, {
-        autoAlpha: 0,
-        // x: xDistance * -1,
-        filter: filterStart,
-      });
+function setPinningAnimation() {
+  const { $ScrollTrigger } = useNuxtApp()
+  if (!pin.value || !footer.value) return
+  $ScrollTrigger.create({
+    trigger: pin.value,
+    pin: pin.value,
+    pinSpacing: false,
+    start: `bottom bottom`,
+    endTrigger: footer.value,
+    end: `bottom bottom`,
+  })
+}
 
-      gsap.to(monumentsC2, {
-        autoAlpha: 1,
-        // x: 0,
-        filter: filterEnd,
-        scrollTrigger: {
-          trigger: header,
-          start: `bottom-=${window.innerHeight / 3} top`,
-          end: `bottom-=${window.innerHeight / 6} top`,
-          scrub: scrub,
-          // markers: true,
-        },
-      });
+function setContentAnimation() {
+  const { $gsap, $ScrollTrigger } = useNuxtApp()
+  if (!grid.value) return
+  const header = grid.value.querySelector('header')
+  const monuments = grid.value.querySelector('section.monuments')
+  const unmarked = grid.value.querySelector('section.unmarked')
+  if (!header || !monuments || !unmarked) return
 
-      gsap.set(monumentsC3, {
-        autoAlpha: 0,
-        // x: xDistance,
-        filter: filterStart,
-      });
+  // First Row
+  const monumentsC1 = monuments.querySelector('.text-wrapper')
+  const monumentsC2 = monuments.querySelector('.image-wrapper.left')
+  const monumentsC3 = monuments.querySelector('.image-wrapper.under')
 
-      gsap.to(monumentsC3, {
-        autoAlpha: 1,
-        // x: 0,
-        filter: filterEnd,
-        scrollTrigger: {
-          trigger: header,
-          start: `bottom-=${window.innerHeight / 3} top`,
-          end: `bottom-=${window.innerHeight / 6} top`,
-          scrub: scrub,
-          // markers: true,
-        },
-      });
+  const scrub = 1.1
+  const xDistance = 300
+  const filterStart = 'grayscale(1) brightness(0.3) contrast(3)'
+  const filterEnd = 'grayscale(0) brightness(1) contrast(1)'
 
-      // Second Row
+  if (monumentsC1) {
+    $gsap.set(monumentsC1, { autoAlpha: 0, x: xDistance })
+    $gsap.to(monumentsC1, {
+      autoAlpha: 1,
+      x: 0,
+      scrollTrigger: {
+        trigger: header,
+        start: `bottom-=${window.innerHeight / 2} top`,
+        end: `bottom-=${window.innerHeight / 6} top`,
+        scrub: scrub,
+      },
+    })
+  }
+  if (monumentsC2) {
+    $gsap.set(monumentsC2, { autoAlpha: 0, filter: filterStart })
+    $gsap.to(monumentsC2, {
+      autoAlpha: 1,
+      filter: filterEnd,
+      scrollTrigger: {
+        trigger: header,
+        start: `bottom-=${window.innerHeight / 3} top`,
+        end: `bottom-=${window.innerHeight / 6} top`,
+        scrub: scrub,
+      },
+    })
+  }
+  if (monumentsC3) {
+    $gsap.set(monumentsC3, { autoAlpha: 0, filter: filterStart })
+    $gsap.to(monumentsC3, {
+      autoAlpha: 1,
+      filter: filterEnd,
+      scrollTrigger: {
+        trigger: header,
+        start: `bottom-=${window.innerHeight / 3} top`,
+        end: `bottom-=${window.innerHeight / 6} top`,
+        scrub: scrub,
+      },
+    })
+  }
 
-      const unmarkedC1 = unmarked.querySelector(".text-wrapper");
-      const unmarkedC2 = unmarked.querySelector(".image-wrapper");
-      gsap.set(unmarkedC1, {
-        autoAlpha: 0,
-        x: -300,
-      });
-      gsap.to(unmarkedC1, {
-        autoAlpha: 1,
-        x: 0,
-        scrollTrigger: {
-          trigger: monuments,
-          start: `bottom-=${window.innerHeight / 2} top`,
-          end: `bottom-=${window.innerHeight / 4} top`,
-          scrub: 0.8,
-          // markers: true,
-        },
-      });
+  // Second Row
+  const unmarkedC1 = unmarked.querySelector('.text-wrapper')
+  const unmarkedC2 = unmarked.querySelector('.image-wrapper')
+  if (unmarkedC1) {
+    $gsap.set(unmarkedC1, { autoAlpha: 0, x: -300 })
+    $gsap.to(unmarkedC1, {
+      autoAlpha: 1,
+      x: 0,
+      scrollTrigger: {
+        trigger: monuments,
+        start: `bottom-=${window.innerHeight / 2} top`,
+        end: `bottom-=${window.innerHeight / 4} top`,
+        scrub: 0.8,
+      },
+    })
+  }
+  if (unmarkedC2) {
+    $gsap.set(unmarkedC2, { autoAlpha: 0, filter: filterStart })
+    $gsap.to(unmarkedC2, {
+      autoAlpha: 1,
+      filter: filterEnd,
+      scrollTrigger: {
+        trigger: monuments,
+        start: `bottom-=${window.innerHeight / 3} top`,
+        scrub: 0.8,
+      },
+    })
+    // fade out
+    $gsap.to(pin.value, {
+      autoAlpha: 0,
+      scrollTrigger: {
+        trigger: unmarkedC2,
+        start: `bottom+=${window.innerHeight / 3}px bottom`,
+        end: `bottom+=${window.innerHeight} top`,
+        scrub: 0.8,
+      },
+    })
+  }
+}
 
-      gsap.set(unmarkedC2, {
-        autoAlpha: 0,
-        // x: 300,
-        filter: "grayscale(1) brightness(0.3) contrast(3)",
-      });
-      gsap.to(unmarkedC2, {
-        autoAlpha: 1,
-        // x: 0,
-        filter: "grayscale(0) brightness(1) contrast(1)",
-
-        scrollTrigger: {
-          trigger: monuments,
-          start: `bottom-=${window.innerHeight / 3} top`,
-          // end: `bottom-=${window.innerHeight / 6} top`,
-          scrub: 0.8,
-          // markers: true,
-        },
-      });
-
-      // fade out 
-
-      gsap.to(pin, {
-        autoAlpha: 0,
-        scrollTrigger: {
-          trigger: unmarkedC2,
-          start: `bottom+=${window.innerHeight / 3}px bottom`,
-          end: `bottom+=${window.innerHeight} top`,
-          scrub: 0.8,
-          // markers: true,
-        },
-      })
-    },
-  },
-};
+// Set page metadata
+useHead(() => ({
+  title: useSetPageTitle(pageMetadata.value)
+}))
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 @mixin conclusionGrid() {
   display: grid;
   grid-template-columns: repeat(8, 1fr);

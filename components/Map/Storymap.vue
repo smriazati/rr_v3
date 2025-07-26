@@ -77,6 +77,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .map {
   width: 100%;
   height: calc(100%);
