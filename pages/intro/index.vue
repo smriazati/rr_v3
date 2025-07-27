@@ -1,20 +1,13 @@
 <template>
   <div ref="wrapper" :class="name" class="text-scroller-page">
     <h1 class="visually-hidden">{{ name }}</h1>
-    <div class="scroll-progress-bar-wrapper">
-      <ScrollProgressBar :height="wrapperHeight" :fullHeight="true" />
-    </div>
     <div class="wrapper">
-      <!-- <div class="image-zoom-wrapper">
-        <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
-      </div> -->
-
       <div class="text-scroller-wrapper" v-if="panels">
-        <SystemTextScroller :panels="panels" :pagination="nav" route="intro" />
+        <TextScrollerNew :blocks="panels" :bgImg="bgImg" @scrolled-to-end="showPagination" />
       </div>
-      <!-- <div v-if="nav">
-          <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />
-        </div> -->
+      <div v-if="nav && isPaginationVisible">
+        <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />
+      </div>
     </div>
   </div>
 </template>
@@ -24,42 +17,30 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import groq from 'groq'
 
 const name = ref('introduction')
-const wrapperHeight = ref<number | null>(null)
 const wrapper = ref<HTMLElement | null>(null)
 
 interface SanityContent {
   panels: any[]
   nav: Record<string, any>
+  bgImg: any,
   pageMetadata: Record<string, any>
 }
 
 const query = groq`*[_type == "landing1"][0]`
 const { data: content } = await useSanityQuery<SanityContent>(query)
-
 const panels = computed(() => content.value?.panels)
 const nav = computed(() => content.value?.nav)
-// const pageMetadata = computed(() => content.value?.pageMetadata)
+const bgImg = computed(() => content.value?.bgImg)
 
-function setWrapperHeight() {
-  if (panels.value) {
-    wrapperHeight.value = window.innerHeight * panels.value.length
-  }
+const isPaginationVisible = ref(false);
+function showPagination() {
+  isPaginationVisible.value = true;
 }
 
-onMounted(() => {
-  setWrapperHeight()
-  window.addEventListener('resize', setWrapperHeight)
-  console.log('Sanity content:', content.value)
-
+useHead({
+  title: 'Introduction'
 })
 
-onUnmounted(() => {
-  window.removeEventListener('resize', setWrapperHeight)
-})
-
-// useHead(() => ({
-//   title: useSetPageTitle(pageMetadata)
-// }))
 </script>
 
 <style lang="scss">

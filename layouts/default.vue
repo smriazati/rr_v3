@@ -1,6 +1,6 @@
 <template>
   <div class="default-layout" :class="`route-${String(route.name)}`">
-    <!-- <ExhibitNav /> -->
+    <ExhibitNav />
     <NuxtPage />
   </div>
 </template>

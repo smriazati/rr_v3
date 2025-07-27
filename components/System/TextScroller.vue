@@ -7,9 +7,9 @@
             <LocalizationString :string="item"></LocalizationString>
           </p>
           <div v-if="index === panels.length - 1" class="pagination-wrapper">
-            <div v-if="pagination">
+            <!-- <div v-if="pagination">
               <Pagination v-if="pagination?.next" :link="`/${route}/stories`" :message="pagination.next" />
-            </div>
+            </div> -->
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span ref="container">
         <span v-if="activeString">
             {{ activeString }}
         </span>
@@ -29,6 +29,7 @@ import type { LocalizedString } from '../../types/sanity'
 // Props with TypeScript typing
 interface Props {
     string?: LocalizedString
+    align?: 'center' | 'start' | 'end'
 }
 
 const props = defineProps<Props>()
@@ -43,6 +44,14 @@ const activeString = computed(() => {
     if (!props.string) return ''
     const lang = activeLanguage.value as keyof LocalizedString
     return props.string[lang] || props.string.en || ''
+})
+
+const container = ref(null);
+onMounted(() => {
+
+    if (props.align === 'center') {
+        container.value.style.justifyContent = 'center'
+    }
 })
 </script>
 
