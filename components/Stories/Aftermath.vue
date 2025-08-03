@@ -1,8 +1,8 @@
 <template>
   <div class="aftermath-stories">
     <div v-if="content">
-      <main ref="content" class="content">
-        <div class="row section gsap-fade-in" v-for="item in content.sections" :key="item._key"
+      <main ref="contentRef" class="content">
+        <div class="row section gsap-fade-in" v-for="item in content" :key="item._key"
           :class="item._type == 'contentImgFull' ? 'dark' : ''">
           <div v-if="item._type == 'contentImgText'">
             <ContentImageText :content="item"></ContentImageText>
@@ -26,74 +26,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue'
-import groq from 'groq'
+import { ref } from 'vue'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
+gsap.registerPlugin(ScrollTrigger)
 
-interface Props {
-  schema: string
-}
 
-const props = defineProps<Props>()
+const props = defineProps<{
+  content: any
+}>()
 
-const query = computed(() => groq`*[_id == "${props.schema}"][0]{
-    "sections": content.sections
-  }`)
-const { data: content } = useSanityQuery<any>(query)
+const contentRef = ref<HTMLElement | null>(null)
 
-const contentRef = ref<HTMLElement>()
-
-// Watch for content changes and set up animations
-watch(content, () => {
-  if (content.value !== '') {
-    nextTick(() => {
-      setAnim()
-    })
-  }
-})
-
-// Animation setup
-const setAnim = () => {
-  const { $gsap } = useNuxtApp()
-  const gsap = $gsap
-
-  if (!contentRef.value) return
-
-  const sections = contentRef.value.querySelectorAll(".section")
-  if (!sections) return
+console.log('content', props.content)
+// Animation function
+function setAnim() {
+  const sections = contentRef.value.querySelectorAll<HTMLElement>('.section')
+  if (!sections.length) return
 
   sections.forEach((panel, i) => {
-    if (i === 0) {
-      gsap.set(panel, {
-        autoAlpha: 0,
-        y: 150,
-      })
+    gsap.set(panel, {
+      autoAlpha: 0,
+      y: 150,
+    })
 
+    if (i === 0) {
       gsap.to(panel, {
         autoAlpha: 1,
         y: 0,
-        duration: 1
+        duration: 1,
       })
     } else {
-      gsap.set(panel, {
-        autoAlpha: 0,
-        y: 150,
-      })
-
       gsap.to(panel, {
         autoAlpha: 1,
         y: 0,
         scrollTrigger: {
           trigger: panel,
-          start: `top+=150px bottom`,
-          end: `+=300px`,
+          start: 'top+=150px bottom',
+          end: '+=300px',
           scrub: 1.1,
         },
       })
     }
   })
 }
-</script>
 
+onMounted(() => {
+  setAnim();
+})
+</script>
 <style lang="scss">
 @use '~/assets/sass/imports/imports.scss' as *;
 

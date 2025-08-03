@@ -1,15 +1,12 @@
 <template>
     <div ref="wrapper" :class="name" class="text-scroller-page">
         <h1 class="visually-hidden">{{ name }}</h1>
-        <div class="scroll-progress-bar-wrapper">
-            <ScrollProgressBar :height="wrapperHeight" />
-        </div>
         <div class="wrapper">
-            <div class="image-zoom-wrapper">
-                <LocalizationImageZoomer :height="wrapperHeight" :img="bgImg"></LocalizationImageZoomer>
-            </div>
             <div class="text-scroller-wrapper" v-if="panels">
-                <SystemTextScroller :panels="panels" :pagination="nav" route="aftermath" />
+                <TextScrollerNew :blocks="panels" :bgImg="bgImg" @scrolled-to-end="showPagination" />
+            </div>
+            <div v-if="nav && isPaginationVisible">
+                <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />
             </div>
         </div>
     </div>
@@ -17,7 +14,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import groq from 'groq'
 
 const name = ref('aftermath')
 const wrapperHeight = ref<number | null>(null)
@@ -25,11 +21,15 @@ const wrapper = ref<HTMLElement | null>(null)
 
 const query = groq`*[_type == "landing4"][0]`
 const { data: content } = await useSanityQuery<any>(query)
-
-const bgImg = computed(() => content.value?.bgImg)
 const panels = computed(() => content.value?.panels)
 const nav = computed(() => content.value?.nav)
-const pageMetadata = computed(() => content.value?.pageMetadata)
+const bgImg = computed(() => content.value?.bgImg)
+
+
+const isPaginationVisible = ref(false);
+function showPagination() {
+    isPaginationVisible.value = true;
+}
 
 function setWrapperHeight() {
     if (panels.value) {
@@ -47,7 +47,7 @@ onUnmounted(() => {
 })
 
 useHead(() => ({
-    title: useSetPageTitle(pageMetadata)
+    title: 'Aftermath'
 }))
 </script>
 

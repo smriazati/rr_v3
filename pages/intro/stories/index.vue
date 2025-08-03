@@ -3,7 +3,7 @@
     <header class="intro-text-wrapper">
       <div class="wrapper">
         <StoriesSubheadline></StoriesSubheadline>
-        hi
+
         <h1 class="center">
           <LocalizationString :string="title"></LocalizationString>
         </h1>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import groq from 'groq'
 
 const name = 'introduction-stories'
@@ -36,7 +36,7 @@ onMounted(() => {
 })
 
 useHead(() => ({
-  title: useSetPageTitle(pageMetadata)
+  title: 'Meet the People'
 }))
 </script>
 

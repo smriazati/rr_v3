@@ -1,27 +1,27 @@
 <template>
-  <div :class="name" class="stories-page-wrapper resistance-page-wrapper ">
+  <div :class="name" class="stories-page-wrapper resistance-page-wrapper">
     <header class="intro-text-wrapper text-wrapper">
       <div class="wrapper">
-        <StoriesSubheadline></StoriesSubheadline>
+        <StoriesSubheadline />
         <h1 class="center">
-          <LocalizationString :string="title"></LocalizationString>
+          <LocalizationString :string="title" />
         </h1>
         <p>
-          <LocalizationString :string="subtext"></LocalizationString>
+          <LocalizationString :string="subtext" />
         </p>
         <div>
-          <LocalizationRte :content="instructions"></LocalizationRte>
+          <LocalizationRte :content="instructions" />
         </div>
       </div>
     </header>
 
     <div class="row-wrapper">
       <div class="row">
-
         <div class="video-wrapper vimeo-component">
-          <VimeoComponent vidId="650434994" @on-vid-playing="onVidPlaying" @on-vid-ended="onVidEnded()"
-            @on-vid-time-update="onVidTimeUpdate">
-          </VimeoComponent>
+          <ClientOnly>
+            <vueVimeoPlayer video-id="650434994" @playing="onVidPlaying" @ended="onVidEnded"
+              @timeupdate="onVidTimeUpdate" />
+          </ClientOnly>
         </div>
 
         <div v-if="isPaginationVisible" class="pagination-wrapper">
@@ -31,93 +31,59 @@
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue'
+import { vueVimeoPlayer } from 'vue-vimeo-player'
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import groq from 'groq'
-
-const name = ref('resistance')
-const isFilmEnded = ref(false)
+const name = 'resistance'
+const vimeoEl = ref(null)
 const isPaginationVisible = ref(false)
-const isFilmActive = ref(false)
-const isFilmPlaying = ref(false)
-const options = {
-  controls: true,
-  loop: false,
-  autoplay: false,
-  muted: false,
-  portrait: false,
-  title: false,
-  byline: false,
-}
-const timeToShowPagination = ref<number | undefined>(undefined)
+const isFilmEnded = ref(false)
+const timeToShowPagination = ref(undefined)
 const timeBeforeEnd = 10
 
-// Data fetching
-const query = groq`*[_type == "intro3"][0]`
-const { data: content } = await useSanityQuery<any>(query)
 
-// Extract data for template
-const title = computed(() => content.value?.title)
-const subtext = computed(() => content.value?.subtext)
-const instructions = computed(() => content.value?.instructions)
-const nav = computed(() => content.value?.nav)
-const pageMetadata = computed(() => content.value?.pageMetadata)
+const { data } = await useSanityQuery(`*[_type == "intro3"][0]`)
+const { pageMetadata, title, subtext, instructions, nav } = data.value || {}
+useSetPageTitle(pageMetadata)
 
-// Set page metadata
-useHead(() => ({
-  title: useSetPageTitle(pageMetadata)
-}))
-
-function onVidPlaying(duration: number) {
-  if (!timeToShowPagination.value) {
-    timeToShowPagination.value = duration - timeBeforeEnd
-  }
-}
-function onVidTimeUpdate(seconds: number) {
-  if (seconds < (timeToShowPagination.value ?? 0)) return
-  showPagination()
-}
-function onVidEnded() {
-  isFilmEnded.value = true
-  showPagination()
-}
 function showPagination() {
   isPaginationVisible.value = true
 }
-function hidePagination() {
-  isPaginationVisible.value = false
+
+function onVidPlaying(duration) {
+  if (!timeToShowPagination.value) {
+    timeToShowPagination.value = duration - timeBeforeEnd.value;
+  }
 }
-function showFilm() {
-  isFilmActive.value = true
-  pauseBgVid()
-  playFilm()
+
+function onVidTimeUpdate(seconds) {
+  if (seconds < timeToShowPagination.value) { return }
+  showPagination();
 }
-function hideFilm() {
-  isFilmActive.value = false
-  playBgVid()
-  pauseFilm()
+
+function onVidEnded() {
+  isFilmEnded.value = true;
+  showPagination();
 }
-function pauseFilm() {
-  // Not implemented: would need a ref to the video player
-}
-function playFilm() {
-  // Not implemented: would need a ref to the video player
-}
-function pauseBgVid() {
-  // Not implemented: would need a ref to the background video player
-}
-function playBgVid() {
-  // Not implemented: would need a ref to the background video player
-}
+
+useHead(() => ({
+  title: 'Resistance'
+}))
+
 </script>
 
+
 <style lang="scss">
+iframe {
+  width: 94%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
 .resistance-page-wrapper {
   display: grid;
   min-height: 100vh;

@@ -11,9 +11,9 @@
                     </LocalizationString>
                 </p>
             </div>
-            <div class="card-row">
-                <nuxt-link :class="`card card-${index + 1}`" v-for="(item, index) in subjects" :key="index"
-                    :to="`/${routeSection}/stories/${index + 1}`">
+            <div class="card-row" v-if="subjectEntries">
+                <nuxt-link v-for="([key, item], index) in subjectEntries" :key="key"
+                    :class="`card hihi card-${index + 1}`" :to="`/${routeSection}/stories/${index + 1}`">
                     <figure class="image-wrapper">
                         <div class="img">
                             <LocalizationImageNoCaption :img="item.img" :size="500"></LocalizationImageNoCaption>
@@ -50,18 +50,18 @@ interface Props {
     subtitle?: any
     title?: any
     subjectCTA?: any
-    route?: string
+
 }
 const props = defineProps<Props>()
 
 const { data: subjects } = await useSanityQuery<any>(groq`*[_type == "subjects"]{ subject1, subject2, subject3 }[0]`)
+const subjectEntries = computed(() =>
+    subjects?.value ? Object.entries(subjects.value) : []
+)
 
-const routeSection = computed(() => {
-    if (!props.route) return ''
-    const routeName = props.route as string
-    const routeKey = routeName.substr(0, routeName.indexOf('-'))
-    return routeKey
-})
+const route = useRoute();
+const routeSection = route.path.split('/')[1] // "intro"
+
 </script>
 
 <style lang="scss">

@@ -1,189 +1,68 @@
 <template>
-    <section class="stories-intro" :class="introClass">
-        <div class="intro-container">
-            <div class="intro-header">
-                <h1 class="intro-title">
-                    <String :string="title" />
-                </h1>
-                <div v-if="subtitle" class="intro-subtitle">
-                    <String :string="subtitle" />
-                </div>
-            </div>
-
-            <div v-if="description" class="intro-description">
-                <Rte :rte="description" />
-            </div>
-
-            <div v-if="image" class="intro-image">
-                <Image :image="image" size="large" :show-caption="true" />
-            </div>
-
-            <div v-if="features.length > 0" class="intro-features">
-                <div class="features-grid">
-                    <div v-for="feature in features" :key="feature.id" class="feature-card">
-                        <div class="feature-icon">
-                            <Icon :name="feature.icon || 'star'" />
-                        </div>
-                        <div class="feature-content">
-                            <h3 class="feature-title">
-                                <String :string="feature.title" />
-                            </h3>
-                            <div v-if="feature.description" class="feature-description">
-                                <String :string="feature.description" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="showNavigation" class="intro-navigation">
-                <div class="nav-buttons">
-                    <button class="nav-button primary" @click="startExploring">
-                        <String :string="startButtonText" />
-                    </button>
-                    <button v-if="showBackButton" class="nav-button secondary" @click="goBack">
-                        <String :string="backButtonText" />
-                    </button>
-                </div>
-            </div>
+    <main ref="contentRef" class="content">
+        <StoryTitle :subjectId="subjectId" :sectionId="sectionId" />
+        <div v-for="item in content" :key="item._key" class="row section gsap-fade-in"
+            :class="{ dark: item._type === 'contentImgFull' }">
+            <ContentImageText v-if="item._type === 'contentImgText'" :content="item" />
+            <ContentImageFull v-else-if="item._type === 'contentImgFull'" :content="item" />
+            <ContentText v-else-if="item._type === 'contentText'" :content="item" />
         </div>
-    </section>
+    </main>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
+gsap.registerPlugin(ScrollTrigger)
 
-/**
- * Stories Intro Component
- * 
- * Core Functions:
- * - Displays introduction for story sections
- * - Handles localized content from Sanity
- * - Provides feature highlights and navigation
- * - Supports different layout variants
- * 
- * Performance Optimizations:
- * - Efficient content rendering
- * - Optimized image loading
- * - Responsive design implementation
- */
 
-// Props definition with TypeScript
-interface Feature {
-    id: string
-    title: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    description?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    icon?: string
-}
-
-interface ImageData {
-    asset?: {
-        _ref?: string
-    }
-    alt?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    caption?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-}
-
-interface Props {
-    title?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    subtitle?: {
-        en?: string
-        uk?: string
-        es?: string
-        he?: string
-    }
-    description?: {
-        en?: any[]
-        uk?: any[]
-        es?: any[]
-        he?: any[]
-    }
-    image?: ImageData
-    features?: Feature[]
-    showNavigation?: boolean
-    showBackButton?: boolean
-    variant?: 'default' | 'centered' | 'minimal' | 'hero'
-    className?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    showNavigation: true,
-    showBackButton: false,
-    variant: 'default',
-    className: '',
-    features: () => []
-})
-
-// Emits definition
-const emit = defineEmits<{
-    'start-exploring': []
-    'go-back': []
+const props = defineProps<{
+    subjectId: string
+    sectionId: string
+    content: any
 }>()
 
-// Computed properties
-const introClass = computed(() => {
-    const classes = ['stories-intro']
+const contentRef = ref<HTMLElement | null>(null)
 
-    if (props.className) {
-        classes.push(props.className)
-    }
 
-    if (props.variant) {
-        classes.push(`variant-${props.variant}`)
-    }
+// Animation function
+function setAnim() {
+    const sections = contentRef.value.querySelectorAll<HTMLElement>('.section')
+    if (!sections.length) return
 
-    return classes.join(' ')
+    sections.forEach((panel, i) => {
+        gsap.set(panel, {
+            autoAlpha: 0,
+            y: 150,
+        })
+
+        if (i === 0) {
+            gsap.to(panel, {
+                autoAlpha: 1,
+                y: 0,
+                duration: 1,
+            })
+        } else {
+            gsap.to(panel, {
+                autoAlpha: 1,
+                y: 0,
+                scrollTrigger: {
+                    trigger: panel,
+                    start: 'top+=150px bottom',
+                    end: '+=300px',
+                    scrub: 1.1,
+                },
+            })
+        }
+    })
+}
+
+onMounted(() => {
+    setAnim();
 })
-
-// Localized button texts
-const startButtonText = computed(() => ({
-    en: 'Start Reading',
-    uk: 'Почати читання',
-    es: 'Comenzar a leer',
-    he: 'התחל לקרוא'
-}))
-
-const backButtonText = computed(() => ({
-    en: 'Go Back',
-    uk: 'Назад',
-    es: 'Volver',
-    he: 'חזור'
-}))
-
-// Event handlers
-const startExploring = () => {
-    emit('start-exploring')
-}
-
-const goBack = () => {
-    emit('go-back')
-}
 </script>
+
 
 <style lang="scss" scoped>
 .stories-intro {

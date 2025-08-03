@@ -98,7 +98,7 @@ onMounted(() => {
 
 .exhibit-nav-wrapper {
   position: fixed;
-  overflow: scroll;
+  overflow: auto;
   z-index: 111;
   background: #31572A;
   height: 100%;

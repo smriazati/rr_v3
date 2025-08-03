@@ -16,20 +16,23 @@ const { data: content } = await useSanityQuery<any>(query)
 const title = computed(() => content.value?.title)
 const subhead = computed(() => content.value?.subhead)
 const subjectCTA = computed(() => content.value?.subjectCTA)
-const pageMetadata = computed(() => content.value?.pageMetadata)
+const metadata = computed(() => content.value?.pageMetadata)
 
 onMounted(() => {
     const body = document.querySelector('body')
     if (body) body.style.height = 'auto'
 })
 
-useHead(() => ({
-    title: useSetPageTitle(pageMetadata)
-}))
+const { pageTitle } = useSetPageTitle(metadata.value?.pageMetadata)
+useHead({
+    title: pageTitle
+})
 </script>
 
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .route-aftermath-stories .stories-subjects-wrapper {
     min-height: 100vh;
 }

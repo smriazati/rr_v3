@@ -68,7 +68,7 @@ function showPagination() {
 }
 
 useHead(() => ({
-    title: useSetPageTitle(pageMetadata)
+    title: 'Talkback'
 }))
 </script>
 

@@ -176,11 +176,11 @@ onMounted(() => {
 }
 
 .scroller-arrow-up {
-    top: 2rem;
+    top: 30vh;
 }
 
 .scroller-arrow-down {
-    bottom: 2rem;
+    bottom: 30vh;
 }
 
 .progress-bar {
@@ -224,6 +224,10 @@ onMounted(() => {
     transition: opacity 0.4s ease, filter 0.4s ease;
 }
 
+.panel :deep(p) {
+    line-height: 1.2;
+}
+
 .panel.active {
     opacity: 1;
     filter: blur(0px);
@@ -246,21 +250,25 @@ onMounted(() => {
 
 .background-image-meta {
     position: fixed;
-    top: 12px;
-    right: 34px;
+    top: 30px;
+    right: 30px;
     text-align: right;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     align-items: flex-end;
-    gap: 0px;
+    gap: 4px;
+    opacity: 0.8;
 }
 
 .background-caption {
-    font-size: 12px;
+    font-size: 14px;
+    letter-spacing: .02px;
+    line-height: 1;
 }
 
 .background-credit {
-    text-transform: uppercase;
     font-size: 10px;
+    line-height: 1;
+    text-transform: uppercase;
 }
 </style>

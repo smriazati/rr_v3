@@ -60,7 +60,7 @@ const nav = computed(() => content.value?.nav)
 const pageMetadata = computed(() => content.value?.pageMetadata)
 
 useHead(() => ({
-  title: useSetPageTitle(pageMetadata)
+  title: 'Talkback'
 }))
 </script>
 

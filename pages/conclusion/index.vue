@@ -1,9 +1,7 @@
 <template>
   <div ref="page" :class="name" class="page">
     <h1 class="visually-hidden">{{ name }}</h1>
-    <div class="scroll-progress-bar-wrapper">
-      <ScrollProgressBar :height="wrapperHeight" />
-    </div>
+
     <ScrollHint />
     <main ref="grid">
       <div ref="pin" class="pin">
@@ -211,9 +209,9 @@ function setContentAnimation() {
 }
 
 // Set page metadata
-useHead(() => ({
-  title: useSetPageTitle(pageMetadata.value)
-}))
+useHead({
+  title: 'Conclusion'
+})
 </script>
 
 <style lang="scss">

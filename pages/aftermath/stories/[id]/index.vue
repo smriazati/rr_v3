@@ -2,10 +2,10 @@
     <div :class="name" class="story-wrapper" ref="story">
         <div class="page-grid">
             <div class="title">
-                <StoryTitle :subjectId="`subject${this.$route.params.id}`" :sectionId="sectionId" />
+                <StoryTitle :subjectId="`subject${id}`" :sectionId="sectionId" />
             </div>
             <div class="story" ref="theStory">
-                <StoriesAftermath :schema="`story4_${this.$route.params.id}`"></StoriesAftermath>
+                <StoriesAftermath :content="content"></StoriesAftermath>
             </div>
             <div class="pagination-row flex-row" v-show="isPaginationVisible">
                 <PaginationHash link="/aftermath/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
@@ -25,32 +25,37 @@ const sectionId = ref('aftermath')
 const isPaginationVisible = ref(true)
 
 const route = useRoute()
-const id = computed(() => route.params.id)
+const id = route.params.id as string
 
-const query = computed(() => groq`
+const query = groq`
 {
   "nav": *[_id == "settings4"]{
     nav
   }[0],
-  "metadata": *[_id == "story4_${id.value}"][0]{
+  "metadata": *[_id == "story4_${id}"][0]{
     pageMetadata
-  }
-}`)
+  },
+  "content": *[_id == "story4_${id}"][0]{ "sections": content.sections }
+}`
 
 const { data: result } = await useSanityQuery<any>(query)
 
 const nav = computed(() => result.value?.nav)
 const metadata = computed(() => result.value?.metadata)
+const content = computed(() => result.value?.content?.sections || [])
 
 // Set page metadata
-useHead(() => ({
-    title: useSetPageTitle(metadata.value?.pageMetadata)
-}))
+const { pageTitle } = useSetPageTitle(metadata.value?.pageMetadata)
+useHead({
+    title: pageTitle
+})
 </script>
 
 
 
 <style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
 .story-wrapper {
     .page-grid {
         background: #E6E6E6;
