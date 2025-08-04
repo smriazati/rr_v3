@@ -6,7 +6,7 @@
                 <TextScrollerNew :blocks="panels" :bgImg="bgImg" @scrolled-to-end="showPagination" />
             </div>
             <div v-if="nav && isPaginationVisible">
-                <Pagination v-if="nav?.next" link="/intro/stories" :message="nav.next" />
+                <Pagination v-if="nav?.next" link="/aftermath/stories" :message="nav.next" />
             </div>
         </div>
     </div>
