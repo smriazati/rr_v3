@@ -49,13 +49,13 @@ useHead(() => ({
   width: 100%;
   grid-template-columns: 40% 60%;
   grid-gap: 30px;
+  padding: 80px 15px;
 
   @media (max-width: 680px) {
     display: flex;
     flex-direction: column;
   }
 
-  padding: 80px 15px;
 
   header {
     display: flex;

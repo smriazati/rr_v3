@@ -1,112 +1,54 @@
 <template>
-    <div class="language-picker-wrapper">
-        <div v-if="showLanguagePicker">
-            <div class="dropdown-wrapper">
-                <div class="dropdown-active">
-                    <div class="wrapper">
-                        <p class="label" @click="toggleDropdown">Select Language</p>
-                        <div class="arrow-down"></div>
-                    </div>
-                </div>
-                <div class="dropdown-options" :class="isExpanded ? 'show' : 'hide'">
-                    <ul class="wrapper">
-                        <li :class="activeLanguage === 'en' ? 'active' : ''">
-                            <button class="flat" @click="setActiveLanguage('en')">
-                                <!-- <span>
-                                    <img src="/images/flag_en.svg" alt="american flag" height="30" />
-                                </span> -->
-                                <span>English</span>
-                            </button>
-                        </li>
-                        <li :class="activeLanguage === 'uk' ? 'active' : ''">
-                            <button class="flat" @click="setActiveLanguage('uk')">
-                                <!-- <span>
-                                    <img src="/images/flag_uk.svg" alt="ukrainian flag" height="30" />
-                                </span> -->
-                                <span>украї́нська</span>
-                            </button>
-                        </li>
-                        <li :class="activeLanguage === 'es' ? 'active' : ''">
-                            <button class="flat" @click="setActiveLanguage('es')">
-                                <!-- <span>
-                                    <img src="/images/flag_uk.svg" alt="spanish flag" height="30" />
-                                </span> -->
-                                <span>Español</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <div v-if="showLanguagePicker" class="language-picker-wrapper">
+      <div class="dropdown-active" @click="toggleDropdown">
+        {{ labelMap[activeLanguage] }} ▾
+      </div>
+      <ul v-show="isExpanded" class="dropdown-options">
+        <li
+          v-for="lang in langs"
+          :key="lang"
+          :class="{ active: lang === activeLanguage }"
+        >
+          <button class="flat" @click="selectLanguage(lang)">
+            {{ labelMap[lang] }}
+          </button>
+        </li>
+      </ul>
     </div>
-</template>
+  </template>
+
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useLocalization } from '../../composables/useLocalization'
+import { ref, computed } from 'vue'
 
-/**
- * LanguagePicker Component
- * 
- * Core Functions:
- * - Displays language selection dropdown in navigation
- * - Fetches language picker visibility from Sanity settings
- * - Handles language switching with route updates
- * - Provides visual feedback for active language
- * 
- * Performance Optimizations:
- * - Uses shallowRef for dropdown state to avoid unnecessary reactivity
- * - Memoized language data to prevent re-fetching
- * - Efficient event handling with proper cleanup
- */
 
-// Props definition with TypeScript
-// interface Props {
-//     string?: string // Optional string prop (legacy support)
-// }
-
-// const props = defineProps<Props>()
-
-// Router for navigation
-const router = useRouter()
-
-// Reactive state with proper typing
+// 1) Dropdown state
 const isExpanded = ref(false)
+const toggleDropdown = () => { isExpanded.value = !isExpanded.value }
 
-// Fetch language picker settings from Sanity
+// 2) Show/hide picker from CMS
 const query = groq`*[_type == "settings"]{ showLanguagePicker }[0]`
-const { data } = await useSanityQuery<any>(query)
-
+const { data } = await useSanityQuery<{ showLanguagePicker: boolean }>(query)
 const showLanguagePicker = computed(() => data.value?.showLanguagePicker ?? true)
 
-// Language configuration (static data - no reactivity needed)
-// const languages = {
-//     en: { name: "English" },
-//     uk: { name: "українська" }
-// } as const
+// 3) Your store-based locale
+const { activeLanguage, setActiveLanguage } = useLocalization()
 
-// Language selection handler with route update
-const setActiveLanguage = (lang: 'en' | 'uk' | 'es') => {
-    toggleDropdown()
-    // Update store and route
-    const { setActiveLanguage: updateLanguage } = useLocalization()
-    updateLanguage(lang)
-    router.push({ query: { lang } })
+// 4) The three codes you support
+const langs = ['en','es','uk'] as const
+
+// 5) Human-friendly labels
+const labelMap: Record<typeof langs[number], string> = {
+  en: 'English',
+  es: 'Español',
+  uk: 'українська'
 }
 
-// Dropdown toggle with proper state management
-const toggleDropdown = () => {
-    isExpanded.value = !isExpanded.value
+// 6) When the user picks one, just update the store—nothing else
+const selectLanguage = (lang: typeof langs[number]) => {
+  setActiveLanguage(lang)
+  isExpanded.value = false
 }
-
-// Get active language from store
-const { activeLanguage } = useLocalization()
-
-// Initialize component
-onMounted(() => {
-    // fetchLanguageSettings() // This line is removed as per the edit hint
-})
 </script>
 
 <style lang="scss">

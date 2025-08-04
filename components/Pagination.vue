@@ -93,13 +93,13 @@ const route = useRoute()
   color: #fff;
   text-align: center;
   background: $gray;
+  transition: 0.3s ease all;
 
   @media (min-width: $collapse-bp) {
     border-radius: 5px;
     background: $forest;
   }
 
-  transition: 0.3s ease all;
 
   .tree-icon {
     position: absolute;
@@ -144,7 +144,10 @@ const route = useRoute()
   a {
     background: $gray;
     transition: 0.3s ease background;
-
+    min-width: 300px;
+    min-height: 10vh;
+    max-height: 15vh;
+    
     @media (max-width: $collapse-bp) {
       background: rgba($forest, 0.8);
     }
@@ -162,9 +165,7 @@ const route = useRoute()
       }
     }
 
-    min-width: 300px;
-    min-height: 10vh;
-    max-height: 15vh;
+  
 
     @media (max-height: 800px) {
       max-height: 300px;
@@ -189,11 +190,12 @@ const route = useRoute()
   }
 
   &.back-btn {
+    right: unset;
+
     @media (min-width: $collapse-bp) {
       left: 30px;
     }
 
-    right: unset;
 
     .tree-icon {
       left: unset;
@@ -206,10 +208,11 @@ const route = useRoute()
     }
 
     @media (max-width: $collapse-bp) {
-      background: darken($forest, 20);
+      background: color-mix($forest 20%, black);
+
 
       a {
-        background: rgba(darken($forest, 20), 0.3);
+        background: rgba(62, 80, 50, 0.3);
       }
 
       .tree-icon {

@@ -176,7 +176,6 @@ useHead({
         }
 
         .wrapper {
-            // background: darken($sage, 10);
 
             &:hover {
                 background: rgba(255, 255, 255, 0.8);

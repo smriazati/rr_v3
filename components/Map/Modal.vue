@@ -93,6 +93,7 @@ onMounted(() => {
   animation: fadeIn 0.3s ease forwards;
   justify-content: center;
   height: calc(100%);
+  width: 100%;
 
   @media (max-width: $collapse-bp) {
     height: 100%;
@@ -103,7 +104,6 @@ onMounted(() => {
     background: rgba(0, 0, 0, 0.8);
   }
 
-  width: 100%;
 
   figcaption p {
     margin-top: 15px;

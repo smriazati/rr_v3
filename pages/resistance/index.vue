@@ -93,6 +93,7 @@ iframe {
   grid-template-columns: 40% 60%;
   grid-gap: 30px;
 
+  padding: 0 15px;
   @media (max-height: 600px) {
     display: flex;
     flex-direction: column;
@@ -103,7 +104,6 @@ iframe {
     }
   }
 
-  padding: 0 15px;
 
   @media (max-width: 680px) {
     margin-top: 60px;

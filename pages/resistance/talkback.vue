@@ -92,15 +92,15 @@ useHead(() => ({
   .grid {
     display: grid;
     height: 100%;
+    width: 100%;
+    min-width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: "h q" "t q";
 
     @media (min-width: $collapse-bp) {
       min-height: 100vh;
     }
 
-    width: 100%;
-    min-width: 100%;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas: "h q" "t q";
 
     >* {
       padding: 30px;

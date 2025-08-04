@@ -102,19 +102,19 @@ onMounted(() => {
   z-index: 111;
   background: #31572A;
   height: 100%;
+  padding: 70px 20px;
+
+  display: flex;
+  flex-direction: column;
 
   @media (max-width: $collapse-bp) {
     width: 100%;
   }
 
-  padding: 70px 20px;
 
   @media (min-width: $collapse-bp) {
     padding-top: 90px;
   }
-
-  display: flex;
-  flex-direction: column;
 
   &.collapsed {
     transform: translateX(-100vw);
@@ -129,13 +129,13 @@ onMounted(() => {
   .nav-links {
     li {
       padding: 15px;
-
+      background: #31572A;
+      transition: 0.3s ease all;
+      
       @media (max-height: 500px) {
         padding: 5px 15px;
       }
 
-      background: #31572A;
-      transition: 0.3s ease all;
 
       &:hover,
       &.active {

@@ -318,6 +318,8 @@ useHead({
     justify-content: center;
     align-items: center;
 
+    width: 100%;
+    overflow: hidden;
     @media (min-width: $collapse-bp) {
       height: calc(100vh);
     }
@@ -326,8 +328,6 @@ useHead({
       height: 100vh;
     }
 
-    width: 100%;
-    overflow: hidden;
 
     @media (max-width: $collapse-bp) {
       padding-top: 60px;

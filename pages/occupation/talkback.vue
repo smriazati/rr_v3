@@ -76,6 +76,15 @@ useHead(() => ({
 @use '~/assets/sass/imports/imports.scss' as *;
 
 .occupation-talkback {
+    width: 100%;
+    min-width: 100vw;
+    height: 100%;
+    min-height: 100vh;
+    // background: #35452b73;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
     h1,
     p,
@@ -84,11 +93,7 @@ useHead(() => ({
         justify-content: center;
     }
 
-    width: 100%;
-    min-width: 100vw;
-    height: 100%;
-    min-height: 100vh;
-
+   
     @media (min-width: $collapse-bp) {
         padding: 100px 0;
     }
@@ -97,11 +102,6 @@ useHead(() => ({
         padding-top: 60px;
     }
 
-    // background: #35452b73;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
 
     h1 {
         margin-bottom: 15px;
@@ -109,15 +109,16 @@ useHead(() => ({
 }
 
 .terms-list {
-    @media (max-width: $collapse-bp) {
-        margin-bottom: 30px;
-    }
-
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     @include siteContainerBig();
     margin-top: 30px;
+
+    @media (max-width: $collapse-bp) {
+        margin-bottom: 30px;
+    }
+
 
 
     >* {

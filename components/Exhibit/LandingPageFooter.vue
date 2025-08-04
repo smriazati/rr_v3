@@ -81,7 +81,7 @@ ul {
 }
 
 /* Use deep selector so styles apply inside child components */
-.logo-wrapper ::v-deep ul {
+.logo-wrapper :deep(ul) {
     display: flex;
 
     >*:not(:last-child) {
@@ -89,7 +89,7 @@ ul {
     }
 }
 
-.logo-wrapper ::v-deep img {
+.logo-wrapper :deep(img) {
     max-height: 50px;
 }
 

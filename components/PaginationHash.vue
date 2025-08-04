@@ -95,25 +95,26 @@ const activeLanguage = computed(() => localizationStore.activeLanguage)
     overflow: hidden;
     position: fixed;
     z-index: 130;
-
-    @media (min-width: $collapse-bp) {
-        border-radius: 5px;
-    }
-
-    animation: slideIn 0.8s ease-in forwards;
+   animation: slideIn 0.8s ease-in forwards;
     bottom: 100px;
 
     right: 30px;
     color: #fff;
     text-align: center;
+    transition: 0.3s ease all;
 
     background: $gray;
+    
+    @media (min-width: $collapse-bp) {
+        border-radius: 5px;
+    }
+
+ 
 
     @media (min-width: $collapse-bp) {
         background: $forest;
     }
 
-    transition: 0.3s ease all;
 
     .tree-icon {
         position: absolute;
@@ -159,6 +160,9 @@ const activeLanguage = computed(() => localizationStore.activeLanguage)
         background: $gray;
         transition: 0.3s ease background;
 
+        min-width: 300px;
+        min-height: 10vh;
+        max-height: 15vh;
         @media (max-width: $collapse-bp) {
             background: rgba($forest, 0.8);
         }
@@ -176,9 +180,6 @@ const activeLanguage = computed(() => localizationStore.activeLanguage)
             }
         }
 
-        min-width: 300px;
-        min-height: 10vh;
-        max-height: 15vh;
 
         @media (max-height: 800px) {
             max-height: 300px;
@@ -203,11 +204,12 @@ const activeLanguage = computed(() => localizationStore.activeLanguage)
     }
 
     &.back-btn {
+        right: unset;
+
         @media (min-width: $collapse-bp) {
             left: 30px;
         }
 
-        right: unset;
 
         .tree-icon {
             left: unset;
@@ -220,10 +222,10 @@ const activeLanguage = computed(() => localizationStore.activeLanguage)
         }
 
         @media (max-width: $collapse-bp) {
-            background: darken($forest, 20);
+            background: color-mix($forest 20%, black);
 
             a {
-                background: rgba(darken($forest, 20), 0.3);
+                background: rgba(62, 80, 50, 0.3);
             }
 
             .tree-icon {
