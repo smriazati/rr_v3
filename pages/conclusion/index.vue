@@ -320,6 +320,7 @@ useHead({
 
     width: 100%;
     overflow: hidden;
+
     @media (min-width: $collapse-bp) {
       height: calc(100vh);
     }

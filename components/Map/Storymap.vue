@@ -15,8 +15,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-// TUCHYN: 50.711008, 26.573502
-
 // Props
 interface Props {
   animActive?: boolean
@@ -26,52 +24,25 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Component refs
-const panToButton = ref<HTMLButtonElement>()
-const onReturnButton = ref<HTMLButtonElement>()
-const map = ref<HTMLElement>()
+// Local state
+const tuchyn = { lat: '50.711008', lng: '26.573502' }
+const nc = { lat: '35.7596', lng: '-79.0193' }
 
-// Component state
-const tuchyn = ref({
-  lat: "50.711008",
-  lng: "26.573502",
-})
+// Template refs
+const panToButton = ref<HTMLButtonElement | null>(null)
+const onReturnButton = ref<HTMLButtonElement | null>(null)
+const map = ref<HTMLDivElement | null>(null)
 
-const nc = ref({
-  lat: "35.7596",
-  lng: "-79.0193",
-})
+// Access Nuxt-provided $maps (via useNuxtApp)
+const { $maps } = useNuxtApp()
 
-// Lifecycle
 onMounted(() => {
-  // set map start location
-
-  // animate
   if (!props.visitedOnce) {
-    const { $maps } = useNuxtApp()
-    $maps.showMap(
-      map.value,
-      nc.value.lat,
-      nc.value.lng,
-      props.markers,
-      "tuchyn"
-    )
-    // if (props.animActive) {
-    // //   setTimeout(() => {
-    // //     // panToButton.value?.click();
-    // //   }, 2500);
-    // }
+    // Initial animation
+    $maps.showMap(map.value, nc.lat, nc.lng, props.markers, 'tuchyn')
   } else {
-    // don't animate
-    const { $maps } = useNuxtApp()
-    $maps.showMap(
-      map.value,
-      tuchyn.value.lat,
-      tuchyn.value.lng,
-      props.markers,
-      "tuchyn"
-    )
-    // onReturnButton.value?.click();
+    // No animation
+    $maps.showMap(map.value, tuchyn.lat, tuchyn.lng, props.markers, 'tuchyn')
   }
 })
 </script>

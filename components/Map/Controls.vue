@@ -1,535 +1,257 @@
 <template>
-  <div class="map-controls" :class="controlsClass">
-    <div class="controls-container">
-      <!-- Zoom Controls -->
-      <div class="control-group zoom-controls">
-        <button class="control-button zoom-in" @click="zoomIn" :disabled="!canZoomIn" :aria-label="zoomInLabel">
-          <Icon name="plus" />
-        </button>
-        <button class="control-button zoom-out" @click="zoomOut" :disabled="!canZoomOut" :aria-label="zoomOutLabel">
-          <Icon name="minus" />
-        </button>
-      </div>
+  <div class="map-controls-wrapper">
+    <!-- Map Options -->
+    <nav class="map-options map-box" v-if="content">
+      <h3 class="visually-hidden">
+        <LocalizationString :string="content.optionsTitle" />
+      </h3>
+      <ul>
+        <li class="hover-cursor" @click="emit('show-intro')">
+          <span class="icon">
+            <img class="icon icon-instructions icon-light" src="/icons/instructions.svg" alt="view instructions icon" />
+          </span>
+          <LocalizationString :string="content.instructionsLabel" />
+        </li>
+        <li class="hover-cursor" id="recenterMap">
+          <span class="icon">
+            <img class="icon icon-recenter icon-light" src="/icons/recenter.svg" alt="recenter the map icon" />
+          </span>
+          <LocalizationString :string="content.recenterLabel" />
+        </li>
+      </ul>
+    </nav>
 
-      <!-- Navigation Controls -->
-      <div class="control-group nav-controls">
-        <button class="control-button recenter" @click="recenterMap" :aria-label="recenterLabel">
-          <Icon name="recenter" />
-        </button>
-        <button class="control-button fullscreen" @click="toggleFullscreen" :aria-label="fullscreenLabel">
-          <Icon name="fullscreen" />
-        </button>
-      </div>
-
-      <!-- Layer Controls -->
-      <div v-if="layers.length > 0" class="control-group layer-controls">
-        <div class="layer-selector">
-          <label class="layer-label">
-            <String :string="layerLabel" />
-          </label>
-          <select v-model="selectedLayer" @change="onLayerChange" class="layer-select">
-            <option v-for="layer in layers" :key="layer.id" :value="layer.id">
-              <String :string="layer.name" />
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Marker List Toggle -->
-      <div v-if="hasMarkers" class="control-group marker-controls">
-        <button class="control-button marker-toggle" @click="toggleMarkerList" :class="{ 'active': isMarkerListOpen }"
-          :aria-label="markerListLabel">
-          <Icon name="list" />
-          <span class="marker-count">{{ markerCount }}</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Marker List Panel -->
-    <div v-if="hasMarkers && isMarkerListOpen" class="marker-list-panel">
-      <div class="marker-list-header">
-        <h3 class="marker-list-title">
-          <String :string="markerListTitle" />
-        </h3>
-        <button class="close-button" @click="closeMarkerList" :aria-label="closeLabel">
-          <Icon name="close" />
-        </button>
-      </div>
-      <div class="marker-list-content">
-        <slot name="marker-list">
-          <ul class="marker-list">
-            <li v-for="marker in visibleMarkers" :key="marker.id" class="marker-item"
-              :class="{ 'active': marker.id === activeMarkerId }">
-              <button class="marker-button" @click="selectMarker(marker.id)">
-                <span class="marker-title">
-                  <String :string="marker.title" />
-                </span>
-                <span v-if="marker.description" class="marker-description">
-                  <String :string="marker.description" />
-                </span>
-              </button>
-            </li>
-          </ul>
-        </slot>
-      </div>
-    </div>
+    <!-- Marker List -->
+    <nav class="map-marker-list map-box">
+      <h3 v-if="content">
+        <LocalizationString :string="content?.markersTitle" />
+      </h3>
+      <ul v-if="markersSorted.length">
+        <MapControlsMarkerListItem v-for="(item, index) in markersSorted" :key="index" :item="item" :index="index" />
+      </ul>
+    </nav>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useLocalization } from '../../composables/useLocalization'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
 
-/**
- * Map Controls Component
- * 
- * Core Functions:
- * - Provides zoom, navigation, and layer controls for maps
- * - Handles marker list display and interaction
- * - Manages map state and user interactions
- * - Supports fullscreen and responsive design
- * 
- * Performance Optimizations:
- * - Efficient state management
- * - Optimized marker list rendering
- * - Debounced control interactions
- */
-
-// Props definition with TypeScript
-interface Marker {
-  id: string
-  title: {
-    en?: string
-    uk?: string
-    es?: string
-    he?: string
-  }
-  description?: {
-    en?: string
-    uk?: string
-    es?: string
-    he?: string
-  }
-  position: {
-    lat: number
-    lng: number
-  }
-  visible?: boolean
-}
-
-interface Layer {
-  id: string
-  name: {
-    en?: string
-    uk?: string
-    es?: string
-    he?: string
-  }
-  visible?: boolean
-}
-
-interface Props {
-  zoom?: number
-  minZoom?: number
-  maxZoom?: number
-  center?: {
-    lat: number
-    lng: number
-  }
-  markers?: Marker[]
-  layers?: Layer[]
-  selectedLayerId?: string
-  activeMarkerId?: string
-  isFullscreen?: boolean
-  className?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  zoom: 10,
-  minZoom: 1,
-  maxZoom: 18,
-  center: () => ({ lat: 0, lng: 0 }),
-  markers: () => [],
-  layers: () => [],
-  selectedLayerId: '',
-  activeMarkerId: '',
-  isFullscreen: false,
-  className: ''
-})
-
-// Emits definition
-const emit = defineEmits<{
-  'zoom-in': []
-  'zoom-out': []
-  'recenter': []
-  'fullscreen-toggle': [value: boolean]
-  'layer-change': [layerId: string]
-  'marker-select': [markerId: string]
-  'marker-list-toggle': [isOpen: boolean]
-}>()
-
-// Reactive state
-const isMarkerListOpen = ref(false)
-const selectedLayer = ref(props.selectedLayerId)
-
-// Get active language
-const { activeLanguage } = useLocalization()
-
-// Computed properties
-const controlsClass = computed(() => {
-  const classes = ['map-controls']
-
-  if (props.className) {
-    classes.push(props.className)
-  }
-
-  if (props.isFullscreen) {
-    classes.push('fullscreen')
-  }
-
-  if (isMarkerListOpen.value) {
-    classes.push('marker-list-open')
-  }
-
-  return classes.join(' ')
-})
-
-const canZoomIn = computed(() => {
-  return props.zoom < props.maxZoom
-})
-
-const canZoomOut = computed(() => {
-  return props.zoom > props.minZoom
-})
-
-const hasMarkers = computed(() => {
-  return props.markers.length > 0
-})
-
-const markerCount = computed(() => {
-  return props.markers.length
-})
-
-const visibleMarkers = computed(() => {
-  return props.markers.filter(marker => marker.visible !== false)
-})
-
-// Localized labels
-const zoomInLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Zoom in',
-    uk: 'Збільшити',
-    es: 'Acercar',
-    he: 'התקרב'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const zoomOutLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Zoom out',
-    uk: 'Зменшити',
-    es: 'Alejar',
-    he: 'התרחק'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const recenterLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Recenter map',
-    uk: 'Центрувати карту',
-    es: 'Centrar mapa',
-    he: 'מרכז מפה'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const fullscreenLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Toggle fullscreen',
-    uk: 'Повноекранний режим',
-    es: 'Pantalla completa',
-    he: 'מסך מלא'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const markerListLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Show markers',
-    uk: 'Показати маркери',
-    es: 'Mostrar marcadores',
-    he: 'הצג סמנים'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const closeLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Close',
-    uk: 'Закрити',
-    es: 'Cerrar',
-    he: 'סגור'
-  }
-  return labels[activeLanguage.value] || labels.en
-})
-
-const layerLabel = computed(() => ({
-  en: 'Layer',
-  uk: 'Шар',
-  es: 'Capa',
-  he: 'שכבה'
-}))
-
-const markerListTitle = computed(() => ({
-  en: 'Markers',
-  uk: 'Маркери',
-  es: 'Marcadores',
-  he: 'סמנים'
-}))
-
-// Event handlers
-const zoomIn = () => {
-  if (canZoomIn.value) {
-    emit('zoom-in')
+// Sanity query
+const query = groq`
+{
+  "content" : *[_type == "settings2"][0],
+  "markers" : {
+    "marker1": *[_id == "marker1"][0]{ "title": content.title },
+    "marker2": *[_id == "marker2"][0]{ "title": content.title },
+    "marker3": *[_id == "marker3"][0]{ "title": content.title },
+    "marker4": *[_id == "marker4"][0]{ "title": content.title },
+    "marker5": *[_id == "marker5"][0]{ "title": content.title },
+    "marker6": *[_id == "marker6"][0]{ "title": content.title }
   }
 }
+`
 
-const zoomOut = () => {
-  if (canZoomOut.value) {
-    emit('zoom-out')
+// Props
+const props = defineProps({
+  markersData: {
+    type: Array,
+    default: () => []
   }
-}
-
-const recenterMap = () => {
-  emit('recenter')
-}
-
-const toggleFullscreen = () => {
-  emit('fullscreen-toggle', !props.isFullscreen)
-}
-
-const onLayerChange = () => {
-  emit('layer-change', selectedLayer.value)
-}
-
-const toggleMarkerList = () => {
-  isMarkerListOpen.value = !isMarkerListOpen.value
-  emit('marker-list-toggle', isMarkerListOpen.value)
-}
-
-const closeMarkerList = () => {
-  isMarkerListOpen.value = false
-  emit('marker-list-toggle', false)
-}
-
-const selectMarker = (markerId: string) => {
-  emit('marker-select', markerId)
-}
-
-// Watch for prop changes
-watch(() => props.selectedLayerId, (newValue) => {
-  selectedLayer.value = newValue
 })
+
+// Emits
+const emit = defineEmits(['show-intro', 'show-timeline'])
+
+const isExpanded = ref(false)
+
+const orderedKeys = ["marker1", "marker2", "marker3", "marker4", "marker5", "marker6"]
+
+
+// Use Nuxt 3 Sanity composable to fetch data
+const { data } = useSanityQuery(query)
+
+const content = computed(() => data?.value?.content)
+const markers = computed(() => data?.value?.markers)
+
+// SSR-safe computed property
+const markersSorted = computed(() => {
+  if (!data.value || !markers.value) return []
+  const markerVals = markers.value
+  if (!markerVals) return []
+  return orderedKeys.map(k => markerVals[k]).filter(Boolean)
+})
+
+function toggleMenu() {
+  isExpanded.value = !isExpanded.value
+}
+function showIntro() {
+  emit('show-intro')
+}
+function showTimeline() {
+  emit('show-timeline')
+}
 </script>
 
-<style lang="scss" scoped>
-.map-controls {
+
+
+<style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
+.map-marker-list {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
+  top: 90px;
+  left: 20px;
 
-  .controls-container {
+  @media (max-height: 550px) {
+    overflow: scroll;
+    height: 100vh;
+  }
+}
+
+.map-controls-wrapper .map-options {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 70px;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.map-controls-wrapper {
+  top: 0;
+  // padding: 80px 0px 40px 0;
+
+  h3 {
+    font-size: 18px;
+    letter-spacing: 0.03em;
+    background: black;
+    padding: 10px 20px;
+  }
+
+  .map-options ul {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+  }
 
-      .control-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
+  .map-marker-list ul {
+    background: #4d643f;
+    margin-bottom: 15px;
+    padding: 15px 20px;
 
-        &:hover:not(:disabled) {
-          background: #f8f9fa;
-          border-color: #007bff;
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        &.active {
-          background: #007bff;
-          color: white;
-          border-color: #007bff;
-        }
-
-        .marker-count {
-          position: absolute;
-          top: -5px;
-          right: -5px;
-          background: #dc3545;
-          color: white;
-          font-size: 10px;
-          padding: 2px 6px;
-          border-radius: 10px;
-          min-width: 16px;
-          text-align: center;
-        }
-      }
-    }
-
-    .layer-selector {
-      .layer-label {
-        display: block;
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 5px;
-      }
-
-      .layer-select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 14px;
-        background: white;
-
-        &:focus {
-          outline: none;
-          border-color: #007bff;
-        }
-      }
+    li {
+      font-size: 18px;
+      line-height: 22px;
     }
   }
 
-  .marker-list-panel {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 300px;
-    max-height: 400px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    margin-top: 10px;
+  .map-options ul li {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 5px 10px;
 
-    .marker-list-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      border-bottom: 1px solid #e0e0e0;
-
-      .marker-list-title {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      .close-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 5px;
-
-        &:hover {
-          opacity: 0.7;
-        }
-      }
-    }
-
-    .marker-list-content {
-      max-height: 300px;
-      overflow-y: auto;
-
-      .marker-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-
-        .marker-item {
-          border-bottom: 1px solid #f0f0f0;
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          &.active {
-            background: #f8f9fa;
-          }
-
-          .marker-button {
-            width: 100%;
-            text-align: left;
-            padding: 12px 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-
-            &:hover {
-              background: #f8f9fa;
-            }
-
-            .marker-title {
-              display: block;
-              font-weight: 500;
-              margin-bottom: 4px;
-            }
-
-            .marker-description {
-              display: block;
-              font-size: 12px;
-              color: #666;
-            }
-          }
-        }
-      }
+    img {
+      width: 25px;
+      height: 25px;
+      margin-right: 10px;
     }
   }
 
-  // Fullscreen mode
-  &.fullscreen {
-    top: 30px;
-    right: 30px;
+  .map-marker-list ul li>span {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .icon {
+      flex: 0 0 35px;
+      margin-right: 10px;
+    }
+  }
+}
+
+$marker-color-0: #54a131;
+$marker-color-1: #70a131;
+$marker-color-2: #8ca131;
+$marker-color-3: #a19a31;
+$marker-color-4: #a17e31;
+$marker-color-5: #a16231;
+
+.map-marker-list {
+  #marker-0 {
+    .icon {
+      background-color: $marker-color-0;
+    }
   }
 
-  // Responsive design
-  @media (max-width: 768px) {
-    top: 10px;
-    right: 10px;
+  #marker-1 {
+    .icon {
+      background-color: $marker-color-1;
+    }
+  }
 
-    .controls-container {
-      padding: 8px;
+  #marker-2 {
+    .icon {
+      background-color: $marker-color-2;
+    }
+  }
 
-      .control-group .control-button {
-        width: 36px;
-        height: 36px;
+  #marker-3 {
+    .icon {
+      background-color: $marker-color-3;
+    }
+  }
+
+  #marker-4 {
+    .icon {
+      background-color: $marker-color-4;
+    }
+  }
+
+  #marker-5 {
+    .icon {
+      background-color: $marker-color-5;
+    }
+  }
+
+  li>* {
+    .icon {
+      width: 35px;
+      height: 35px;
+      transition: 0.3s ease all;
+      -webkit-mask-image: url("./icons/pin.svg");
+      mask-image: url("./icons/pin.svg");
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      mask-position: center center;
+    }
+
+    &:not(.viewed-marker):hover {
+      .icon {
+        background-color: white;
       }
     }
 
-    .marker-list-panel {
-      width: 280px;
-      right: -10px;
+    &.viewed-marker {
+      .icon {
+        background-color: $gray !important;
+      }
+
+      span span {
+        text-decoration: line-through;
+        color: $gray;
+      }
     }
   }
 }

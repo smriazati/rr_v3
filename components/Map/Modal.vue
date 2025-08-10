@@ -1,16 +1,16 @@
 <template>
   <div ref="wrapper" class="modal-wrapper" tabindex="0" @keydown.esc="closeModal">
-    <div class="flat close-button" @click="closeModal()">
+    <div class="flat close-button" @click="closeModal">
       <p class="visually-hidden">Close</p>
       <div class="icon icon-close"></div>
     </div>
     <div class="story-container">
       <div class="stories-modal">
-        <MapModalsS :activeStoryId="activeStoryId"></MapModalsS>
+        <MapModalsS :activeStoryId="activeStoryId" />
       </div>
-      <button class="inline-close-button bright centered" @click="closeModal()">
+      <button class="inline-close-button bright centered" @click="closeModal">
         <span v-if="modalCloseBtnText">
-          <LocalizationString :string="modalCloseBtnText"></LocalizationString>
+          <LocalizationString :string="modalCloseBtnText" />
         </span>
         <SystemIcon type="arrow" color="light" :width="25" />
       </button>
@@ -18,67 +18,57 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted } from 'vue'
-import groq from 'groq'
-
-const schema = "settings2"
-const query = groq`*[_type == "${schema}"]{
-  backBtnText
-}[0]`
 
 // Props
-interface Props {
-  activeStoryId: number
-}
-
-const props = defineProps<Props>()
+defineProps({
+  activeStoryId: {
+    type: Number,
+    required: true
+  }
+})
 
 // Emits
-const emit = defineEmits<{
-  'close-modal': []
-}>()
+const emit = defineEmits(['close-modal'])
 
-const { data: content } = await useSanityQuery<any>(query)
+// Constants and refs
+const query = groq`*[_type == "settings2"]{ backBtnText }[0]`
 
-// Component state
-const wrapper = ref<HTMLElement>()
-const isCollapsed = ref(false)
+const { data: content } = await useSanityQuery(query)
 
-// Computed properties
+const wrapper = ref(null)
+
+onMounted(async () => {
+  if (wrapper.value) {
+    wrapper.value.focus()
+  }
+
+  initLightbox()
+})
+
+// Computed for modalCloseBtnText
 const modalCloseBtnText = computed(() => {
   if (!content.value) return
-  if (!content.value.backBtnText) {
-    return
-  }
+  if (!content.value.backBtnText) return
   return content.value.backBtnText
 })
 
 // Methods
-const closeModal = () => {
-  emit("close-modal")
+function closeModal() {
+  emit('close-modal')
 }
 
-const initLightbox = () => {
-  const boxes = document.querySelectorAll("figure:not(.no-lb)")
-  if (!boxes) {
-    return
-  }
-  boxes.forEach((box) => {
-    box.classList.add("hover-cursor")
-    box.addEventListener("click", () => {
-      box.classList.toggle("lightbox-expanded")
+function initLightbox() {
+  const boxes = document.querySelectorAll('figure:not(.no-lb)')
+  if (!boxes) return
+  boxes.forEach(box => {
+    box.classList.add('hover-cursor')
+    box.addEventListener('click', () => {
+      box.classList.toggle('lightbox-expanded')
     })
   })
 }
-
-// Lifecycle
-onMounted(() => {
-  if (wrapper.value) {
-    wrapper.value.focus()
-  }
-  initLightbox()
-})
 </script>
 
 <style lang="scss">
@@ -93,6 +83,8 @@ onMounted(() => {
   animation: fadeIn 0.3s ease forwards;
   justify-content: center;
   height: calc(100%);
+  width: 100%;
+
   width: 100%;
 
   @media (max-width: $collapse-bp) {
@@ -130,14 +122,17 @@ onMounted(() => {
 
 .modal-wrapper {
   color: white;
+
   border: 0;
   outline: 0;
+
   height: 100%;
   overflow-y: scroll;
 
   &:not(.transparent) {
     background: black;
   }
+
 
   &:not(.full-width) {
     width: 1280px;
@@ -170,6 +165,10 @@ onMounted(() => {
 }
 
 .stories-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
   main.content>.row.title {
     padding: 0 0 0 0;
   }
@@ -181,6 +180,14 @@ onMounted(() => {
   main.content>.row blockquote {
     max-width: 40ch;
     @include pBigStyle();
+  }
+}
+
+.inline-close-button {
+  display: flex;
+
+  >span:first-child {
+    padding-right: 0;
   }
 }
 </style>

@@ -1,4 +1,4 @@
-@use '../imports/imports.scss'as *;
+@use '../imports/imports.scss' as *;
 
 .icon {
   display: flex;
@@ -21,8 +21,8 @@
 }
 
 .icon-close {
-  -webkit-mask-image: url("./assets/icons/close.svg");
-  mask-image: url("./assets/icons/close.svg");
+  -webkit-mask-image: url("/icons/close.svg");
+  mask-image: url("/icons/close.svg");
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: contain;

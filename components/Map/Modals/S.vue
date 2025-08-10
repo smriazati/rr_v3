@@ -27,7 +27,6 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import groq from 'groq'
 
 // Props
 interface Props {
@@ -35,8 +34,9 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-const query = computed(() => groq`*[_id == "marker${props.activeStoryId + 1}"][0]`)
-const { data: content } = useSanityQuery<any>(query)
+const query = `*[_id == "marker${props.activeStoryId + 1}"][0]`
+const { data } = await useSanityQuery(query)
+const content = computed(() => data.value?.content)
 </script>
 <style lang="scss">
 .storymap-modal-content .title h1 {

@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import groq from 'groq'
 
 const name = ref('introduction')
 const wrapper = ref<HTMLElement | null>(null)
@@ -28,6 +27,7 @@ interface SanityContent {
 
 const query = groq`*[_type == "landing1"][0]`
 const { data: content } = await useSanityQuery<SanityContent>(query)
+
 const panels = computed(() => content.value?.panels)
 const nav = computed(() => content.value?.nav)
 const bgImg = computed(() => content.value?.bgImg)

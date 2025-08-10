@@ -52,6 +52,7 @@ const route = useRoute()
 
 <style scoped lang="scss">
 @use '~/assets/sass/imports/imports.scss' as *;
+@use "sass:color";
 
 @keyframes slideIn {
   from {
@@ -147,7 +148,7 @@ const route = useRoute()
     min-width: 300px;
     min-height: 10vh;
     max-height: 15vh;
-    
+
     @media (max-width: $collapse-bp) {
       background: rgba($forest, 0.8);
     }
@@ -165,7 +166,7 @@ const route = useRoute()
       }
     }
 
-  
+
 
     @media (max-height: 800px) {
       max-height: 300px;
@@ -208,11 +209,12 @@ const route = useRoute()
     }
 
     @media (max-width: $collapse-bp) {
-      background: color-mix($forest 20%, black);
+      background: color.adjust($forest, $lightness: -20%);
 
 
       a {
-        background: rgba(62, 80, 50, 0.3);
+        background: color.change(color.adjust($forest, $lightness: -20%),
+            $alpha: 0.3);
       }
 
       .tree-icon {
