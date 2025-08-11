@@ -183,4 +183,8 @@ useHead({
         }
     }
 }
+
+.story-wrapper .page-grid .story main.content>.row .vimeo-component {
+    flex: 0 0 300px;
+}
 </style>

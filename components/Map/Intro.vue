@@ -263,4 +263,9 @@ function closeModal() {
     }
   }
 }
+
+.story-map-intro .button-wrapper {
+  display: flex;
+  justify-content: center;
+}
 </style>

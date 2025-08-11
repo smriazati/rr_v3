@@ -1,352 +1,210 @@
 <template>
-  <div class="vimeo-component" :class="componentClass">
-    <div class="vimeo-container">
-      <div v-if="!isPlaying" class="vimeo-preview" @click="playVideo">
-        <img v-if="thumbnailUrl" :src="thumbnailUrl" :alt="videoTitle || ''" class="preview-image" />
-        <div class="play-overlay">
-          <button class="play-button" :aria-label="playLabel">
-            <Icon name="play" />
-          </button>
-        </div>
-        <div v-if="showCaption" class="video-caption">
-          <div class="caption-content">
-            <h3 v-if="videoTitle" class="video-title">
-              <String :string="videoTitle" />
-            </h3>
-            <div v-if="videoDescription" class="video-description">
-              <Rte :rte="videoDescription" />
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="video-component-container">
+    <button class="pauseBtn" @click="togglePlayback">
+      <span v-if="isPlaying">
+        <LocalizationString :string="labels?.pause" />
+      </span>
+      <span v-else>
+        <LocalizationString :string="labels?.play" />
+      </span>
+    </button>
 
-      <div v-else class="vimeo-player">
-        <iframe :src="embedUrl" :title="videoTitle || 'Video player'" class="vimeo-iframe" frameborder="0"
-          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen @load="onPlayerLoad"></iframe>
-      </div>
+    <div :id="vidId" class="vimeo-component" :class="{ playing: isPlaying }" @click="playVid">
+      <ClientOnly>
+        <div class="iframe-wrapper" v-if="vidId" ref="vidWrapper">
+          <vueVimeoPlayer ref="vid" :key="vidId" :video-id="vidId" :options="options" @ready="onVidReady"
+            @loaded="onVidLoaded" @playing="onVidPlaying" @pause="onVidPaused" @timeupdate="onVidTimeUpdate"
+            @ended="onVidEnded" />
+        </div>
+      </ClientOnly>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
+import { vueVimeoPlayer } from 'vue-vimeo-player'
+const vimeoEl = ref(null)
 
-/**
- * Vimeo Component
- * 
- * Core Functions:
- * - Displays Vimeo videos with custom controls
- * - Handles video playback and state management
- * - Provides thumbnail preview and play overlay
- * - Supports localized video content
- * 
- * Performance Optimizations:
- * - Lazy loading for video embeds
- * - Efficient thumbnail handling
- * - Optimized player initialization
- */
-
-// Props definition with TypeScript
-interface Props {
-  videoId?: string
-  videoUrl?: string
-  videoTitle?: {
-    en?: string
-    uk?: string
-    es?: string
-    he?: string
-  }
-  videoDescription?: {
-    en?: any[]
-    uk?: any[]
-    es?: any[]
-    he?: any[]
-  }
-  thumbnailUrl?: string
-  autoplay?: boolean
-  showCaption?: boolean
-  size?: 'small' | 'medium' | 'large' | 'full'
-  aspectRatio?: '16:9' | '4:3' | '1:1'
-  className?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  autoplay: false,
-  showCaption: true,
-  size: 'medium',
-  aspectRatio: '16:9',
-  className: ''
-})
-
-// Emits definition
-const emit = defineEmits<{
-  'play': [videoId: string]
-  'pause': [videoId: string]
-  'end': [videoId: string]
-  'load': [videoId: string]
+// Props
+const props = defineProps<{
+  vidId: string
 }>()
 
-// Reactive state
-const isPlaying = ref(props.autoplay)
-const isLoaded = ref(false)
+// Emits
+const emit = defineEmits<{
+  (e: 'on-vid-playing', payload: any): void
+  (e: 'on-vid-pausing', payload: any): void
+  (e: 'on-vid-ended'): void
+  (e: 'on-vid-time-update', payload: number): void
+}>()
 
-// Computed properties
-const componentClass = computed(() => {
-  const classes = ['vimeo-component']
+// State
+const labels = ref<{ pause: string; play: string } | null>(null)
+const options = {
+  controls: true,
+  loop: false,
+  autoplay: false,
+  muted: false,
+  portrait: false,
+  title: false,
+  byline: false,
+}
+const isPlaying = ref(false)
 
-  if (props.className) {
-    classes.push(props.className)
-  }
 
-  if (props.size) {
-    classes.push(`size-${props.size}`)
-  }
+const vidWrapper = ref<HTMLElement | null>(null)
+const vid = ref<any>(null) // ref to vueVimeoPlayer component instance
 
-  if (props.aspectRatio) {
-    classes.push(`aspect-${props.aspectRatio.replace(':', '-')}`)
-  }
+// Fetch labels from sanity (client-only)
+const query = groq`*[_type == "settings"]{
+  "pause": vidPlaybackLabels.pause,
+  "play": vidPlaybackLabels.play
+}[0]`
 
+const { data } = await useSanityQuery<{ pause: string; play: string }>(query)
+labels.value = data.value || null
+
+
+function togglePlayback() {
   if (isPlaying.value) {
-    classes.push('playing')
-  }
-
-  return classes.join(' ')
-})
-
-const videoId = computed(() => {
-  if (props.videoId) {
-    return props.videoId
-  }
-
-  if (props.videoUrl) {
-    const match = props.videoUrl.match(/vimeo\.com\/(\d+)/)
-    return match ? match[1] : null
-  }
-
-  return null
-})
-
-const embedUrl = computed(() => {
-  if (!videoId.value) return null
-
-  const baseUrl = `https://player.vimeo.com/video/${videoId.value}`
-  const params = new URLSearchParams({
-    h: 'auto',
-    autoplay: isPlaying.value ? '1' : '0',
-    title: '0',
-    byline: '0',
-    portrait: '0',
-    controls: '1'
-  })
-
-  return `${baseUrl}?${params.toString()}`
-})
-
-// Localized labels
-const playLabel = computed(() => {
-  const labels: Record<string, string> = {
-    en: 'Play video',
-    uk: 'Відтворити відео',
-    es: 'Reproducir video',
-    he: 'הפעל וידאו'
-  }
-  return labels[useLocalization().activeLanguage.value] || labels.en
-})
-
-// Event handlers
-const playVideo = () => {
-  if (videoId.value) {
-    isPlaying.value = true
-    emit('play', videoId.value)
+    pauseVid()
+  } else {
+    playVid()
   }
 }
 
-const onPlayerLoad = () => {
-  isLoaded.value = true
-  if (videoId.value) {
-    emit('load', videoId.value)
-  }
+function playVid() {
+  if (!vid.value?.player) return
+  isPlaying.value = true
+  emit('on-vid-playing', true)
+  vid.value.player.play()
+  pauseOtherVids()
 }
 
-// Handle keyboard events
-const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && isPlaying.value) {
-    isPlaying.value = false
-    if (videoId.value) {
-      emit('pause', videoId.value)
+function pauseVid() {
+  if (!vid.value?.player) return
+  isPlaying.value = false
+  emit('on-vid-pausing', false)
+  vid.value.player.pause()
+}
+
+function pauseOtherVids() {
+  const refEl = vid.value?.$el
+  if (!refEl) return
+
+  const id = refEl.id
+  const container = refEl.closest('div.story')
+  if (!container) return
+
+  const otherVids = container.querySelectorAll(
+    `[id^='vimeo-player']:not([id='${id}'])`
+  )
+
+  otherVids.forEach((el) => {
+    const component = el.closest('.vimeo-component')
+    const otherIsPlaying = component?.classList.contains('playing')
+    if (otherIsPlaying) {
+      const pauseBtn = component?.parentElement?.querySelector(
+        '.pauseBtn'
+      ) as HTMLButtonElement | null
+      if (pauseBtn) pauseBtn.click()
     }
-  }
+  })
 }
 
-// Initialize component
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
+// Vimeo player event handlers (emit same events as before)
+function onVidLoaded(id: any) {
 
-// Cleanup
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-})
+}
+
+function onVidReady() {
+
+}
+
+function onVidPlaying(event: any) {
+  if (!isPlaying.value) {
+    isPlaying.value = true
+  }
+  emit('on-vid-playing', event.duration)
+}
+
+function onVidPaused() {
+  if (isPlaying.value) {
+    isPlaying.value = false
+  }
+  emit('on-vid-pausing', false)
+}
+
+function onVidEnded() {
+  if (isPlaying.value) {
+    isPlaying.value = false
+  }
+  emit('on-vid-ended')
+}
+
+function onVidTimeUpdate(event: any) {
+  emit('on-vid-time-update', event.seconds)
+}
 </script>
 
-<style lang="scss" scoped>
-.vimeo-component {
+<style lang="scss">
+@use '~/assets/sass/imports/imports.scss' as *;
+
+.iframe-wrapper>div {
+  overflow: hidden;
+  padding-top: 56.25%;
+  position: relative;
   width: 100%;
-  margin: 20px 0;
+}
 
-  .vimeo-container {
-    position: relative;
-    width: 100%;
-    background: #000;
-    border-radius: 8px;
-    overflow: hidden;
+.vimeo-component .vimeo-component {
+  position: relative;
+}
 
-    .vimeo-preview {
-      position: relative;
-      cursor: pointer;
+.video-component-container {
+  display: flex;
+  flex-direction: column-reverse;
+}
 
-      .preview-image {
-        width: 100%;
-        height: auto;
-        display: block;
-        transition: opacity 0.3s ease;
-      }
+.vimeo-component {
+  button {
+    display: none !important;
+  }
 
-      .play-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
+  .pauseBtn {
+    z-index: 100;
+    margin: 0;
+    border-radius: 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    padding: 3px 0;
 
-        &:hover {
-          background: rgba(0, 0, 0, 0.5);
-        }
-
-        .play-button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 80px;
-          height: 80px;
-          background: rgba(255, 255, 255, 0.9);
-          border: none;
-          border-radius: 50%;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 32px;
-          color: #333;
-
-          &:hover {
-            background: white;
-            transform: scale(1.1);
-          }
-        }
-      }
-
-      .video-caption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-        color: white;
-        padding: 20px;
-
-        .caption-content {
-          .video-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-
-            @media (max-width: 768px) {
-              font-size: 16px;
-            }
-          }
-
-          .video-description {
-            font-size: 14px;
-            line-height: 1.4;
-            opacity: 0.9;
-
-            @media (max-width: 768px) {
-              font-size: 13px;
-            }
-          }
-        }
-      }
-    }
-
-    .vimeo-player {
-      position: relative;
-      width: 100%;
-
-      .vimeo-iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-      }
+    span {
+      padding: 3px 0;
     }
   }
 
-  // Size variants
-  &.size-small {
-    max-width: 400px;
-    margin: 20px auto;
+  flex: 1;
+
+  .caption {
+    margin-top: 8px;
   }
 
-  &.size-medium {
-    max-width: 600px;
-    margin: 20px auto;
+  @media (min-width: $collapse-bp) {
+    border-radius: 6px;
   }
 
-  &.size-large {
-    max-width: 800px;
-    margin: 20px auto;
+  .iframe-wrapper {
+    box-shadow: 0px 0px 1000px rgb(216 216 216 / 14%);
   }
 
-  &.size-full {
-    // Full width - no max-width
-  }
-
-  // Aspect ratio variants
-  &.aspect-16-9 .vimeo-container {
-    padding-bottom: 56.25%; // 16:9 aspect ratio
-  }
-
-  &.aspect-4-3 .vimeo-container {
-    padding-bottom: 75%; // 4:3 aspect ratio
-  }
-
-  &.aspect-1-1 .vimeo-container {
-    padding-bottom: 100%; // 1:1 aspect ratio
-  }
-
-  // Responsive design
-  @media (max-width: 768px) {
-    margin: 15px 0;
-
-    .vimeo-container {
-      .vimeo-preview {
-        .play-overlay .play-button {
-          width: 60px;
-          height: 60px;
-          font-size: 24px;
-        }
-
-        .video-caption {
-          padding: 15px;
-        }
-      }
-    }
+  iframe {
+    max-width: 1280px;
+    max-height: 100vh;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 </style>

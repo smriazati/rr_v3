@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="content-text row">
         <div class="col" v-if="content">
             <h2 v-if="content.title">
                 <LocalizationString :string="content.title"></LocalizationString>
@@ -24,6 +24,10 @@ const props = defineProps<{
     display: flex;
     justify-content: center;
     margin-top: 15px;
+}
+
+.content-text .col {
+    max-width: 0 0 50ch;
 }
 
 .content-text {

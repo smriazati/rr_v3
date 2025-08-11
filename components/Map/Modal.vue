@@ -8,7 +8,7 @@
       <div class="stories-modal">
         <MapModalsS :activeStoryId="activeStoryId" />
       </div>
-      <button class="inline-close-button bright centered" @click="closeModal">
+      <button class="inline-close-button bright centered" @click="closeModal" style="display:flex;">
         <span v-if="modalCloseBtnText">
           <LocalizationString :string="modalCloseBtnText" />
         </span>
@@ -73,6 +73,20 @@ function initLightbox() {
 
 <style lang="scss">
 @use '~/assets/sass/imports/imports.scss' as *;
+
+.inline-close-button {
+  display: flex;
+
+  >span:first-child {
+    padding-right: 0;
+  }
+}
+
+.story-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .modal-container {
   display: flex;
@@ -180,14 +194,6 @@ function initLightbox() {
   main.content>.row blockquote {
     max-width: 40ch;
     @include pBigStyle();
-  }
-}
-
-.inline-close-button {
-  display: flex;
-
-  >span:first-child {
-    padding-right: 0;
   }
 }
 </style>

@@ -25,6 +25,10 @@ const props = defineProps<{
 
 
 <style lang="scss" scoped>
+blockquote {
+    font-style: italic;
+}
+
 figcaption {
     display: flex;
     justify-content: center;

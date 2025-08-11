@@ -248,8 +248,8 @@ figcaption,
 
 .lightbox-expanded {
   &:before {
-    -webkit-mask-image: url("./assets/icons/close.svg");
-    mask-image: url("./assets/icons/close.svg");
+    -webkit-mask-image: url("/icons/close.svg");
+    mask-image: url("/icons/close.svg");
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;

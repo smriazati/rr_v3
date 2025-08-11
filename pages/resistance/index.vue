@@ -19,8 +19,7 @@
       <div class="row">
         <div class="video-wrapper vimeo-component">
           <ClientOnly>
-            <vueVimeoPlayer video-id="650434994" @playing="onVidPlaying" @ended="onVidEnded"
-              @timeupdate="onVidTimeUpdate" />
+            <vueVimeoPlayer video-id="650434994" @ended="onVidEnded" @timeupdate="onVidTimeUpdate" />
           </ClientOnly>
         </div>
 
@@ -42,9 +41,7 @@ const name = 'resistance'
 const vimeoEl = ref(null)
 const isPaginationVisible = ref(false)
 const isFilmEnded = ref(false)
-const timeToShowPagination = ref(undefined)
-const timeBeforeEnd = 10
-
+const timeToShowPagination = ref(0.974) // percent 
 
 const { data } = await useSanityQuery(`*[_type == "intro3"][0]`)
 const { pageMetadata, title, subtext, instructions, nav } = data.value || {}
@@ -54,20 +51,19 @@ function showPagination() {
   isPaginationVisible.value = true
 }
 
-function onVidPlaying(duration) {
-  if (!timeToShowPagination.value) {
-    timeToShowPagination.value = duration - timeBeforeEnd.value;
-  }
-}
-
-function onVidTimeUpdate(seconds) {
-  if (seconds < timeToShowPagination.value) { return }
+function onVidTimeUpdate(time) {
+  // {seconds: 340.908, percent: 0.918, duration: 371.438}
+  if (isPaginationVisible.value) { return }
+  const percent = time.percent
+  if (percent < timeToShowPagination.value) { return }
   showPagination();
 }
 
 function onVidEnded() {
   isFilmEnded.value = true;
-  showPagination();
+  if (!isPaginationVisible.value) {
+    showPagination();
+  }
 }
 
 useHead(() => ({
@@ -94,6 +90,7 @@ iframe {
   grid-gap: 30px;
 
   padding: 0 15px;
+
   @media (max-height: 600px) {
     display: flex;
     flex-direction: column;
