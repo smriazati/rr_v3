@@ -18,9 +18,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const store = useNuxtApp().$store as any
-const activeLanguage = computed(() => store?.state?.localization?.activeLanguage || 'en')
-
+const { activeLanguage } = useLocalization()
 const src = computed(() => {
     return props.img?.img || null
 })

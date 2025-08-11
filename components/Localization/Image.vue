@@ -20,9 +20,8 @@ const props = defineProps<{
     img: any
     height: any
 }>()
-// Get store and active language (using any for now to avoid type issues)
-const store = useNuxtApp().$store as any
-const activeLanguage = computed(() => store?.state?.localization?.activeLanguage || 'en')
+
+const { activeLanguage } = useLocalization()
 
 // Computed properties for image data with fallbacks
 const imgSrc = computed(() => {

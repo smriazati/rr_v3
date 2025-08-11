@@ -15,22 +15,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useLocalization } from '../../composables/useLocalization'
 
-/**
- * ImageZoomer Component
- * 
- * Core Functions:
- * - Displays images with click-to-zoom functionality
- * - Handles localized image content from Sanity
- * - Provides full-screen zoom overlay
- * - Supports keyboard navigation (ESC to close)
- * 
- * Performance Optimizations:
- * - Lazy loading for full-size images
- * - Efficient event handling with proper cleanup
- * - Optimized image sizing for different zoom levels
- */
 
 // Props definition with TypeScript
 interface Props {

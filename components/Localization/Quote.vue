@@ -34,9 +34,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // Get store and active language (using any for now to avoid type issues)
-const store = useNuxtApp().$store as any
-const activeLanguage = computed(() => store?.state?.localization?.activeLanguage || 'en')
-
+const { activeLanguage } = useLocalization()
 // Computed property for active string with fallback
 const activeString = computed(() => {
     if (!activeLanguage.value) return ''

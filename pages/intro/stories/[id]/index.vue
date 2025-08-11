@@ -4,7 +4,7 @@
       <StoriesIntro :subjectId="`subject${id}`" sectionId="intro" :content="content" />
     </div>
     <div class="pagination-row flex-row">
-      <PaginationHash link="/intro/stories" hash="stories" :message="nav?.nav?.prev" :back="true" />
+      <Pagination link="/intro/stories" :message="nav?.nav?.prev" :back="true" />
       <Pagination link="/occupation" :message="nav?.nav?.next" />
     </div>
   </div>

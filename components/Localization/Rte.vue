@@ -15,20 +15,6 @@
 import { computed } from 'vue'
 import type { LocalizedContent } from '../../types/sanity'
 
-/**
- * LocalizationRte Component
- * 
- * Core Functions:
- * - Displays localized rich text content from Sanity
- * - Provides fallback to English if translation is missing
- * - Handles undefined/null localized objects gracefully
- * - Renders Sanity Portable Text blocks
- * 
- * Performance Optimizations:
- * - Computed property for efficient language switching
- * - Minimal reactivity for optimal performance
- */
-
 // Props with TypeScript typing
 interface Props {
     content?: LocalizedContent
@@ -37,9 +23,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // Get store and active language (using any for now to avoid type issues)
-const store = useNuxtApp().$store as any
-const activeLanguage = computed(() => store?.state?.localization?.activeLanguage || 'en')
-
+const { activeLanguage } = useLocalization()
 // Computed property for active content with fallback
 const activeString = computed(() => {
     if (!activeLanguage.value) return null

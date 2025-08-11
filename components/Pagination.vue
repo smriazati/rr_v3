@@ -43,6 +43,7 @@ const { data: labels } = useSanityQuery<any>(query)
 const backLabel = computed(() => labels.value?.prev)
 const nextLabel = computed(() => labels.value?.next)
 
+// console.log('Back label raw:', labels.value?.prev);
 
 
 

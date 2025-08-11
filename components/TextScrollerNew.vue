@@ -36,7 +36,10 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import type { LocalizedString } from '~/types/sanity';
 const { $urlFor } = useNuxtApp()
-gsap.registerPlugin(ScrollTrigger)
+
+
+
+
 
 const emit = defineEmits<{
     (e: 'scrolled-to-end'): void

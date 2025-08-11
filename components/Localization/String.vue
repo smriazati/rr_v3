@@ -13,20 +13,7 @@
 import { computed } from 'vue'
 import type { LocalizedString } from '../../types/sanity'
 
-/**
- * LocalizationString Component
- * 
- * Core Functions:
- * - Displays localized text based on current language
- * - Provides fallback to English if translation is missing
- * - Handles undefined/null localized objects gracefully
- * 
- * Performance Optimizations:
- * - Computed property for efficient language switching
- * - Minimal reactivity for optimal performance
- */
 
-// Props with TypeScript typing
 interface Props {
     string?: LocalizedString
     align?: 'center' | 'start' | 'end'
@@ -38,6 +25,7 @@ const props = defineProps<Props>()
 const localizationStore = useLocalizationStore()
 const activeLanguage = computed(() => localizationStore.activeLanguage)
 
+
 // Computed property for active string with fallback
 const activeString = computed(() => {
     if (!activeLanguage.value) return ''
@@ -48,6 +36,7 @@ const activeString = computed(() => {
 
 const container = ref(null);
 onMounted(() => {
+
 
     if (props.align === 'center') {
         container.value.style.justifyContent = 'center'
