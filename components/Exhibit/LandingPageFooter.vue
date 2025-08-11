@@ -14,7 +14,6 @@ interface FooterData {
 
 const query = groq`*[_type == "intro0"]{ logos, warning }[0]`
 const { data } = useSanityQuery<FooterData>(query)
-console.log(data)
 </script>
 <template>
     <footer ref="warning">

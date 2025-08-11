@@ -50,7 +50,6 @@ const props = defineProps<{
     bgImg: any
 }>()
 
-console.log('props', props)
 const { activeLanguage } = useLocalization();
 const currentLocale = computed(() => activeLanguage.value)
 

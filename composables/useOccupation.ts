@@ -21,22 +21,18 @@ export const useOccupation = () => {
     }
 
     const setPanAnimComplete = () => {
-        console.log('setPanAnimComplete')
         occupationStore.setPanAnimComplete()
     }
 
     const resetPanAnimComplete = () => {
-        console.log('resetPanAnimComplete')
         occupationStore.resetPanAnimComplete()
     }
 
     const setFirstVisit = () => {
-        console.log('setFirstVisit')
         occupationStore.setFirstVisit()
     }
 
     const setFlyoverComplete = () => {
-        console.log('setFlyoverComplete')
         occupationStore.setFlyoverComplete()
     }
 

@@ -12,7 +12,6 @@ export const useOccupationStore = defineStore('occupation', {
         setActiveStory(payload: number) {
             this.activeStory = payload
             if (!this.viewedStories.includes(payload)) {
-                console.log('adding viewed story', payload)
                 this.viewedStories.push(payload)
             }
         },

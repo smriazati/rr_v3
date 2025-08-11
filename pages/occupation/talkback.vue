@@ -93,7 +93,7 @@ useHead(() => ({
         justify-content: center;
     }
 
-   
+
     @media (min-width: $collapse-bp) {
         padding: 100px 0;
     }
@@ -112,8 +112,8 @@ useHead(() => ({
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    @include siteContainerBig();
     margin-top: 30px;
+    @include siteContainerBig();
 
     @media (max-width: $collapse-bp) {
         margin-bottom: 30px;

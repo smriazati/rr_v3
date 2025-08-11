@@ -37,7 +37,6 @@ const props = defineProps<{
 
 const contentRef = ref<HTMLElement | null>(null)
 
-console.log('content', props.content)
 // Animation function
 function setAnim() {
   const sections = contentRef.value.querySelectorAll<HTMLElement>('.section')

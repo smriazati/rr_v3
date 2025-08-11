@@ -103,10 +103,8 @@ watch(activeStoryId, (newValue) => {
 })
 
 watch(viewedStories, (newValue) => {
-    console.log('viewedStories', viewedStories)
     if (!newValue) return
     if (newValue.length === markersData.value.length) {
-        console.log('viewed all the stoires!')
         viewedAllStories.value = true
         occupationStore.setFirstVisit()
     }
@@ -119,7 +117,6 @@ watch(isModalVisible, (newValue) => {
 })
 
 watch(panAnimComplete, (newValue) => {
-    console.log('watch panAnim complete newValue: ', newValue)
     if (newValue) {
         occupationStore.setFlyoverComplete()
         showMapControls()
@@ -141,39 +138,31 @@ const resetActiveStory = () => {
 }
 
 const closeIntro = () => {
-    console.log('closeIntro')
     isIntroVisible.value = false
 
     // if visited once, click return button. if visited first, click pan to button
     if (visitedOnce.value || areMapControlsActive.value) {
         const showMap = storymap.value?.$refs?.onReturnButton
-        console.log('clicking shopw map button', showMap)
         showMap?.click()
     } else {
         const panToMap = storymap.value?.$refs?.panToButton
-        console.log('clicking pan to map button', panToMap)
         panToMap?.click()
     }
 }
 
 const showIntro = () => {
-    console.log('showIntro')
     isIntroVisible.value = true
-    console.log('showIntro isIntroVisible', isIntroVisible.value)
 }
 
 const showMapControls = () => {
-    console.log('showMapControls')
     areMapControlsActive.value = true
 }
 
 // Lifecycle
 onMounted(() => {
-    console.log('on mounted isIntroVisible', isIntroVisible.value)
     if (visitedOnce.value) {
         areMapControlsActive.value = true
     }
-    console.log('smounted  ')
     showIntro()
 })
 
