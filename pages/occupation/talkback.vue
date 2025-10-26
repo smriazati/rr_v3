@@ -151,7 +151,7 @@ useHead(() => ({
 
         h2 {
             font-size: 42px;
-            transition: 0.5s ease-out all;
+            transition: 0.5s ease-out font-size;
         }
 
         &:hover {
