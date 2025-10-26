@@ -139,6 +139,7 @@ useHead(() => ({
 
     .term-wrapper {
         background: $white;
+        transition: .3s ease background;
         color: $gray;
         padding: 3rem;
         text-align: center;
@@ -151,13 +152,10 @@ useHead(() => ({
 
         h2 {
             font-size: 42px;
-            transition: 0.5s ease-out font-size;
         }
 
         &:hover {
-            h2 {
-                font-size: 50px;
-            }
+            background: #e2e2e2;
         }
     }
 
