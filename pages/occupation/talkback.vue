@@ -139,7 +139,8 @@ useHead(() => ({
 
     .term-wrapper {
         background: $white;
-        transition: .3s ease background;
+        transition: .3s ease all;
+        transform: scale(1.0);
         color: $gray;
         padding: 3rem;
         text-align: center;
@@ -156,6 +157,7 @@ useHead(() => ({
 
         &:hover {
             background: #e2e2e2;
+            transform: scale(1.1);
         }
     }
 
